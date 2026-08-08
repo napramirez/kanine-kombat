@@ -36,3 +36,7 @@ MANIFEST
 # 5. OS-specific system files
 .DS_Store
 Thumbs.db
+
+# 6. Serena local state
+.serena/cache/
+.serena/project.local.yml

@@ -473,6 +473,210 @@
 
   #fight-btn:hover { background: #e74c3c; }
 
+  #battle-plan-stepper {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 4, 18, 0.95);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 60;
+    padding: 102px 36px 28px;
+    text-align: center;
+  }
+
+  #battle-plan-stepper h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    text-shadow: 3px 3px #000;
+    margin-bottom: 14px;
+  }
+
+  #battle-plan-summary {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.9;
+    text-shadow: 2px 2px #000;
+    min-height: 52px;
+  }
+
+  #battle-plan-route {
+    position: relative;
+    width: 920px;
+    height: 250px;
+    margin: 140px 0 18px;
+  }
+
+  #battle-plan-route-line {
+    position: absolute;
+    left: 80px;
+    right: 80px;
+    top: 105px;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #5b2c6f, #1f6aa5, #c0392b);
+    box-shadow: 0 0 18px rgba(116, 185, 255, 0.25);
+  }
+
+  #battle-plan-route-steps {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100%;
+  }
+
+  .battle-plan-step {
+    width: 132px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .battle-plan-badge {
+    min-width: 56px;
+    padding: 6px 8px;
+    border: 2px solid #666;
+    background: #191919;
+    color: #aaa;
+    font-size: 8px;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+  }
+
+  .battle-plan-step.completed .battle-plan-badge {
+    color: #2ecc71;
+    border-color: #2ecc71;
+  }
+
+  .battle-plan-step.next .battle-plan-badge {
+    color: #f1c40f;
+    border-color: #f1c40f;
+    box-shadow: 0 0 12px rgba(241, 196, 15, 0.45);
+  }
+
+  .battle-plan-step.locked .battle-plan-badge {
+    color: #777;
+    border-color: #444;
+  }
+
+  .battle-plan-step-portrait {
+    width: 110px;
+    height: 118px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #444;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.completed .battle-plan-step-portrait {
+    border-color: #2ecc71;
+    box-shadow: 0 0 16px rgba(46, 204, 113, 0.25), inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.next .battle-plan-step-portrait {
+    border-color: #f1c40f;
+    box-shadow: 0 0 18px rgba(241, 196, 15, 0.4), inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.locked .battle-plan-step-portrait {
+    opacity: 0.65;
+  }
+
+  .battle-plan-step-portrait canvas {
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(1.3);
+    transform-origin: center 72%;
+    margin-bottom: -2px;
+  }
+
+  .battle-plan-step-name {
+    color: #fff;
+    font-size: 8px;
+    line-height: 1.5;
+    text-shadow: 2px 2px #000;
+    min-height: 24px;
+  }
+
+  .battle-plan-step-note {
+    color: #999;
+    font-size: 7px;
+    line-height: 1.5;
+    min-height: 20px;
+  }
+
+  #battle-plan-player-token {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 66px;
+    height: 66px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: left 0.85s cubic-bezier(0.22, 1, 0.36, 1), top 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  #battle-plan-player-token::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid #ff6b6b;
+    filter: drop-shadow(0 2px 0 #000);
+  }
+
+  .battle-plan-player-card {
+    position: relative;
+    background: linear-gradient(180deg, #3d1515 0%, #2a0f0f 100%);
+    border: 3px solid #ff6b6b;
+    box-shadow: 0 0 18px rgba(255, 107, 107, 0.45);
+    width: 66px;
+    height: 66px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .battle-plan-player-card canvas {
+    display: block;
+    margin: -12px 0 -6px;
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(0.62);
+    transform-origin: center 72%;
+  }
+
+  #battle-plan-prompt {
+    min-height: 18px;
+    color: #74b9ff;
+    font-size: 10px;
+    text-shadow: 2px 2px #000;
+  }
+
+  #battle-plan-prompt.ready {
+    color: #fff;
+    animation: pulse 1.2s infinite;
+  }
+
   #special-bars {
     display: flex;
     justify-content: space-between;
@@ -645,6 +849,16 @@
     </div>
     <button id="fight-btn">FIGHT!</button>
   </div>
+  <div id="battle-plan-stepper">
+    <h1>BATTLE PLAN</h1>
+    <div id="battle-plan-summary"></div>
+    <div id="battle-plan-route">
+      <div id="battle-plan-route-line"></div>
+      <div id="battle-plan-route-steps"></div>
+      <div id="battle-plan-player-token"></div>
+    </div>
+    <div id="battle-plan-prompt"></div>
+  </div>
 </div>
 
 <script>
@@ -655,6 +869,7 @@ const W = canvas.width, H = canvas.height;
 const GAME_STATES = {
   MENU: 'menu',
   CHAR_SELECT: 'charSelect',
+  BATTLE_PLAN_STEPPER: 'battlePlanStepper',
   COUNTDOWN: 'countdown',
   FIGHT: 'fight',
   ROUND_END: 'roundEnd',
@@ -779,6 +994,12 @@ const GROUND = H - PHYSICS.groundOffset;
 const ui = {
   startScreen: document.getElementById('start-screen'),
   charSelect: document.getElementById('char-select'),
+  battlePlanStepper: document.getElementById('battle-plan-stepper'),
+  battlePlanSummary: document.getElementById('battle-plan-summary'),
+  battlePlanRoute: document.getElementById('battle-plan-route'),
+  battlePlanRouteSteps: document.getElementById('battle-plan-route-steps'),
+  battlePlanPlayerToken: document.getElementById('battle-plan-player-token'),
+  battlePlanPrompt: document.getElementById('battle-plan-prompt'),
   startButton: document.getElementById('start-btn'),
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
@@ -929,7 +1150,7 @@ function syncMusicMode() {
 
   stopTrack(titleTrack, true);
 
-  if (game.state === GAME_STATES.CHAR_SELECT) {
+  if (game.state === GAME_STATES.CHAR_SELECT || game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     syncCharSelectTrackVolume();
     stopTrack(fightTrack, true);
     if (charSelectTrack.paused) playTrack(charSelectTrack);
@@ -3180,7 +3401,9 @@ let game = {
     currentIndex: 0,
     playerCharacterId: '',
     pendingAdvance: false,
-    cleared: false
+    cleared: false,
+    stepperFromIndex: -1,
+    stepperReady: false
   },
   timer: ROUND_RULES.timerSeconds,
   timerInterval: null,
@@ -3306,6 +3529,9 @@ function resetBattlePlanState() {
   game.battlePlan.playerCharacterId = '';
   game.battlePlan.pendingAdvance = false;
   game.battlePlan.cleared = false;
+  game.battlePlan.stepperFromIndex = -1;
+  game.battlePlan.stepperReady = false;
+  hideBattlePlanStepper();
 }
 
 function buildBattlePlanRoute(playerCharacterId) {
@@ -3347,24 +3573,166 @@ function loadBattlePlanMatch() {
   updateRoundDots();
 }
 
+function buildBattlePlanStepPortrait(char, container) {
+  container.innerHTML = '';
+  container.appendChild(cloneCanvas(renderCharPreview(char)));
+}
+
+function getBattlePlanStepMeta(char, index) {
+  if (index === game.battlePlan.route.length - 1) {
+    return { badge: 'FINAL', note: 'CATNIP showdown' };
+  }
+
+  if (char.id === game.battlePlan.playerCharacterId) {
+    return { badge: 'MIRROR', note: 'Face yourself' };
+  }
+
+  return { badge: `MATCH ${index + 1}`, note: 'CPU opponent' };
+}
+
+function buildBattlePlanStepper() {
+  const playerChar = getCharacterById(game.battlePlan.playerCharacterId);
+  const nextOpponent = getBattlePlanCurrentOpponent();
+  const clearedCount = game.battlePlan.currentIndex;
+
+  ui.battlePlanRouteSteps.innerHTML = '';
+  ui.battlePlanPlayerToken.innerHTML = '';
+
+  game.battlePlan.route.forEach((id, index) => {
+    const char = getCharacterById(id);
+    const meta = getBattlePlanStepMeta(char, index);
+    const step = document.createElement('div');
+    let cls = 'battle-plan-step';
+    if (index < game.battlePlan.currentIndex) cls += ' completed';
+    else if (index === game.battlePlan.currentIndex) cls += ' next';
+    else cls += ' locked';
+    step.className = cls;
+    step.dataset.stepIndex = index;
+
+    const badge = document.createElement('div');
+    badge.className = 'battle-plan-badge';
+    badge.textContent = meta.badge;
+
+    const portrait = document.createElement('div');
+    portrait.className = 'battle-plan-step-portrait';
+    buildBattlePlanStepPortrait(char, portrait);
+
+    const name = document.createElement('div');
+    name.className = 'battle-plan-step-name';
+    name.textContent = char.name;
+
+    const note = document.createElement('div');
+    note.className = 'battle-plan-step-note';
+    note.textContent = index < game.battlePlan.currentIndex ? 'CLEARED' : meta.note;
+
+    step.appendChild(badge);
+    step.appendChild(portrait);
+    step.appendChild(name);
+    step.appendChild(note);
+    ui.battlePlanRouteSteps.appendChild(step);
+  });
+
+  const playerCard = document.createElement('div');
+  playerCard.className = 'battle-plan-player-card';
+  buildBattlePlanStepPortrait(playerChar, playerCard);
+  ui.battlePlanPlayerToken.appendChild(playerCard);
+
+  ui.battlePlanSummary.innerHTML = clearedCount === 0
+    ? `Plan locked in.<br>First opponent: ${nextOpponent.name}`
+    : `Match ${clearedCount} cleared.<br>Next opponent: ${nextOpponent.name}`;
+
+  ui.battlePlanPrompt.textContent = 'Scanning route...';
+  ui.battlePlanPrompt.classList.remove('ready');
+}
+
+function getBattlePlanTokenPosition(index) {
+  const steps = ui.battlePlanRouteSteps.querySelectorAll('.battle-plan-step');
+  if (!steps.length) return { left: 0, top: 0 };
+
+  const routeRect = ui.battlePlanRoute.getBoundingClientRect();
+  const firstRect = steps[0].getBoundingClientRect();
+  const sampleRect = steps[Math.min(1, steps.length - 1)].getBoundingClientRect();
+  const gap = steps.length > 1 ? sampleRect.left - firstRect.left : 140;
+
+  let rect = firstRect;
+  let left = rect.left - routeRect.left + rect.width / 2;
+  if (index < 0) {
+    left -= gap * 0.7;
+  } else {
+    rect = steps[index].getBoundingClientRect();
+    left = rect.left - routeRect.left + rect.width / 2;
+  }
+
+  return {
+    left,
+    top: firstRect.top - routeRect.top - 96
+  };
+}
+
+function setBattlePlanTokenPosition(index, animate) {
+  const pos = getBattlePlanTokenPosition(index);
+  ui.battlePlanPlayerToken.style.transition = animate
+    ? 'left 0.85s cubic-bezier(0.22, 1, 0.36, 1), top 0.85s cubic-bezier(0.22, 1, 0.36, 1)'
+    : 'none';
+  ui.battlePlanPlayerToken.style.left = `${pos.left}px`;
+  ui.battlePlanPlayerToken.style.top = `${pos.top}px`;
+}
+
+function hideBattlePlanStepper() {
+  ui.battlePlanStepper.style.display = 'none';
+  ui.battlePlanPrompt.classList.remove('ready');
+}
+
+function showBattlePlanStepper(fromIndex, toIndex) {
+  game.state = GAME_STATES.BATTLE_PLAN_STEPPER;
+  game.battlePlan.stepperFromIndex = fromIndex;
+  game.battlePlan.stepperReady = false;
+  buildBattlePlanStepper();
+  ui.battlePlanStepper.style.display = 'flex';
+  syncMusicMode();
+
+  requestAnimationFrame(() => {
+    setBattlePlanTokenPosition(fromIndex, false);
+    ui.battlePlanPlayerToken.offsetWidth;
+
+    requestAnimationFrame(() => {
+      setBattlePlanTokenPosition(toIndex, true);
+      window.setTimeout(() => {
+        game.battlePlan.stepperReady = true;
+        ui.battlePlanPrompt.textContent = 'Press SPACE to start the next match';
+        ui.battlePlanPrompt.classList.add('ready');
+      }, 900);
+    });
+  });
+}
+
 function queueNextBattlePlanMatch() {
   game.battlePlan.currentIndex++;
   game.battlePlan.pendingAdvance = true;
+  game.battlePlan.stepperFromIndex = game.battlePlan.currentIndex - 1;
   game.round = 1;
   p1.roundsWon = 0;
   p2.roundsWon = 0;
   updateRoundDots();
-
-  const nextOpponent = getBattlePlanCurrentOpponent();
-  game.roundMessage = `NEXT TARGET\n${nextOpponent.name}`;
-  game.roundMessageTimer = 180;
-  game.state = GAME_STATES.ROUND_END;
 }
 
 function advanceBattlePlanMatch() {
   game.battlePlan.pendingAdvance = false;
+  hideBattlePlanStepper();
   loadBattlePlanMatch();
   startRound();
+}
+
+function proceedBattlePlanStepper() {
+  if (game.state !== GAME_STATES.BATTLE_PLAN_STEPPER || !game.battlePlan.stepperReady) return;
+
+  playUiSound('confirm');
+  if (game.battlePlan.pendingAdvance) {
+    advanceBattlePlanMatch();
+  } else {
+    hideBattlePlanStepper();
+    startRound();
+  }
 }
 
 function resetInputState(keys) {
@@ -3582,6 +3950,12 @@ function confirmSelection() {
 
   ui.charSelect.style.display = 'none';
   playUiSound('confirm');
+  if (isBattlePlanMode()) {
+    showBattlePlanStepper(-1, game.battlePlan.currentIndex);
+    startGameLoop();
+    return;
+  }
+
   startRound();
   startGameLoop();
 }
@@ -3709,9 +4083,10 @@ function endRound() {
     winner.roundsWon++;
     updateRoundDots();
     const flawless = winner.health >= ROUND_RULES.flawlessHealth;
-    if (isBattlePlanMode() && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1) {
+    const battlePlanMatchComplete = isBattlePlanMode() && winner.roundsWon >= ROUND_RULES.winsToFinish;
+    if (battlePlanMatchComplete && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1) {
       game.roundMessage = 'BATTLE PLAN\nCLEARED!';
-    } else if (isBattlePlanMode() && winner === p2) {
+    } else if (battlePlanMatchComplete && winner === p2) {
       game.roundMessage = 'BATTLE PLAN\nFAILED';
     } else {
       game.roundMessage = flawless ? `${winner.name}\nFLAWLESS VICTORY!` : `${winner.name} WINS!`;
@@ -3820,6 +4195,7 @@ function openCharacterSelect(resetRounds = false) {
 
   ui.startScreen.style.display = 'none';
   ui.charSelect.style.display = 'flex';
+  hideBattlePlanStepper();
   game.state = GAME_STATES.CHAR_SELECT;
   syncMusicMode();
   p1Confirmed = false;
@@ -3840,6 +4216,8 @@ ui.startScreen.addEventListener('pointerdown', () => {
 
 // Input handling
 document.addEventListener('keydown', e => {
+  if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
+
   const k = e.key.toLowerCase();
   if (k === 'a') keys1.left = true;
   if (k === 'd') keys1.right = true;
@@ -3863,6 +4241,8 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
+  if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
+
   const k = e.key.toLowerCase();
   if (k === 'a') keys1.left = false;
   if (k === 'd') keys1.right = false;
@@ -3950,7 +4330,7 @@ function gameLoop() {
 
     if (game.roundMessageTimer <= 0 && game.state === GAME_STATES.ROUND_END) {
       if (isBattlePlanMode() && game.battlePlan.pendingAdvance) {
-        advanceBattlePlanMatch();
+        showBattlePlanStepper(game.battlePlan.stepperFromIndex, game.battlePlan.currentIndex);
       } else {
         startRound();
       }
@@ -4054,6 +4434,11 @@ ui.battlePlanButton.addEventListener('click', () => {
 
 // Restart - go back to character select
 document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
+    ensureAudioReady();
+    proceedBattlePlanStepper();
+  }
+
   if (e.code === 'Space' && game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
     ensureAudioReady();
     openCharacterSelect(true);

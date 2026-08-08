@@ -45,7 +45,7 @@ To enable round music, place a loopable music file at `src/assets/fight-bgm.mp3`
 ## File Structure
 
 ```
-k9-kombat/
+kanine-kombat/
 ├── src/
 │   ├── index.html      # Complete game (single file)
 │   └── assets/         # Optional music assets

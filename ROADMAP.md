@@ -63,15 +63,15 @@
 
 ## Version History
 
+**v0.3.7** - Harpoon Stun Update
+- SKORPDOG harpoon now applies a 1-second `STUNNED` state on hit
+- Stunned opponents cannot move, attack, or use specials
+
 **v0.3.6** - Battle Plan Update
 - Added `BATTLE PLAN` mode on the title screen
 - Battle Plan chains CPU matches using the player's selected fighter
 - The second-to-last match is a mirror match
 - CATNIP is always the final opponent
-
-**v0.3.7** - Harpoon Stun Update
-- SKORPDOG harpoon now applies a 1-second `STUNNED` state on hit
-- Stunned opponents cannot move, attack, or use specials
 
 **v0.3.5** - CPU Battle Update
 - Added `VS CPU` mode on the title screen

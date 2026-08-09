@@ -801,6 +801,14 @@
     top: 60px; left: 0; right: 0;
   }
 
+  #passive-bars {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: absolute;
+    top: 94px; left: 0; right: 0;
+  }
+
   .special-container {
     width: 28%;
     height: 12px;
@@ -812,6 +820,8 @@
   .special-bar { height: 100%; width: 0%; transition: width 0.2s; }
   #p1-special { background: linear-gradient(90deg, #f39c12, #e74c3c); float: right; }
   #p2-special { background: linear-gradient(90deg, #2980b9, #9b59b6); }
+  #p1-passive { background: linear-gradient(90deg, #81ecec, #00cec9); float: right; }
+  #p2-passive { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
 
   .special-bar.ready {
     animation: specialBlink 0.4s infinite;
@@ -832,6 +842,17 @@
 
   #p1-special-label { left: 22px; }
   #p2-special-label { right: 22px; }
+
+  .passive-label {
+    position: absolute;
+    top: 110px;
+    color: #6fdde0;
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #p1-passive-label { left: 22px; }
+  #p2-passive-label { right: 22px; }
 
   .round-indicator {
     position: absolute;
@@ -904,8 +925,14 @@
       <div class="special-container"><div class="special-bar" id="p1-special"></div></div>
       <div class="special-container"><div class="special-bar" id="p2-special"></div></div>
     </div>
-    <span class="special-label" id="p1-special-label">SPECIAL</span>
-    <span class="special-label" id="p2-special-label">SPECIAL</span>
+    <div id="passive-bars">
+      <div class="special-container" id="p1-passive-container"><div class="special-bar" id="p1-passive"></div></div>
+      <div class="special-container" id="p2-passive-container"><div class="special-bar" id="p2-passive"></div></div>
+    </div>
+    <span class="special-label" id="p1-special-label">ACTIVE</span>
+    <span class="special-label" id="p2-special-label">ACTIVE</span>
+    <span class="passive-label" id="p1-passive-label">PASSIVE</span>
+    <span class="passive-label" id="p2-passive-label">PASSIVE</span>
     <div class="round-indicator" id="p1-rounds"><span class="round-dot" id="p1-r1"></span><span class="round-dot" id="p1-r2"></span></div>
     <div class="round-indicator" id="p2-rounds"><span class="round-dot" id="p2-r1"></span><span class="round-dot" id="p2-r2"></span></div>
     <div class="combo-counter" id="p1-combo"></div>
@@ -1051,7 +1078,9 @@ const COMBAT = {
     raydog: {
       damage: 5,
       knockback: 4,
-      displayFrames: 12
+      displayFrames: 12,
+      passiveIntervalFrames: 180,
+      passiveRadius: 340
     },
     skorpdog: {
       ownerLockFrames: 2,
@@ -1167,6 +1196,14 @@ const ui = {
   p2Health: document.getElementById('p2-health'),
   p1Special: document.getElementById('p1-special'),
   p2Special: document.getElementById('p2-special'),
+  p1PassiveContainer: document.getElementById('p1-passive-container'),
+  p2PassiveContainer: document.getElementById('p2-passive-container'),
+  p1Passive: document.getElementById('p1-passive'),
+  p2Passive: document.getElementById('p2-passive'),
+  p1SpecialLabel: document.getElementById('p1-special-label'),
+  p2SpecialLabel: document.getElementById('p2-special-label'),
+  p1PassiveLabel: document.getElementById('p1-passive-label'),
+  p2PassiveLabel: document.getElementById('p2-passive-label'),
   p1Combo: document.getElementById('p1-combo'),
   p2Combo: document.getElementById('p2-combo'),
   p1Portrait: document.getElementById('p1-portrait'),
@@ -1517,8 +1554,18 @@ updateAudioUI();
 // Sprite cache
 const spriteCache = {};
 
+const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
+const DOGGOMELEON_MORPH_FRAMES = 480;
+
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON';
+}
+
+function getRainbowColor(frame, phase = 0, alpha = 1) {
+  const r = Math.floor(128 + 127 * Math.sin(frame * 0.14 + phase));
+  const g = Math.floor(128 + 127 * Math.sin(frame * 0.14 + phase + 2.09));
+  const b = Math.floor(128 + 127 * Math.sin(frame * 0.14 + phase + 4.18));
+  return alpha >= 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function getMaskedTrimColors(name, frozen) {
@@ -1576,7 +1623,7 @@ function getMaskedTrimColors(name, frozen) {
   };
 }
 
-function getMaskedGearColors(name, frozen) {
+function getMaskedGearColors(name, frozen, frame = 0) {
   if (frozen) {
     return {
       vestColor: '#5f9ea0',
@@ -1613,6 +1660,15 @@ function getMaskedGearColors(name, frozen) {
     };
   }
 
+  if (name === 'DOGGOMELEON') {
+    return {
+      vestColor: getRainbowColor(frame, 0),
+      vestHighlight: getRainbowColor(frame, 1.2),
+      maskColor: getRainbowColor(frame, 2.4),
+      maskEdge: getRainbowColor(frame, 3.6)
+    };
+  }
+
   if (name === 'RAYNDOG') {
     return {
       vestColor: '#8e44ad',
@@ -1645,6 +1701,65 @@ function isDoggoCage(name) {
 
 function isRaydog(name) {
   return name === 'RAYDOG';
+}
+
+function getDoggomeleonMorphName(fighter) {
+  if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
+  return DOGGOMELEON_FORMS[fighter.doggomeleonFormIndex % DOGGOMELEON_FORMS.length];
+}
+
+function getActiveSpecialName(fighter) {
+  if (!fighter) return '';
+  if (fighter.name !== 'DOGGOMELEON') return fighter.name;
+  if (fighter.attackTimer > 0 && fighter.lastAttackType === 'special' && fighter.specialFormSource) return fighter.specialFormSource;
+  return DOGGOMELEON_FORMS[Math.max(0, fighter.doggomeleonFormIndex || 0)];
+}
+
+function getCharacterByName(name) {
+  return CHARACTERS.find(char => char.name === name) || null;
+}
+
+function hasPassiveSpecialAbility(entity) {
+  return !!(entity && entity.passiveSpecialGain > 0);
+}
+
+function getDisplayedCharacterData(fighter) {
+  if (!fighter) {
+    return { name: '', color1: '#fff', color2: '#111', eyeColor: '#fff' };
+  }
+
+  if (fighter.name !== 'DOGGOMELEON') {
+    return {
+      name: fighter.name,
+      color1: fighter.color1,
+      color2: fighter.color2,
+      eyeColor: fighter.eyeColor
+    };
+  }
+
+  const morphName = getDoggomeleonMorphName(fighter);
+  const specialDisplayName = fighter.attackTimer > 0 && fighter.lastAttackType === 'special' ? fighter.specialFormSource : '';
+  if (!morphName && !specialDisplayName) {
+    return {
+      name: fighter.name,
+      color1: fighter.color1,
+      color2: fighter.color2,
+      eyeColor: fighter.eyeColor
+    };
+  }
+
+  const char = getCharacterByName(specialDisplayName || morphName);
+  return char ? {
+    name: char.name,
+    color1: char.color1,
+    color2: char.color2,
+    eyeColor: char.eyeColor
+  } : {
+    name: fighter.name,
+    color1: fighter.color1,
+    color2: fighter.color2,
+    eyeColor: fighter.eyeColor
+  };
 }
 
 function getPointBlankTargetX(attacker, defender) {
@@ -1706,16 +1821,74 @@ function drawRaydogGear(x, bodyY, headY, frozen) {
 
   x.fillStyle = hatColor;
   x.beginPath();
-  x.moveTo(46, headY - 13);
+  x.moveTo(40, headY - 13);
   x.lineTo(70, headY - 42);
-  x.lineTo(94, headY - 13);
+  x.lineTo(100, headY - 13);
   x.closePath();
   x.fill();
   x.stroke();
 
   x.fillStyle = hatShadow;
-  x.fillRect(50, headY - 13, 40, 5);
-  x.strokeRect(50, headY - 13, 40, 5);
+  x.fillRect(44, headY - 13, 52, 5);
+  x.strokeRect(44, headY - 13, 52, 5);
+}
+
+function drawRaydogSparks(x, bodyY, headY, frame, frozen) {
+  const pulse = frozen ? 0 : Math.sin(frame * 0.28) * 4;
+  const sparkColor = frozen ? '#e0ffff' : '#f5f3ff';
+  const glowColor = frozen ? '#87ceeb' : '#74b9ff';
+  const sparkleColor = frozen ? 'rgba(224,255,255,0.8)' : 'rgba(255,255,255,0.9)';
+  const sparks = [
+    { x: 38, y: bodyY + 2, dx: -10, dy: -8 },
+    { x: 92, y: bodyY + 8, dx: 12, dy: -10 },
+    { x: 72, y: headY - 28, dx: 8, dy: -12 }
+  ];
+
+  x.strokeStyle = sparkColor;
+  x.lineWidth = 2;
+  x.lineCap = 'round';
+
+  sparks.forEach((spark, i) => {
+    const flicker = frozen ? 0 : Math.sin(frame * 0.35 + i * 1.7) * 3;
+    const sx = spark.x + (i === 1 ? pulse : -pulse * 0.5);
+    const sy = spark.y + flicker;
+
+    x.beginPath();
+    x.moveTo(sx, sy);
+    x.lineTo(sx + spark.dx * 0.45, sy + spark.dy * 0.35);
+    x.lineTo(sx + spark.dx * 0.2, sy + spark.dy * 0.65);
+    x.lineTo(sx + spark.dx, sy + spark.dy);
+    x.stroke();
+
+    x.strokeStyle = glowColor;
+    x.beginPath();
+    x.moveTo(sx + 1, sy + 1);
+    x.lineTo(sx + spark.dx * 0.3, sy + spark.dy * 0.15);
+    x.lineTo(sx + spark.dx * 0.55, sy + spark.dy * 0.45);
+    x.lineTo(sx + spark.dx * 0.75, sy + spark.dy * 0.7);
+    x.stroke();
+
+    const twinkleX = sx + spark.dx * 0.9;
+    const twinkleY = sy + spark.dy * 0.85;
+    const twinkle = frozen ? 1.5 : 1.5 + Math.sin(frame * 0.45 + i) * 0.8;
+
+    x.strokeStyle = sparkleColor;
+    x.lineWidth = 1.5;
+    x.beginPath();
+    x.moveTo(twinkleX - twinkle, twinkleY);
+    x.lineTo(twinkleX + twinkle, twinkleY);
+    x.moveTo(twinkleX, twinkleY - twinkle);
+    x.lineTo(twinkleX, twinkleY + twinkle);
+    x.stroke();
+
+    x.fillStyle = sparkleColor;
+    x.beginPath();
+    x.arc(sx + spark.dx * 0.45, sy + spark.dy * 0.35, frozen ? 1.2 : 1.2 + Math.sin(frame * 0.35 + i) * 0.35, 0, Math.PI * 2);
+    x.fill();
+
+    x.strokeStyle = sparkColor;
+    x.lineWidth = 2;
+  });
 }
 
 function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false) {
@@ -1833,7 +2006,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   // Masked fighter gear: hoodie, mask, vest
   if (isMaskedFighter(name)) {
-    const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen);
+    const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen, frame);
 
     // Vest on body
     x.fillStyle = vestColor;
@@ -1960,6 +2133,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
+  if (isRaydog(name)) drawRaydogSparks(x, bodyY, headY, frame, frozen);
 
   // Eyebrows
   if (state === 'hit' || state === 'attack_punch' || state === 'attack_kick' || state === 'special' || frozen) {
@@ -2384,7 +2558,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // Masked fighter gear
     if (isMaskedFighter(name)) {
-      const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen);
+      const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen, frame);
 
       // Vest on body
       x.fillStyle = vestColor;
@@ -2500,6 +2674,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
+    if (isRaydog(name)) drawRaydogSparks(x, vicBodyY, vicHeadY, frame, frozen);
 
     // Victory stars/sparkles
     for (let i = 0; i < 5; i++) {
@@ -2606,6 +2781,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, defHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, defBodyY, defHeadY, frozen);
+    if (isRaydog(name)) drawRaydogSparks(x, defBodyY, defHeadY, frame, frozen);
 
     // Snout
     x.fillStyle = frozenColor2;
@@ -2623,7 +2799,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // Masked fighter gear
     if (isMaskedFighter(name)) {
-      const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen);
+      const { vestColor, vestHighlight, maskColor, maskEdge } = getMaskedGearColors(name, frozen, frame);
 
       // Vest on body
       x.fillStyle = vestColor;
@@ -2754,10 +2930,12 @@ class Fighter {
     this.speed = char.speed;
     this.scale = char.scale || 1;
     this.specialGain = char.specialGain;
+    this.passiveSpecialGain = char.passiveSpecialGain || 0;
     this.maxHealth = char.health;
     this.facing = facing;
     this.health = char.health;
     this.special = 0;
+    this.passiveSpecial = 0;
     this.state = 'idle';
     this.frame = 0;
     this.attackTimer = 0;
@@ -2789,6 +2967,8 @@ class Fighter {
     this.borkoImpactY = GROUND - 24;
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
+    this.doggomeleonFormIndex = -1;
+    this.specialFormSource = '';
   }
 
   reset(x) {
@@ -2798,6 +2978,7 @@ class Fighter {
     this.vy = 0;
     this.health = this.maxHealth;
     this.special = 0;
+    this.passiveSpecial = 0;
     this.state = 'idle';
     this.frame = 0;
     this.attackTimer = 0;
@@ -2824,6 +3005,8 @@ class Fighter {
     this.borkoImpactY = GROUND - 24;
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
+    this.doggomeleonFormIndex = -1;
+    this.specialFormSource = '';
   }
 
   getHurtbox() {
@@ -2875,6 +3058,7 @@ class Fighter {
     if (type === 'special' && this.special < SPECIAL_METER_MAX) return;
 
     this.lastAttackType = type;
+    this.specialFormSource = type === 'special' ? getActiveSpecialName(this) : '';
     if (type === 'punch') {
       this.state = 'attack_punch';
       this.attackTimer = COMBAT.punch.duration;
@@ -3106,8 +3290,30 @@ class Fighter {
     }
   }
 
+  updateRaydogPassive(opponent) {
+    if (this.name !== 'RAYDOG' || this.health <= 0) return;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    this.passiveSpecial = 0;
+    spawnRaydogPassiveArcLightning(this, opponent);
+  }
+
+  updateDoggomeleonMorph() {
+    if (this.name !== 'DOGGOMELEON' || this.health <= 0) return;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX) return;
+
+    this.passiveSpecial = 0;
+    this.doggomeleonFormIndex = (this.doggomeleonFormIndex + 1 + DOGGOMELEON_FORMS.length) % DOGGOMELEON_FORMS.length;
+  }
+
   update(keys, opponent) {
     this.frame++;
+    this.updateDoggomeleonMorph();
+    this.updateRaydogPassive(opponent);
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;
@@ -3171,7 +3377,10 @@ class Fighter {
     // Timers
     if (this.attackTimer > 0) {
       this.attackTimer--;
-      if (this.attackTimer <= 0) this.state = 'idle';
+      if (this.attackTimer <= 0) {
+        this.state = 'idle';
+        this.specialFormSource = '';
+      }
     }
     if (this.hitTimer > 0) {
       this.hitTimer--;
@@ -3182,7 +3391,7 @@ class Fighter {
 // Combo decay
 if (Date.now() - this.lastHitTime > COMBAT.comboResetMs) this.comboCount = 0;
 
-if (this.name === 'TREMODOG' && this.attackTimer > 0 && this.lastAttackType === 'special') {
+if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAttackType === 'special') {
   this.vx = 0;
   this.vy = 0;
   this.isCrouching = true;
@@ -3259,9 +3468,10 @@ const speed = this.speed;
     }
 
     const isFrozen = this.freezeTimer > 0;
+    const displayChar = getDisplayedCharacterData(this);
     let sprite = createDogSprite(
-      this.color1, this.color2, this.eyeColor,
-      this.name, this.facing, this.frame, state, 1, isFrozen
+      displayChar.color1, displayChar.color2, displayChar.eyeColor,
+      displayChar.name, this.facing, this.frame, state, 1, isFrozen
     );
 
     if (this.health <= 0 && this.defeatTimer > 0) {
@@ -3433,9 +3643,10 @@ function drawParticles() {
 const projectiles = [];
 
 function spawnProjectile(owner) {
+  const specialName = owner.specialFormSource || getActiveSpecialName(owner);
   let color1, color2, type, speed, radius, dmg, kb;
 
-  if (owner.name === 'SKORPDOG') {
+  if (specialName === 'SKORPDOG') {
     color1 = '#f1c40f';
     color2 = '#c8a800';
     type = 'harpoon';
@@ -3443,7 +3654,7 @@ function spawnProjectile(owner) {
     radius = 8;
     dmg = 15;
     kb = 5;
-  } else if (owner.name === 'SEKDOG') {
+  } else if (specialName === 'SEKDOG') {
     color1 = '#ff6b6b';
     color2 = '#c0392b';
     type = 'missile';
@@ -3451,15 +3662,15 @@ function spawnProjectile(owner) {
     radius = COMBAT.special.sekdog.missileRadius;
     dmg = COMBAT.special.sekdog.missileDamage;
     kb = COMBAT.special.sekdog.missileKnockback;
-  } else if (owner.name === 'BORKO') {
+  } else if (specialName === 'BORKO') {
     return;
-  } else if (owner.name === 'RAYNDOG') {
+  } else if (specialName === 'RAYNDOG') {
     spawnRayndogLightningCloud(owner, owner === p1 ? p2 : p1);
     return;
-  } else if (owner.name === 'RAYDOG') {
+  } else if (specialName === 'RAYDOG') {
     spawnRaydogArcLightning(owner, owner === p1 ? p2 : p1);
     return;
-  } else if (owner.name === 'CYDOG') {
+  } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
     type = 'net';
@@ -3469,10 +3680,10 @@ function spawnProjectile(owner) {
     kb = 0;
     const bomb = spawnCydogBomb(owner);
     owner.pendingCydogBomb = bomb;
-  } else if (owner.name === 'TREMODOG') {
+  } else if (specialName === 'TREMODOG') {
     spawnTremdogShockwaveField(owner);
     return;
-  } else if (owner.name === 'SUBDOG') {
+  } else if (specialName === 'SUBDOG') {
     color1 = '#87ceeb';
     color2 = '#b0e0e6';
     type = 'snowflake';
@@ -3578,6 +3789,12 @@ function spawnRaydogArcLightning(owner, target) {
   game.hitStop = COMBAT.effects.projectileHitStop;
   if (target.health <= 0) addParticle(target.x, target.y - 50, 'ko');
 
+  spawnRaydogArcLightningEffect(owner, startX, startY, targetX, targetY);
+}
+
+function spawnRaydogArcLightningEffect(owner, startX, startY, targetX, targetY) {
+  const special = COMBAT.special.raydog;
+
   projectiles.push({
     x: (startX + targetX) / 2,
     y: (startY + targetY) / 2,
@@ -3605,6 +3822,27 @@ function spawnRaydogArcLightning(owner, target) {
     targetX,
     targetY
   });
+}
+
+function spawnRaydogPassiveArcLightning(owner, target) {
+  const special = COMBAT.special.raydog;
+  const startX = owner.x;
+  const startY = owner.y - 70;
+  const ownerCenterY = owner.y - owner.height / 2;
+  const targetCenterY = target.y - target.height / 2;
+  const inRadius = Math.hypot(target.x - owner.x, targetCenterY - ownerCenterY) <= special.passiveRadius;
+
+  if (target.health > 0 && inRadius) {
+    spawnRaydogArcLightning(owner, target);
+    return;
+  }
+
+  const targetX1 = FIGHTER_LAYOUT.boundaryPadding + Math.random() * (W - FIGHTER_LAYOUT.boundaryPadding * 2);
+  const targetY1 = 30 + Math.random() * Math.max(40, owner.y * 0.35);
+  const targetX2 = FIGHTER_LAYOUT.boundaryPadding + Math.random() * (W - FIGHTER_LAYOUT.boundaryPadding * 2);
+  const targetY2 = 30 + Math.random() * Math.max(40, owner.y * 0.35);
+  spawnRaydogArcLightningEffect(owner, startX, startY, targetX1, targetY1);
+  spawnRaydogArcLightningEffect(owner, startX, startY, targetX2, targetY2);
 }
 
 function spawnCydogBomb(owner) {
@@ -5072,7 +5310,20 @@ const CHARACTERS = [
     speed: 5,
     health: 100,
     specialGain: 0.75,
+    passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.raydog.passiveIntervalFrames,
     desc: 'ARC'
+  },
+  {
+    id: 'doggomeleon',
+    name: 'DOGGOMELEON',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    passiveSpecialGain: SPECIAL_METER_MAX / DOGGOMELEON_MORPH_FRAMES,
+    desc: 'SHIFT'
   },
   {
     id: 'subdog',
@@ -5910,7 +6161,8 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG' || attacker.name === 'RAYNDOG' || attacker.name === 'RAYDOG') || attacker.lastAttackType === 'special') {
+    const attackerSpecialName = getActiveSpecialName(attacker);
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;
@@ -6034,7 +6286,16 @@ function updateUI() {
   ui.p2Health.style.width = p2.health + '%';
   ui.p1Special.style.width = p1.special + '%';
   ui.p2Special.style.width = p2.special + '%';
+  ui.p1Passive.style.width = p1.passiveSpecial + '%';
+  ui.p2Passive.style.width = p2.passiveSpecial + '%';
   ui.timer.textContent = game.timer;
+
+  const p1HasPassive = hasPassiveSpecialAbility(p1);
+  const p2HasPassive = hasPassiveSpecialAbility(p2);
+  ui.p1PassiveContainer.style.visibility = p1HasPassive ? 'visible' : 'hidden';
+  ui.p2PassiveContainer.style.visibility = p2HasPassive ? 'visible' : 'hidden';
+  ui.p1PassiveLabel.style.visibility = p1HasPassive ? 'visible' : 'hidden';
+  ui.p2PassiveLabel.style.visibility = p2HasPassive ? 'visible' : 'hidden';
 
   // Blinking effect when special is ready
   ui.p1Special.classList.toggle('ready', p1.special >= SPECIAL_METER_MAX);

@@ -134,6 +134,20 @@
     z-index: 50;
   }
 
+#title-logo {
+  width: 140px;
+  height: 140px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#title-logo canvas {
+  border: none;
+  image-rendering: pixelated;
+}
+
   #start-screen h1 {
     color: #c0392b;
     font-size: 52px;
@@ -861,6 +875,7 @@
     <div id="message"></div>
   </div>
   <div id="start-screen">
+    <div id="title-logo"></div>
     <h1>KANINE KOMBAT</h1>
     <h2>such fight. very punch. wow.</h2>
     <div id="mode-buttons">
@@ -1045,6 +1060,7 @@ const GROUND = H - PHYSICS.groundOffset;
 
 const ui = {
   startScreen: document.getElementById('start-screen'),
+  titleLogo: document.getElementById('title-logo'),
   charSelect: document.getElementById('char-select'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
@@ -4022,6 +4038,85 @@ function tintSprite(src, fillStyle) {
 function renderCharPreview(char) {
   return createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
 }
+
+function buildTitleLogo() {
+  if (!ui.titleLogo) return;
+
+  ui.titleLogo.innerHTML = '';
+  const c = document.createElement('canvas');
+  c.width = 140;
+  c.height = 140;
+  const x = c.getContext('2d');
+
+  x.imageSmoothingEnabled = false;
+
+  x.strokeStyle = '#e74c3c';
+  x.lineWidth = 8;
+  x.beginPath();
+  x.arc(70, 70, 56, 0, Math.PI * 2);
+  x.stroke();
+
+  x.fillStyle = '#c0392b';
+  x.beginPath();
+  x.ellipse(61, 101, 26, 25, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#e74c3c';
+  x.beginPath();
+  x.ellipse(77, 64, 23, 21, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.beginPath();
+  x.ellipse(62, 42, 9, 15, -0.35, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(90, 44, 8, 13, 0.35, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#f1948a';
+  x.beginPath();
+  x.ellipse(65, 43, 4, 8, -0.35, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(89, 45, 3.5, 7, 0.35, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#f5b7b1';
+  x.beginPath();
+  x.ellipse(88, 70, 15, 11, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#fff';
+  x.beginPath();
+  x.ellipse(73, 54, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(85, 54, 6, 7, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#f1c40f';
+  x.beginPath();
+  x.ellipse(75, 55, 3.8, 4.8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(87, 55, 3.2, 4.2, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = '#2b2b2b';
+  x.beginPath();
+  x.ellipse(95, 63, 4.5, 3.5, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.strokeStyle = '#7b241c';
+  x.lineWidth = 2;
+  x.beginPath();
+  x.arc(88, 71, 6, 0.2, Math.PI - 0.1);
+  x.stroke();
+
+  ui.titleLogo.appendChild(c);
+}
+
+buildTitleLogo();
 
 function updatePortrait(char, container) {
   container.innerHTML = '';

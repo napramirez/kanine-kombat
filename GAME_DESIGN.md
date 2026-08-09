@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with an eight-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a nine-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -19,6 +19,7 @@ Players choose from a shared roster before each match.
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
 | `TREMODOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
+| `RAYNDOG` | Storm | 5 | 100 | SKORPDOG-inspired look with purple gear |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System
@@ -38,6 +39,7 @@ Players choose from a shared roster before each match.
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
+- `RAYNDOG`: summons a purple lightning cloud over the opponent that zaps them for 3 seconds
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -56,12 +58,13 @@ Players choose from a shared roster before each match.
 ### Special Meter
 
 - Base passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, and `SUBDOG` passively gain `0.25` per frame
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` passively gain `0.25` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
+- On blocked hits, defenders gain a flat `2` meter, except `BORKO` and `SHAO CATNIP`, who gain `4`
 - Full meter is required to use a special
 - Meter blinks when ready
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, and `SUBDOG` do not gain special from punch or kick hits
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` do not gain special from punch or kick hits
 
 ### Physics
 
@@ -120,7 +123,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared eight-fighter roster
+- Shared nine-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route

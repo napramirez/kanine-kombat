@@ -1003,6 +1003,12 @@ const COMBAT = {
       shockKnockback: 8,
       shockStunMs: 1000
     },
+    rayndog: {
+      durationFrames: 180,
+      pulseIntervalFrames: 45,
+      zapDamage: 5,
+      zapKnockback: 3
+    },
     skorpdog: {
       ownerLockFrames: 2,
       pointBlankGap: 6
@@ -1052,7 +1058,9 @@ const COMBAT = {
   },
   meter: {
     onHitMultiplier: 0.8,
-    onHurtMultiplier: 0.5
+    onHurtMultiplier: 0.5,
+    onBlockGain: 2,
+    onBlockBonusGain: 4
   },
   attackBox: {
     forwardOffset: 15,
@@ -1460,7 +1468,7 @@ updateAudioUI();
 const spriteCache = {};
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG';
 }
 
 function getMaskedTrimColors(name, frozen) {
@@ -1488,12 +1496,23 @@ function getMaskedTrimColors(name, frozen) {
 
   if (name === 'CYDOG') {
     return {
-      limbColor: '#68644f',
-      pawColor: '#a59663',
-      hoodieColor: '#4f4a34',
-      hoodieEdge: '#d8c37a',
-      centerStripe: '#94844e',
-      innerEar: '#a18f58'
+      limbColor: '#5c6670',
+      pawColor: '#8c98a4',
+      hoodieColor: '#4f5963',
+      hoodieEdge: '#aab4bf',
+      centerStripe: '#737f8b',
+      innerEar: '#919ca8'
+    };
+  }
+
+  if (name === 'RAYNDOG') {
+    return {
+      limbColor: '#111',
+      pawColor: '#222',
+      hoodieColor: '#111',
+      hoodieEdge: '#222',
+      centerStripe: '#111',
+      innerEar: '#333'
     };
   }
 
@@ -1537,10 +1556,19 @@ function getMaskedGearColors(name, frozen) {
 
   if (name === 'CYDOG') {
     return {
-      vestColor: '#f1c40f',
-      vestHighlight: '#ffe66d',
-      maskColor: '#f1c40f',
-      maskEdge: '#c8a800'
+      vestColor: '#d8b43f',
+      vestHighlight: '#f0d46e',
+      maskColor: '#d8b43f',
+      maskEdge: '#a2832d'
+    };
+  }
+
+  if (name === 'RAYNDOG') {
+    return {
+      vestColor: '#8e44ad',
+      vestHighlight: '#c77dff',
+      maskColor: '#8e44ad',
+      maskEdge: '#6c3483'
     };
   }
 
@@ -2025,6 +2053,22 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(82, bodyY - 12, 7, 0, Math.PI * 2);
       x.arc(94, bodyY - 2, 5, 0, Math.PI * 2);
       x.fill();
+    } else if (name === 'RAYNDOG') {
+      x.fillStyle = '#6c5ce7';
+      x.beginPath();
+      x.ellipse(86, bodyY - 10, 18, 10, 0, 0, Math.PI * 2);
+      x.ellipse(76, bodyY - 12, 10, 8, 0, 0, Math.PI * 2);
+      x.ellipse(98, bodyY - 12, 9, 7, 0, 0, Math.PI * 2);
+      x.fill();
+
+      x.strokeStyle = '#d6b3ff';
+      x.lineWidth = 2;
+      x.beginPath();
+      x.moveTo(84, bodyY - 2);
+      x.lineTo(78, bodyY + 8);
+      x.lineTo(86, bodyY + 8);
+      x.lineTo(80, bodyY + 20);
+      x.stroke();
     } else if (name === 'TREMODOG') {
       x.strokeStyle = '#ff7de9';
       x.lineWidth = 3;
@@ -2758,7 +2802,7 @@ class Fighter {
     this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
-    this.special = Math.min(SPECIAL_METER_MAX, this.special + dmg * COMBAT.meter.onHurtMultiplier);
+this.special = Math.min(SPECIAL_METER_MAX, this.special + (this.isBlocking ? ((this.name === 'BORKO' || this.name === 'SHAO CATNIP') ? COMBAT.meter.onBlockBonusGain : COMBAT.meter.onBlockGain) : dmg * COMBAT.meter.onHurtMultiplier));
   }
 
   applyStunnedStatus(durationMs) {
@@ -3263,6 +3307,9 @@ function spawnProjectile(owner) {
     kb = COMBAT.special.sekdog.missileKnockback;
   } else if (owner.name === 'BORKO') {
     return;
+  } else if (owner.name === 'RAYNDOG') {
+    spawnRayndogLightningCloud(owner, owner === p1 ? p2 : p1);
+    return;
   } else if (owner.name === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
@@ -3329,6 +3376,45 @@ function spawnProjectile(owner) {
   });
 
   owner.pendingCydogBomb = null;
+}
+
+function spawnRayndogLightningCloud(owner, target) {
+  const special = COMBAT.special.rayndog;
+
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    if (projectiles[i].type === 'lightningCloud' && projectiles[i].owner === owner) {
+      projectiles.splice(i, 1);
+    }
+  }
+
+  projectiles.push({
+    x: target.x,
+    y: target.y - 130,
+    vx: 0,
+    vy: 0,
+    owner,
+    dmg: special.zapDamage,
+    kb: special.zapKnockback,
+    life: special.durationFrames,
+    radius: 44,
+    color1: '#8e44ad',
+    color2: '#c77dff',
+    type: 'lightningCloud',
+    trail: [],
+    hit: true,
+    pullTimer: 0,
+    rotation: 0,
+    ownerAnchorX: owner.x,
+    ownerAnchorY: owner.y,
+    ownerAnchorFacing: owner.facing,
+    fuseFrames: 0,
+    exploded: false,
+    pulseTimer: 1,
+    pulseInterval: special.pulseIntervalFrames,
+    strikeFrames: 0,
+    targetX: target.x,
+    targetY: target.y - target.height / 2
+  });
 }
 
 function spawnCydogBomb(owner) {
@@ -3459,6 +3545,32 @@ function updateProjectiles(opponent) {
       p.y = target.y - 52;
 
       if (p.pullTimer > 150) {
+        projectiles.splice(i, 1);
+      }
+      continue;
+    }
+
+    if (p.type === 'lightningCloud') {
+      p.x = target.x;
+      p.y = target.y - 130;
+      p.targetX = target.x;
+      p.targetY = target.y - target.height / 2;
+      p.rotation += 0.03;
+      p.pulseTimer--;
+      if (p.strikeFrames > 0) p.strikeFrames--;
+
+      if (p.pulseTimer <= 0 && target.health > 0) {
+        p.pulseTimer = p.pulseInterval;
+        p.strikeFrames = 8;
+        target.takeHit(p.dmg, p.kb, p.owner.facing);
+        addParticle(target.x, target.y - 50, 'hit');
+        game.screenShake = COMBAT.effects.projectileShake;
+        game.hitStop = COMBAT.effects.projectileHitStop;
+        if (target.health <= 0) playImpactSound('ko');
+        else playImpactSound('hit');
+      }
+
+      if (p.life <= 0) {
         projectiles.splice(i, 1);
       }
       continue;
@@ -3705,6 +3817,48 @@ function drawProjectiles() {
       ctx.fill();
       
       ctx.restore();
+    } else if (p.type === 'lightningCloud') {
+      const pulse = p.strikeFrames > 0 ? p.strikeFrames / 8 : 0;
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 1.7);
+      glow.addColorStop(0, 'rgba(199, 125, 255, 0.65)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 1.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#8e44ad';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, p.radius, p.radius * 0.55, 0, 0, Math.PI * 2);
+      ctx.ellipse(p.x - 24, p.y + 2, p.radius * 0.52, p.radius * 0.34, 0, 0, Math.PI * 2);
+      ctx.ellipse(p.x + 24, p.y + 1, p.radius * 0.48, p.radius * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#c77dff';
+      ctx.beginPath();
+      ctx.ellipse(p.x - 10, p.y - 4, p.radius * 0.36, p.radius * 0.2, 0, 0, Math.PI * 2);
+      ctx.ellipse(p.x + 14, p.y - 5, p.radius * 0.3, p.radius * 0.18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (pulse > 0) {
+        ctx.strokeStyle = '#f5f3ff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y + 12);
+        ctx.lineTo(p.x - 8, p.y + 34);
+        ctx.lineTo(p.x + 6, p.y + 34);
+        ctx.lineTo(p.x - 10, p.targetY - 12);
+        ctx.lineTo(p.x + 2, p.targetY - 12);
+        ctx.lineTo(p.targetX - 4, p.targetY + 10);
+        ctx.stroke();
+
+        ctx.globalAlpha = pulse * alpha * 0.35;
+        ctx.fillStyle = '#d6b3ff';
+        ctx.beginPath();
+        ctx.ellipse(p.targetX, p.targetY + 8, 34, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (p.type === 'missile') {
       p.rotation = Math.atan2(p.vy, p.vx || p.owner.facing);
 
@@ -4551,6 +4705,17 @@ const CHARACTERS = [
     desc: 'QUAKE'
   },
   {
+    id: 'rayndog',
+    name: 'RAYNDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'STORM'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',
@@ -5220,7 +5385,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG') || attacker.lastAttackType === 'special') {
+    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG' || attacker.name === 'RAYNDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

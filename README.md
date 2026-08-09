@@ -1,6 +1,6 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with an eight-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a nine-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
@@ -25,7 +25,7 @@ Optional music files:
 - Local 2-player versus mode
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
-- 8 playable fighters:
+- 9 playable fighters:
   - `DOGGO CAGE`
   - `BORKO`
   - `SHAO CATNIP`
@@ -33,13 +33,14 @@ Optional music files:
   - `SEKDOG`
   - `CYDOG`
   - `TREMODOG`
+  - `RAYNDOG`
   - `SUBDOG`
 - Character select screen with shared roster
 - Randomized background stages each match
 - Procedural sprite animation and portrait previews
 - Punch, kick, block, jump, crouch, and special attacks
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights

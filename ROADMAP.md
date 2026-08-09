@@ -11,7 +11,7 @@
 ## Phase 2: Content Expansion
 
 - [x] Character select screen
-- [x] Third character (CATNIP)
+- [x] Third character (SHAO CATNIP)
 - [x] Fourth character (SKORPDOG)
 - [x] Fifth character (SUBDOG)
 - [x] Sixth character (SEKDOG)
@@ -71,7 +71,7 @@
 - Added `BATTLE PLAN` mode on the title screen
 - Battle Plan chains CPU matches using the player's selected fighter
 - The second-to-last match is a mirror match
-- CATNIP is always the final opponent
+- SHAO CATNIP is always the final opponent
 
 **v0.3.5** - CPU Battle Update
 - Added `VS CPU` mode on the title screen
@@ -109,7 +109,7 @@
 
 **v0.2.0** - Character Select & New Fighters
 - Character select screen with portraits
-- 4 characters (DOGGO CAGE, BORKO, CATNIP, SKORPDOG)
+- 4 characters (DOGGO CAGE, BORKO, SHAO CATNIP, SKORPDOG)
 - Character-specific stats and movesets
 - Combo counter display (2+ hits)
 - Special meter blink when ready

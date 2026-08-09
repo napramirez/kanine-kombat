@@ -23,7 +23,7 @@ Players choose their fighters from a shared roster before each match.
 - Style: Power
 - Speed: 4, Health: 110
 
-**CATNIP**
+**SHAO CATNIP**
 - Color: Purple (#9b59b6, #d2b4de)
 - Eye color: Yellow (#f1c40f)
 - Style: Speed
@@ -62,7 +62,7 @@ Players choose their fighters from a shared roster before each match.
 **Special Move (Projectile):**
 - DOGGO CAGE: Gold/red energy ball (25 dmg, 15 kb, speed 10)
 - BORKO: Blue/purple energy ball (25 dmg, 15 kb, speed 10)
-- CATNIP: Blue/purple energy ball (25 dmg, 15 kb, speed 10)
+- SHAO CATNIP: Blue/purple energy ball (25 dmg, 15 kb, speed 10)
 - SKORPDOG: Harpoon with chain (15 dmg, pulls opponent into point-blank range, speed 14, stuns 1s, SKORPDOG stays planted during pull)
 - SEKDOG: Rocket missile (15 dmg, 5 kb, speed 14) followed by teleport punch from behind (8 dmg, 10 kb)
 - SUBDOG: Snowflake (0 dmg, freezes opponent 2s, speed 8)
@@ -105,7 +105,7 @@ Players choose their fighters from a shared roster before each match.
 
 - Local 2-player versus
 - Single player vs CPU (Player 2 uses basic AI)
-- Battle Plan: a CPU gauntlet where the penultimate match is a mirror and the final opponent is CATNIP
+- Battle Plan: a CPU gauntlet where the penultimate match is a mirror and the final opponent is SHAO CATNIP
 
 ### Game States
 
@@ -178,7 +178,7 @@ menu → charSelect → countdown → fight → roundEnd → countdown → ... �
 
 In `VS CPU` mode, the CPU auto-selects and auto-confirms Player 2.
 
-In `BATTLE PLAN`, the player keeps the chosen fighter for a sequence of CPU matches, with a mirror match second-to-last and CATNIP as the final opponent.
+In `BATTLE PLAN`, the player keeps the chosen fighter for a sequence of CPU matches, with a mirror match second-to-last and SHAO CATNIP as the final opponent.
 
 **In-Game Messages:**
 - Countdown numbers with scale animation

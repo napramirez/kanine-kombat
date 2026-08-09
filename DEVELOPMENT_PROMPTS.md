@@ -3,7 +3,7 @@
 Use these prompts to iterate on the game. Each prompt targets a specific improvement area.
 
 Current build assumptions:
-- 6 playable fighters are already present: DOGGO CAGE, BORKO, CATNIP, SKORPDOG, SEKDOG, SUBDOG
+- 6 playable fighters are already present: DOGGO CAGE, BORKO, SHAO CATNIP, SKORPDOG, SEKDOG, SUBDOG
 - Character select, combo counters, victory/defeat poses, and projectile-driven or teleport specials already exist
 - `VS CPU` mode already exists with a basic AI opponent
 - `BATTLE PLAN` mode already exists as a CPU gauntlet
@@ -36,13 +36,13 @@ Add a seventh character to expand the roster beyond the current six fighters:
 - Give the character a distinct silhouette, palette, and idle animation
 - Add them to the character select screen and roster data
 - Create a unique projectile or status-effect special
-- Balance the character against DOGGO CAGE, BORKO, CATNIP, SKORPDOG, SEKDOG, and SUBDOG
+- Balance the character against DOGGO CAGE, BORKO, SHAO CATNIP, SKORPDOG, SEKDOG, and SUBDOG
 ```
 
 ### Deepen Character Differentiation
 ```
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, SUBDOG as trapper
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, SUBDOG as trapper
 - Make per-character normal damage values affect actual attacks, not just roster data
 - Adjust knockback, frame data, or mobility per character
 - Add more distinct special attack behaviors where overlap still exists

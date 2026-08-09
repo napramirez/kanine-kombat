@@ -24,7 +24,7 @@ To enable round music, place a loopable music file at `src/assets/fight-bgm.mp3`
 - 2-player local multiplayer
 - Single player vs CPU mode
 - Battle Plan gauntlet mode
-- 6 playable fighters: DOGGO CAGE, BORKO, CATNIP, SKORPDOG, SEKDOG, SUBDOG
+- 6 playable fighters: DOGGO CAGE, BORKO, SHAO CATNIP, SKORPDOG, SEKDOG, SUBDOG
 - Character select screen before each match
 - Procedural sprite animation
 - Punch, kick, and special attacks

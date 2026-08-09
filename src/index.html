@@ -3591,7 +3591,7 @@ function drawProjectiles() {
       });
 
       // Glow
-      const flashGreen = p.owner && p.owner.name === 'CATNIP' && Math.sin(Date.now() * 0.03) > 0;
+      const flashGreen = p.owner && p.owner.name === 'SHAO CATNIP' && Math.sin(Date.now() * 0.03) > 0;
       const flashColor1 = flashGreen ? '#7bed9f' : '#2ecc71';
       const flashColor2 = flashGreen ? '#2ecc71' : '#27ae60';
       ctx.globalAlpha = alpha * 0.3;
@@ -3774,7 +3774,7 @@ const CHARACTERS = [
   },
   {
     id: 'catnip',
-    name: 'CATNIP',
+    name: 'SHAO CATNIP',
     color1: '#9b59b6',
     color2: '#d2b4de',
     eyeColor: '#f1c40f',
@@ -3924,7 +3924,7 @@ function buildBattlePlanStepPortrait(char, container) {
 
 function getBattlePlanStepMeta(char, index) {
   if (index === game.battlePlan.route.length - 1) {
-    return { badge: 'FINAL', note: 'CATNIP showdown' };
+    return { badge: 'FINAL', note: 'SHAO CATNIP showdown' };
   }
 
   if (index === game.battlePlan.route.length - 2 && char.id === 'borko') {

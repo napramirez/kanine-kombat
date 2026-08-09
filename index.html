@@ -1006,7 +1006,7 @@ const COMBAT = {
     rayndog: {
       durationFrames: 180,
       pulseIntervalFrames: 45,
-      zapDamage: 5,
+      zapDamage: 10,
       zapKnockback: 3
     },
     skorpdog: {
@@ -4219,12 +4219,13 @@ function drawKanineLogo(x, cx, cy, scale = 1, palette = {}) {
 
 const BACKGROUND_STAGES = {
   BORKO_LAIR: 'borkoLair',
+  CATNIP_DOMAIN: 'catnipDomain',
   NIGHT_CITY: 'nightCity',
   TEMPLE: 'temple'
 };
 
 function pickRandomBackgroundStage() {
-  const stages = [BACKGROUND_STAGES.BORKO_LAIR, BACKGROUND_STAGES.NIGHT_CITY, BACKGROUND_STAGES.TEMPLE];
+  const stages = [BACKGROUND_STAGES.BORKO_LAIR, BACKGROUND_STAGES.CATNIP_DOMAIN, BACKGROUND_STAGES.NIGHT_CITY, BACKGROUND_STAGES.TEMPLE];
   return stages[Math.floor(Math.random() * stages.length)];
 }
 
@@ -4315,6 +4316,128 @@ function drawNightCityBackground() {
   ctx.fillStyle = '#333';
   for (let i = 0; i < W; i += 40) {
     ctx.fillRect(i, GROUND + 5, 20, 2);
+  }
+}
+
+function drawCatnipsDomainBackground() {
+  const caveGrad = ctx.createLinearGradient(0, 0, 0, H);
+  caveGrad.addColorStop(0, '#2a1d34');
+  caveGrad.addColorStop(0.45, '#1f1728');
+  caveGrad.addColorStop(1, '#100d15');
+  ctx.fillStyle = caveGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#34253f';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  for (let x = 0; x <= W; x += 28) {
+    const depth = 16 + Math.sin(x * 0.045) * 10 + Math.cos(x * 0.11) * 6;
+    ctx.lineTo(x, depth);
+  }
+  ctx.lineTo(W, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = '#4a3356';
+  for (let x = 24; x <= W; x += 86) {
+    const tipY = 40 + Math.sin(x * 0.04) * 16;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x - 18, tipY);
+    ctx.lineTo(x + 16, tipY - 6);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = 'rgba(120, 90, 130, 0.35)';
+  ctx.lineWidth = 3;
+  for (let i = 0; i < 10; i++) {
+    const sx = 120 + i * 82;
+    const sy = 120 + (i % 3) * 58;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + 26, sy - 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sx + 8, sy + 10);
+    ctx.lineTo(sx + 34, sy + 2);
+    ctx.stroke();
+  }
+
+  const torchXs = [170, 854];
+  torchXs.forEach(tx => {
+    const ty = 190;
+    const glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, 78);
+    glow.addColorStop(0, 'rgba(255, 218, 138, 0.55)');
+    glow.addColorStop(1, 'rgba(255, 218, 138, 0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(tx, ty, 78, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#7a5a44';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(tx - 10, ty + 18);
+    ctx.lineTo(tx + 12, ty - 28);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ff9f43';
+    ctx.beginPath();
+    ctx.moveTo(tx + 10, ty - 34);
+    ctx.lineTo(tx - 2, ty - 6);
+    ctx.lineTo(tx + 18, ty - 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#ffd166';
+    ctx.beginPath();
+    ctx.moveTo(tx + 8, ty - 26);
+    ctx.lineTo(tx + 2, ty - 10);
+    ctx.lineTo(tx + 14, ty - 12);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  const trenchTop = GROUND + 16;
+  const trenchGrad = ctx.createLinearGradient(0, trenchTop, 0, H);
+  trenchGrad.addColorStop(0, '#120f17');
+  trenchGrad.addColorStop(1, '#040405');
+  ctx.fillStyle = trenchGrad;
+  ctx.fillRect(0, trenchTop, W, H - trenchTop);
+
+  ctx.strokeStyle = '#6d4c41';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(46, GROUND - 6);
+  ctx.bezierCurveTo(270, GROUND - 18, 742, GROUND - 18, 978, GROUND - 6);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(46, GROUND + 28);
+  ctx.bezierCurveTo(270, GROUND + 12, 742, GROUND + 12, 978, GROUND + 28);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#8d6e63';
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= 22; i++) {
+    const t = i / 22;
+    const x = 46 + t * 932;
+    const topY = GROUND - 6 - Math.sin(t * Math.PI) * 12;
+    const bottomY = GROUND + 28 - Math.sin(t * Math.PI) * 10;
+    ctx.beginPath();
+    ctx.moveTo(x, topY);
+    ctx.lineTo(x, bottomY);
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < 21; i++) {
+    const t = i / 20;
+    const x = 58 + t * 908;
+    const plankY = GROUND + 6 + Math.sin(t * Math.PI) * 4;
+    ctx.fillStyle = i % 2 === 0 ? '#7b5a3e' : '#6a4d36';
+    ctx.fillRect(x - 18, plankY, 36, 12);
+    ctx.strokeStyle = '#4a3425';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 18, plankY, 36, 12);
   }
 }
 
@@ -4580,6 +4703,11 @@ function drawTempleBackground() {
 function drawBackground() {
   if (game.stage === BACKGROUND_STAGES.BORKO_LAIR) {
     drawBorkosLairBackground();
+    return;
+  }
+
+  if (game.stage === BACKGROUND_STAGES.CATNIP_DOMAIN) {
+    drawCatnipsDomainBackground();
     return;
   }
 

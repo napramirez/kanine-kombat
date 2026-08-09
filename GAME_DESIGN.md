@@ -142,3 +142,4 @@ fight or battlePlanStepper -> paused
   - `The Temple`: afternoon sky, Chinese-style temple facade, lush forest, and `KANINE KOMBAT` doors
   - `Night City`: moonlit skyline, stars, lit windows, and dark pavement
   - `Borko's Lair`: indoor sewer canal, flowing waste water, and glowing yellow eyes in the darkness
+  - `CATNIP's Domain`: torchlit cave wall, scratch marks, stalactites, and a rope bridge over a dark trench

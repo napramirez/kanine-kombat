@@ -50,6 +50,7 @@ Optional music files:
 - `The Temple`: afternoon Chinese-style temple with lush forest behind it and logo doors
 - `Night City`: moonlit skyline with stars, lit windows, and dark pavement
 - `Borko's Lair`: indoor sewer stage with a flowing canal and glowing yellow eyes in the dark
+- `CATNIP's Domain`: cave rope-bridge stage with torchlit walls, scratch marks, stalactites, and darkness below
 - Each new match picks one of the available stages at random
 
 ## Battle Plan

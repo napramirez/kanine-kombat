@@ -73,6 +73,7 @@
 - `RAYNDOG` uses a 3-second lightning-cloud special
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
+- Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`
 - `Esc` pause flow exists for fights and Battle Plan stepper screens
 
 ## Version History

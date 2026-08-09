@@ -61,6 +61,7 @@ Optional music files:
 - Penultimate match is `BORKO` as the sub-boss
 - The `BORKO` sub-boss match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
+- `SHAO CATNIP` boss match always uses `CATNIP's Domain`
 - The route stepper appears before the first match and between wins, and scrolls to keep progress visible
 - Press `Space` when prompted to start the next match
 

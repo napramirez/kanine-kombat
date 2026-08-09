@@ -95,6 +95,7 @@ Players choose from a shared roster before each match.
 - Penultimate match is always `BORKO`
 - The `BORKO` match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
+- The `SHAO CATNIP` match always uses `CATNIP's Domain`
 - A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
 - `Space` advances from the route stepper into the next fight
 

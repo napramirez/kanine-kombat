@@ -4274,8 +4274,9 @@ const BACKGROUND_STAGES = {
   TEMPLE: 'temple'
 };
 
-function pickRandomBackgroundStage() {
-  const stages = [BACKGROUND_STAGES.BORKO_LAIR, BACKGROUND_STAGES.CATNIP_DOMAIN, BACKGROUND_STAGES.NIGHT_CITY, BACKGROUND_STAGES.TEMPLE];
+function pickRandomBackgroundStage(excludedStages = []) {
+  const stages = [BACKGROUND_STAGES.BORKO_LAIR, BACKGROUND_STAGES.CATNIP_DOMAIN, BACKGROUND_STAGES.NIGHT_CITY, BACKGROUND_STAGES.TEMPLE]
+    .filter(stage => !excludedStages.includes(stage));
   return stages[Math.floor(Math.random() * stages.length)];
 }
 
@@ -4983,9 +4984,15 @@ function getBattlePlanCurrentOpponent() {
 function loadBattlePlanMatch() {
   const playerChar = getCharacterById(game.battlePlan.playerCharacterId);
   const opponentChar = getBattlePlanCurrentOpponent();
-  game.stage = opponentChar.id === 'borko'
-    ? BACKGROUND_STAGES.BORKO_LAIR
-    : pickRandomBackgroundStage();
+  const isBorkoSubBossMatch = game.battlePlan.currentIndex === game.battlePlan.route.length - 2 && opponentChar.id === 'borko';
+  const isCatnipBossMatch = game.battlePlan.currentIndex === game.battlePlan.route.length - 1 && opponentChar.id === 'catnip';
+  if (isBorkoSubBossMatch) {
+    game.stage = BACKGROUND_STAGES.BORKO_LAIR;
+  } else if (isCatnipBossMatch) {
+    game.stage = BACKGROUND_STAGES.CATNIP_DOMAIN;
+  } else {
+    game.stage = pickRandomBackgroundStage();
+  }
 
   p1 = new Fighter(PLAYER_SPAWNS.p1, playerChar, 1);
   p2 = new Fighter(PLAYER_SPAWNS.p2, opponentChar, -1);

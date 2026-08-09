@@ -3503,6 +3503,10 @@ function drawProjectiles() {
       ctx.restore();
     } else if (p.type === 'net') {
       p.rotation += 0.12;
+      const target = p.owner === p1 ? p2 : p1;
+      const capturedHurtbox = p.hit ? target.getHurtbox() : null;
+      const netRadiusX = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.w * 0.65) : p.radius;
+      const netRadiusY = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.h * 0.58) : p.radius;
 
       p.trail.forEach(t => {
         const ta = (t.life / 15) * 0.25 * alpha;
@@ -3524,15 +3528,15 @@ function drawProjectiles() {
       for (let i = 0; i < 4; i++) {
         ctx.rotate(Math.PI / 4);
         ctx.beginPath();
-        ctx.moveTo(-p.radius, 0);
-        ctx.lineTo(p.radius, 0);
+        ctx.moveTo(-netRadiusX, 0);
+        ctx.lineTo(netRadiusX, 0);
         ctx.stroke();
       }
 
       ctx.strokeStyle = '#7bed9f';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, p.radius * 0.95, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, netRadiusX * 0.95, netRadiusY * 0.95, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     } else if (p.type === 'bomb') {

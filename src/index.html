@@ -295,7 +295,7 @@
 
   #char-pool {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     justify-content: center;
   }
 
@@ -383,8 +383,8 @@
   }
 
   .char-option {
-    width: 126px;
-    height: 164px;
+    width: 116px;
+    height: 156px;
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     border: 3px solid #444;
     display: flex;
@@ -447,7 +447,7 @@
   .char-option canvas {
     border: none;
     image-rendering: pixelated;
-    transform: scale(1.65);
+    transform: scale(1.5);
     transform-origin: center 65%;
     margin-bottom: 5px;
   }
@@ -1010,6 +1010,13 @@ const COMBAT = {
       bombDamage: 15,
       bombKnockback: 11
     },
+    tremdog: {
+      durationFrames: 600,
+      pulseIntervalFrames: 120,
+      shockDamage: 10,
+      shockKnockback: 6,
+      shockStunMs: 900
+    },
     sekdog: {
       descendFrames: 12,
       riseFrames: 12,
@@ -1445,7 +1452,7 @@ updateAudioUI();
 const spriteCache = {};
 
 function isMaskedFighter(name) {
-  return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG';
+  return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMDOG';
 }
 
 function getMaskedTrimColors(name, frozen) {
@@ -1529,6 +1536,15 @@ function getMaskedGearColors(name, frozen) {
     };
   }
 
+  if (name === 'TREMDOG') {
+    return {
+      vestColor: '#8b5a2b',
+      vestHighlight: '#b07d45',
+      maskColor: '#8b5a2b',
+      maskEdge: '#5c3b1e'
+    };
+  }
+
   return {
     vestColor: '#87ceeb',
     vestHighlight: '#b0e0e6',
@@ -1608,7 +1624,8 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
 
   // Legs (no walk animation when frozen) - skip for victory/defeat
   const legSpread = (state === 'walk' && !frozen) ? Math.sin(frame * 0.3) * 8 : 0;
-  const crouchOffset = state === 'crouch' ? 12 : 0;
+  const isSpecialCrouch = state === 'special' && name === 'TREMDOG';
+  const crouchOffset = (state === 'crouch' || isSpecialCrouch) ? 12 : 0;
 
   const trimColors = getMaskedTrimColors(name, frozen);
   const limbColor = isMaskedFighter(name) ? trimColors.limbColor : color1;
@@ -1633,7 +1650,7 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
 
   // Body and head positions (needed for all states)
   const bodyY = 52 + bobY + crouchOffset;
-  const headY = bodyY - 8 + (state === 'crouch' ? 8 : 0);
+  const headY = bodyY - 8 + ((state === 'crouch' || isSpecialCrouch) ? 8 : 0);
 
   if (!isSpecialState) {
     // Body
@@ -2845,11 +2862,20 @@ class Fighter {
     }
     if (this.blockTimer > 0) this.blockTimer--;
 
-    // Combo decay
-    if (Date.now() - this.lastHitTime > COMBAT.comboResetMs) this.comboCount = 0;
+// Combo decay
+if (Date.now() - this.lastHitTime > COMBAT.comboResetMs) this.comboCount = 0;
 
-    // Movement (only if not attacking or hit)
-    const speed = this.speed;
+if (this.name === 'TREMDOG' && this.attackTimer > 0 && this.lastAttackType === 'special') {
+  this.vx = 0;
+  this.vy = 0;
+  this.isCrouching = true;
+  this.isBlocking = false;
+  this.state = 'special';
+  return;
+}
+
+// Movement (only if not attacking or hit)
+const speed = this.speed;
     if (this.attackTimer <= 0 && this.hitTimer <= 0) {
       if (keys.left && !keys.right) {
         this.vx = -speed;
@@ -3094,6 +3120,9 @@ function spawnProjectile(owner) {
     kb = 0;
     const bomb = spawnCydogBomb(owner);
     owner.pendingCydogBomb = bomb;
+  } else if (owner.name === 'TREMDOG') {
+    spawnTremdogShockwaveField(owner);
+    return;
   } else if (owner.name === 'SUBDOG') {
     color1 = '#87ceeb';
     color2 = '#b0e0e6';
@@ -3179,6 +3208,42 @@ function spawnCydogBomb(owner) {
   return bomb;
 }
 
+function spawnTremdogShockwaveField(owner) {
+  const special = COMBAT.special.tremdog;
+
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    if (projectiles[i].type === 'floorShockwave' && projectiles[i].owner === owner) {
+      projectiles.splice(i, 1);
+    }
+  }
+
+  projectiles.push({
+    x: W / 2,
+    y: GROUND - 6,
+    vx: 0,
+    vy: 0,
+    owner,
+    dmg: special.shockDamage,
+    kb: special.shockKnockback,
+    life: special.durationFrames,
+    radius: 0,
+    color1: '#ff7de9',
+    color2: '#ff4fd8',
+    type: 'floorShockwave',
+    trail: [],
+    hit: true,
+    pullTimer: 0,
+    rotation: 0,
+    ownerAnchorX: owner.x,
+    ownerAnchorY: owner.y,
+    ownerAnchorFacing: owner.facing,
+    fuseFrames: 0,
+    exploded: false,
+    pulseTimer: 1,
+    pulseInterval: special.pulseIntervalFrames
+  });
+}
+
 function updateProjectiles(opponent) {
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
@@ -3241,6 +3306,31 @@ function updateProjectiles(opponent) {
       p.y = target.y - 52;
 
       if (p.pullTimer > 150) {
+        projectiles.splice(i, 1);
+      }
+      continue;
+    }
+
+    if (p.type === 'floorShockwave') {
+      p.pulseTimer--;
+      p.rotation += 0.08;
+
+      if (p.pulseTimer <= 0) {
+        p.pulseTimer = p.pulseInterval;
+
+        if (target.health > 0 && target.onGround) {
+          target.takeHit(p.dmg, p.kb, p.owner.facing);
+          target.applyStunnedStatus(COMBAT.special.tremdog.shockStunMs);
+          addParticle(target.x, target.y - 26, 'hit');
+          addParticle(target.x, target.y - 26, 'stunned');
+          game.screenShake = COMBAT.effects.projectileShake;
+          game.hitStop = COMBAT.effects.projectileHitStop;
+          if (target.health <= 0) playImpactSound('ko');
+          else playImpactSound('hit');
+        }
+      }
+
+      if (p.life <= 0) {
         projectiles.splice(i, 1);
       }
       continue;
@@ -3578,6 +3668,39 @@ function drawProjectiles() {
       ctx.beginPath();
       ctx.arc(p.x + 14, p.y - p.radius - 2, 3 + Math.sin(Date.now() * 0.02) * 1.2, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'floorShockwave') {
+      const pulseAlpha = 0.2 + (0.5 + Math.sin(Date.now() * 0.04) * 0.5) * 0.35;
+      const band = ctx.createLinearGradient(0, GROUND - 24, 0, GROUND + 18);
+      band.addColorStop(0, 'rgba(255, 125, 233, 0)');
+      band.addColorStop(0.35, 'rgba(255, 125, 233, 0.35)');
+      band.addColorStop(1, 'rgba(255, 79, 216, 0)');
+
+      ctx.globalAlpha = pulseAlpha;
+      ctx.fillStyle = band;
+      ctx.fillRect(0, GROUND - 24, W, 32);
+
+      ctx.globalAlpha = 0.65 + Math.sin(Date.now() * 0.06) * 0.2;
+      ctx.strokeStyle = '#ff7de9';
+      ctx.lineWidth = 4;
+      for (let i = 0; i < 6; i++) {
+        const cx = (i + 0.5) * (W / 6);
+        const radiusX = 58 + Math.sin(p.rotation + i * 0.8) * 12;
+        const radiusY = 12 + Math.cos(p.rotation + i * 0.5) * 4;
+        ctx.beginPath();
+        ctx.ellipse(cx, GROUND + 2, radiusX, radiusY, 0, Math.PI, 0, true);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 0.75;
+      ctx.strokeStyle = '#ff4fd8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND - 2);
+      for (let x = 0; x <= W; x += 24) {
+        const waveY = GROUND - 2 - Math.sin((x / 40) + p.rotation * 4) * 6;
+        ctx.lineTo(x, waveY);
+      }
+      ctx.stroke();
     } else {
       // Regular energy ball projectile
       // Trail
@@ -3767,7 +3890,7 @@ const CHARACTERS = [
     color2: '#d3d3d3',
     eyeColor: '#e74c3c',
     scale: 1.3,
-    speed: 4,
+    speed: 5,
     health: 125,
     specialGain: 0.08,
     desc: 'POWER'
@@ -3816,6 +3939,18 @@ const CHARACTERS = [
     health: 100,
     specialGain: 0.25,
     desc: 'TRAPPER'
+  },
+  {
+    id: 'tremdog',
+    name: 'TREMDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    scale: 1.15,
+    speed: 4,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'QUAKE'
   },
   {
     id: 'subdog',
@@ -4545,7 +4680,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG') || attacker.lastAttackType === 'special') {
+    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

@@ -1012,7 +1012,7 @@ const COMBAT = {
   special: {
     duration: 30,
     borko: {
-      airFrames: 42,
+      airFrames: 32,
       jumpHeight: 240,
       shockRadius: 240,
       shockDamage: 10,
@@ -1075,8 +1075,8 @@ const COMBAT = {
   meter: {
     onHitMultiplier: 0.8,
     onHurtMultiplier: 0.5,
-    onBlockGain: 2,
-    onBlockBonusGain: 4
+    onBlockMultiplier: 0.3,
+    onBlockBonusMultiplier: 0.5
   },
   attackBox: {
     forwardOffset: 15,
@@ -2800,6 +2800,7 @@ class Fighter {
 
   takeHit(dmg, kb, attackerFacing) {
     if (this.hitCooldown > 0) return;
+    const incomingDamage = dmg;
     if (this.isBlocking) {
       dmg = Math.floor(dmg * COMBAT.block.damageMultiplier);
       kb *= COMBAT.block.knockbackMultiplier;
@@ -2819,7 +2820,10 @@ class Fighter {
     this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
-this.special = Math.min(SPECIAL_METER_MAX, this.special + (this.isBlocking ? ((this.name === 'BORKO' || this.name === 'SHAO CATNIP') ? COMBAT.meter.onBlockBonusGain : COMBAT.meter.onBlockGain) : dmg * COMBAT.meter.onHurtMultiplier));
+    const blockedMeterGain = (this.name === 'BORKO' || this.name === 'SHAO CATNIP')
+      ? incomingDamage * COMBAT.meter.onBlockBonusMultiplier
+      : incomingDamage * COMBAT.meter.onBlockMultiplier;
+    this.special = Math.min(SPECIAL_METER_MAX, this.special + (this.isBlocking ? blockedMeterGain : dmg * COMBAT.meter.onHurtMultiplier));
   }
 
   applyStunnedStatus(durationMs) {
@@ -4787,7 +4791,7 @@ const CHARACTERS = [
     color2: '#d3d3d3',
     eyeColor: '#e74c3c',
     scale: 1.3,
-    speed: 5,
+    speed: 4,
     health: 125,
     specialGain: 0.08,
     desc: 'POWER'

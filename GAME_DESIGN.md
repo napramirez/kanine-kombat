@@ -13,7 +13,7 @@ Players choose from a shared roster before each match.
 | Fighter | Style | Speed | Health | Notes |
 |---|---|---:|---:|---|
 | `DOGGO CAGE` | Balanced | 5 | 100 | Tan/brown palette, sunglasses |
-| `BORKO` | Power | 5 | 125 | Gray palette, red eyes, `scale: 1.3` |
+| `BORKO` | Power | 4 | 125 | Gray palette, red eyes, `scale: 1.3` |
 | `SHAO CATNIP` | Speed | 8 | 150 | Purple palette, yellow eyes, `scale: 1.3` |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
@@ -39,7 +39,7 @@ Players choose from a shared roster before each match.
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
-- `RAYNDOG`: summons a purple lightning cloud over the opponent that zaps them for 3 seconds
+- `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -61,7 +61,7 @@ Players choose from a shared roster before each match.
 - `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` passively gain `0.25` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
-- On blocked hits, defenders gain a flat `2` meter, except `BORKO` and `SHAO CATNIP`, who gain `4`
+- On blocked hits, defenders gain `damage * 0.3`; `BORKO` and `SHAO CATNIP` gain `damage * 0.5`
 - Full meter is required to use a special
 - Meter blinks when ready
 - `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` do not gain special from punch or kick hits
@@ -95,7 +95,7 @@ Players choose from a shared roster before each match.
 - Penultimate match is always `BORKO`
 - The `BORKO` match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
-- A route stepper appears before the first match and after each win
+- A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
 - `Space` advances from the route stepper into the next fight
 
 ## Game States

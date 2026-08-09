@@ -35,7 +35,7 @@ Optional music files:
   - `TREMODOG`
   - `RAYNDOG`
   - `SUBDOG`
-- Character select screen with shared roster
+- Character select screen with shared roster, side portraits, and a navigable grid
 - Randomized background stages each match
 - Procedural sprite animation and portrait previews
 - Punch, kick, block, jump, crouch, and special attacks
@@ -61,7 +61,7 @@ Optional music files:
 - Penultimate match is `BORKO` as the sub-boss
 - The `BORKO` sub-boss match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
-- The route stepper appears before the first match and between wins
+- The route stepper appears before the first match and between wins, and scrolls to keep progress visible
 - Press `Space` when prompted to start the next match
 
 ## Project Structure

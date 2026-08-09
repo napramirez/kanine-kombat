@@ -295,7 +295,7 @@
 
   #char-pool {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
   }
 
@@ -383,8 +383,8 @@
   }
 
   .char-option {
-    width: 140px;
-    height: 170px;
+    width: 126px;
+    height: 164px;
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     border: 3px solid #444;
     display: flex;
@@ -447,7 +447,7 @@
   .char-option canvas {
     border: none;
     image-rendering: pixelated;
-    transform: scale(1.8);
+    transform: scale(1.65);
     transform-origin: center 65%;
     margin-bottom: 5px;
   }
@@ -999,6 +999,17 @@ const COMBAT = {
       ownerLockFrames: 2,
       pointBlankGap: 6
     },
+    cydog: {
+      netSpeed: 11,
+      netRadius: 16,
+      captureGap: 26,
+      capturePullSpeed: 10,
+      captureHoldMs: 4200,
+      bombFuseFrames: 240,
+      bombRadius: 28,
+      bombDamage: 15,
+      bombKnockback: 11
+    },
     sekdog: {
       descendFrames: 12,
       riseFrames: 12,
@@ -1434,7 +1445,7 @@ updateAudioUI();
 const spriteCache = {};
 
 function isMaskedFighter(name) {
-  return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG';
+  return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG';
 }
 
 function getMaskedTrimColors(name, frozen) {
@@ -1457,6 +1468,17 @@ function getMaskedTrimColors(name, frozen) {
       hoodieEdge: '#aab4bf',
       centerStripe: '#737f8b',
       innerEar: '#919ca8'
+    };
+  }
+
+  if (name === 'CYDOG') {
+    return {
+      limbColor: '#68644f',
+      pawColor: '#a59663',
+      hoodieColor: '#4f4a34',
+      hoodieEdge: '#d8c37a',
+      centerStripe: '#94844e',
+      innerEar: '#a18f58'
     };
   }
 
@@ -1498,6 +1520,15 @@ function getMaskedGearColors(name, frozen) {
     };
   }
 
+  if (name === 'CYDOG') {
+    return {
+      vestColor: '#f1c40f',
+      vestHighlight: '#ffe66d',
+      maskColor: '#f1c40f',
+      maskEdge: '#c8a800'
+    };
+  }
+
   return {
     vestColor: '#87ceeb',
     vestHighlight: '#b0e0e6',
@@ -1513,6 +1544,14 @@ function isDoggoCage(name) {
 function getPointBlankTargetX(attacker, defender) {
   const spacing = attacker.width / 2 + defender.width / 2 - COMBAT.special.skorpdog.pointBlankGap;
   return attacker.x + attacker.facing * spacing;
+}
+
+function releaseCapturedOpponent(opponent) {
+  if (opponent.health <= 0) return;
+  opponent.stunnedTimer = 0;
+  opponent.vx = 0;
+  opponent.vy = 0;
+  opponent.state = 'idle';
 }
 
 function drawDoggoCageSunglasses(x, headY, frozen) {
@@ -1919,6 +1958,31 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
       x.fillStyle = '#fff';
       x.beginPath();
       x.arc(harpoonX + 1, harpoonY, 2, 0, Math.PI * 2);
+      x.fill();
+    } else if (name === 'CYDOG') {
+      const netFrame = frame % 10;
+      const netX = 96 + netFrame * 2;
+      const netY = bodyY + 2;
+      x.strokeStyle = '#2ecc71';
+      x.lineWidth = 2;
+      x.beginPath();
+      x.arc(netX, netY, 10, 0, Math.PI * 2);
+      x.stroke();
+
+      for (let i = 0; i < 4; i++) {
+        x.save();
+        x.translate(netX, netY);
+        x.rotate((i / 4) * Math.PI / 2 + frame * 0.05);
+        x.beginPath();
+        x.moveTo(-8, 0);
+        x.lineTo(8, 0);
+        x.stroke();
+        x.restore();
+      }
+
+      x.fillStyle = '#f1c40f';
+      x.beginPath();
+      x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
     } else {
       const sf = frame % 12;
@@ -2585,6 +2649,10 @@ class Fighter {
       }
       this.special = 0;
       spawnProjectile(this);
+      if (this.name === 'CYDOG') {
+        this.attackTimer = 0;
+        this.state = 'idle';
+      }
     }
 
     playAttackSound(type);
@@ -3014,6 +3082,16 @@ function spawnProjectile(owner) {
     radius = COMBAT.special.sekdog.missileRadius;
     dmg = COMBAT.special.sekdog.missileDamage;
     kb = COMBAT.special.sekdog.missileKnockback;
+  } else if (owner.name === 'CYDOG') {
+    color1 = '#2ecc71';
+    color2 = '#27ae60';
+    type = 'net';
+    speed = COMBAT.special.cydog.netSpeed;
+    radius = COMBAT.special.cydog.netRadius;
+    dmg = 0;
+    kb = 0;
+    const bomb = spawnCydogBomb(owner);
+    owner.pendingCydogBomb = bomb;
   } else if (owner.name === 'SUBDOG') {
     color1 = '#87ceeb';
     color2 = '#b0e0e6';
@@ -3058,13 +3136,51 @@ function spawnProjectile(owner) {
     pullTimer: 0,
     rotation: 0,
     ownerAnchorX: owner.x,
-    ownerAnchorY: owner.y
+    ownerAnchorY: owner.y,
+    ownerAnchorFacing: owner.facing,
+    bombAnchorX: owner.pendingCydogBomb ? owner.pendingCydogBomb.x : 0,
+    bombAnchorY: owner.pendingCydogBomb ? owner.pendingCydogBomb.y : 0,
+    fuseFrames: 0,
+    exploded: false
   });
+
+  owner.pendingCydogBomb = null;
+}
+
+function spawnCydogBomb(owner) {
+  const special = COMBAT.special.cydog;
+  const bomb = {
+    x: owner.x + owner.facing * 84,
+    y: owner.y - 34,
+    vx: 0,
+    vy: 0,
+    owner,
+    dmg: special.bombDamage,
+    kb: special.bombKnockback,
+    life: special.bombFuseFrames,
+    radius: special.bombRadius,
+    color1: '#f1c40f',
+    color2: '#f39c12',
+    type: 'bomb',
+    trail: [],
+    hit: true,
+    pullTimer: 0,
+    rotation: 0,
+    ownerAnchorX: owner.x,
+    ownerAnchorY: owner.y,
+    ownerAnchorFacing: owner.facing,
+    fuseFrames: special.bombFuseFrames,
+    exploded: false
+  };
+
+  projectiles.push(bomb);
+  return bomb;
 }
 
 function updateProjectiles(opponent) {
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
+    const target = p.owner === p1 ? p2 : p1;
     p.life--;
 
     // Harpoon pull logic
@@ -3097,6 +3213,51 @@ function updateProjectiles(opponent) {
 
       // Timeout safety for pathological cases only; allow long pulls to finish.
       if (p.pullTimer > 120) {
+        projectiles.splice(i, 1);
+      }
+      continue;
+    }
+
+    if (p.type === 'net' && p.hit) {
+      p.pullTimer++;
+      const targetX = p.bombAnchorX - p.ownerAnchorFacing * (target.width / 2 + Math.max(12, COMBAT.special.cydog.bombRadius * 0.35));
+      const dx = targetX - target.x;
+      const pullSpeed = COMBAT.special.cydog.capturePullSpeed;
+
+      if (Math.abs(dx) > 5) {
+        target.x += Math.sign(dx) * Math.min(pullSpeed, Math.abs(dx));
+        target.vx = 0;
+        target.vy = 0;
+      } else {
+        target.x = targetX;
+        target.vx = 0;
+        target.vy = 0;
+        projectiles.splice(i, 1);
+      }
+
+      p.x = target.x - p.ownerAnchorFacing * 12;
+      p.y = target.y - 52;
+
+      if (p.pullTimer > 150) {
+        projectiles.splice(i, 1);
+      }
+      continue;
+    }
+
+    if (p.type === 'bomb') {
+      if (p.life <= 0 && !p.exploded) {
+        p.exploded = true;
+        const targetDistance = Math.hypot(target.x - p.x, target.y - 50 - p.y);
+        if (targetDistance <= p.radius + target.width / 2) {
+          target.takeHit(p.dmg, p.kb, p.owner.facing);
+        }
+        releaseCapturedOpponent(target);
+        addParticle(p.x, p.y, 'ko');
+        addParticle(p.x, p.y, 'hit');
+        game.screenShake = COMBAT.effects.projectileShake;
+        game.hitStop = COMBAT.effects.projectileHitStop;
+        if (target.health <= 0) playImpactSound('ko');
+        else playImpactSound('hit');
         projectiles.splice(i, 1);
       }
       continue;
@@ -3139,6 +3300,20 @@ function updateProjectiles(opponent) {
           game.screenShake = COMBAT.effects.harpoonShake;
           game.hitStop = COMBAT.effects.harpoonHitStop;
           if (opponent.health <= 0) playImpactSound('ko');
+        } else if (p.type === 'net') {
+          p.hit = true;
+          p.vx = 0;
+          p.vy = 0;
+          p.pullTimer = 0;
+          p.ownerAnchorX = p.owner.x;
+          p.ownerAnchorY = p.owner.y;
+          p.ownerAnchorFacing = p.owner.facing;
+          p.owner.attackTimer = 0;
+          p.owner.state = 'idle';
+          opponent.applyStunnedStatus(COMBAT.special.cydog.captureHoldMs);
+          addParticle(p.x, p.y, 'stunned');
+          game.screenShake = COMBAT.effects.freezeShake;
+          game.hitStop = COMBAT.effects.freezeHitStop;
         } else if (p.type === 'snowflake') {
           // Snowflake: freeze opponent
           opponent.freezeTimer = 2000;
@@ -3326,6 +3501,77 @@ function drawProjectiles() {
       ctx.fill();
 
       ctx.restore();
+    } else if (p.type === 'net') {
+      p.rotation += 0.12;
+
+      p.trail.forEach(t => {
+        const ta = (t.life / 15) * 0.25 * alpha;
+        ctx.globalAlpha = ta;
+        ctx.strokeStyle = '#2ecc71';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, p.radius * 0.45 * (t.life / 15), 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = '#2ecc71';
+      ctx.lineWidth = 3;
+
+      for (let i = 0; i < 4; i++) {
+        ctx.rotate(Math.PI / 4);
+        ctx.beginPath();
+        ctx.moveTo(-p.radius, 0);
+        ctx.lineTo(p.radius, 0);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#7bed9f';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.radius * 0.95, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    } else if (p.type === 'bomb') {
+      const fuseProgress = 1 - p.life / p.fuseFrames;
+
+      ctx.globalAlpha = 0.25 + fuseProgress * 0.2;
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 1.7);
+      glow.addColorStop(0, '#ffe66d');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 1.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createRadialGradient(p.x - 6, p.y - 8, 2, p.x, p.y, p.radius);
+      grad.addColorStop(0, '#fff7b2');
+      grad.addColorStop(0.35, '#f1c40f');
+      grad.addColorStop(1, '#d68910');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#7b241c';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.strokeStyle = fuseProgress > 0.7 ? '#2ecc71' : '#f39c12';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - p.radius * 0.6);
+      ctx.quadraticCurveTo(p.x + 6, p.y - p.radius - 8, p.x + 14, p.y - p.radius - 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#2ecc71';
+      ctx.beginPath();
+      ctx.arc(p.x + 14, p.y - p.radius - 2, 3 + Math.sin(Date.now() * 0.02) * 1.2, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       // Regular energy ball projectile
       // Trail
@@ -3548,6 +3794,17 @@ const CHARACTERS = [
     health: 100,
     specialGain: 0.25,
     desc: 'AMBUSH'
+  },
+  {
+    id: 'cydog',
+    name: 'CYDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#f1c40f',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'TRAPPER'
   },
   {
     id: 'subdog',
@@ -4272,7 +4529,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG') || attacker.lastAttackType === 'special') {
+    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

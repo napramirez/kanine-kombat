@@ -265,17 +265,12 @@
   }
 
   #char-select-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
+    width: min(calc(100% - 48px), 1024px);
     margin-bottom: 25px;
-  }
-
-  .char-select-portraits {
-    display: flex;
-    gap: 40px;
-    align-items: flex-end;
   }
 
   .char-select-panel {
@@ -283,6 +278,9 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .char-select-panel.p1 { justify-self: start; }
+  .char-select-panel.p2 { justify-self: end; }
 
   .char-select-panel h2 {
     font-size: 14px;
@@ -294,9 +292,11 @@
   .char-select-panel.p2 h2 { color: #74b9ff; }
 
   #char-pool {
-    display: flex;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 116px);
+    gap: 12px;
     justify-content: center;
+    justify-self: center;
   }
 
   .char-portrait {
@@ -447,9 +447,9 @@
   .char-option canvas {
     border: none;
     image-rendering: pixelated;
-    transform: scale(1.5);
-    transform-origin: center 65%;
-    margin-bottom: 5px;
+    transform: scale(1.15);
+    transform-origin: center 58%;
+    margin-bottom: 2px;
   }
 
   .char-option .char-name {
@@ -471,6 +471,9 @@
   #char-select-controls {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
     font-size: 9px;
     color: #888;
     margin-bottom: 25px;
@@ -508,17 +511,18 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     z-index: 60;
-    padding: 102px 36px 28px;
+    padding: 54px 36px 28px;
     text-align: center;
+    overflow: hidden;
   }
 
   #battle-plan-stepper h1 {
     color: #f1c40f;
     font-size: 28px;
     text-shadow: 3px 3px #000;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   #battle-plan-summary {
@@ -529,17 +533,26 @@
     min-height: 52px;
   }
 
+  #battle-plan-route-viewport {
+    width: min(calc(100vw - 72px), 1120px);
+    max-width: 100%;
+    padding-top: 96px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: visible;
+    margin: 42px 0 18px;
+  }
+
   #battle-plan-route {
     position: relative;
-    width: 920px;
     height: 250px;
-    margin: 140px 0 18px;
+    margin: 0 auto;
   }
 
   #battle-plan-route-line {
     position: absolute;
-    left: 80px;
-    right: 80px;
+    left: 146px;
+    right: 146px;
     top: 105px;
     height: 6px;
     border-radius: 999px;
@@ -551,9 +564,12 @@
     position: relative;
     z-index: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     height: 100%;
+    gap: 34px;
+    padding: 0 80px;
+    box-sizing: border-box;
   }
 
   .battle-plan-step {
@@ -887,31 +903,31 @@
   <div id="char-select">
     <h1>SELECT YOUR FIGHTER</h1>
     <div id="char-select-container">
-      <div class="char-select-portraits">
-        <div class="char-select-panel p1">
-          <h2 id="p1-select-label">PLAYER 1</h2>
-          <div class="char-portrait p1" id="p1-portrait"></div>
-        </div>
-        <div class="char-select-panel p2">
-          <h2 id="p2-select-label">PLAYER 2</h2>
-          <div class="char-portrait p2" id="p2-portrait"></div>
-        </div>
+      <div class="char-select-panel p1">
+        <h2 id="p1-select-label">PLAYER 1</h2>
+        <div class="char-portrait p1" id="p1-portrait"></div>
       </div>
       <div id="char-pool"></div>
+      <div class="char-select-panel p2">
+        <h2 id="p2-select-label">PLAYER 2</h2>
+        <div class="char-portrait p2" id="p2-portrait"></div>
+      </div>
     </div>
     <div id="char-select-controls">
-      <span id="p1-select-controls">P1: <kbd>A</kbd><kbd>D</kbd> Select &bull; <kbd>J</kbd> Confirm</span>
-      <span id="p2-select-controls">P2: <kbd>&larr;</kbd><kbd>&rarr;</kbd> Select &bull; <kbd>1</kbd> Confirm</span>
+      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm</span>
+      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm</span>
     </div>
     <button id="fight-btn">FIGHT!</button>
   </div>
   <div id="battle-plan-stepper">
     <h1>BATTLE PLAN</h1>
     <div id="battle-plan-summary"></div>
-    <div id="battle-plan-route">
-      <div id="battle-plan-route-line"></div>
-      <div id="battle-plan-route-steps"></div>
-      <div id="battle-plan-player-token"></div>
+    <div id="battle-plan-route-viewport">
+      <div id="battle-plan-route">
+        <div id="battle-plan-route-line"></div>
+        <div id="battle-plan-route-steps"></div>
+        <div id="battle-plan-player-token"></div>
+      </div>
     </div>
     <div id="battle-plan-prompt"></div>
   </div>
@@ -1098,6 +1114,7 @@ const ui = {
   charSelect: document.getElementById('char-select'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
+  battlePlanRouteViewport: document.getElementById('battle-plan-route-viewport'),
   battlePlanRoute: document.getElementById('battle-plan-route'),
   battlePlanRouteSteps: document.getElementById('battle-plan-route-steps'),
   battlePlanPlayerToken: document.getElementById('battle-plan-player-token'),
@@ -4971,9 +4988,15 @@ function buildBattlePlanStepper() {
   const playerChar = getCharacterById(game.battlePlan.playerCharacterId);
   const nextOpponent = getBattlePlanCurrentOpponent();
   const clearedCount = game.battlePlan.currentIndex;
+  const routeStepCount = game.battlePlan.route.length;
+  const stepWidth = 132;
+  const stepGap = 34;
+  const routePadding = 160;
+  const routeWidth = Math.max(920, routePadding + routeStepCount * stepWidth + Math.max(0, routeStepCount - 1) * stepGap);
 
   ui.battlePlanRouteSteps.innerHTML = '';
   ui.battlePlanPlayerToken.innerHTML = '';
+  ui.battlePlanRoute.style.width = `${routeWidth}px`;
 
   game.battlePlan.route.forEach((id, index) => {
     const char = getCharacterById(id);
@@ -5046,6 +5069,31 @@ function getBattlePlanTokenPosition(index) {
   };
 }
 
+function getBattlePlanRouteScrollLeft(index) {
+  if (index < 0) return 0;
+
+  const steps = ui.battlePlanRouteSteps.querySelectorAll('.battle-plan-step');
+  const step = steps[index];
+  if (!step) return 0;
+
+  const viewport = ui.battlePlanRouteViewport;
+  const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+  const target = step.offsetLeft + step.offsetWidth / 2 - viewport.clientWidth / 2;
+  return Math.max(0, Math.min(maxScroll, target));
+}
+
+function setBattlePlanRouteScroll(index, animate) {
+  const viewport = ui.battlePlanRouteViewport;
+  const left = getBattlePlanRouteScrollLeft(index);
+
+  if (animate) {
+    viewport.scrollTo({ left, behavior: 'smooth' });
+    return;
+  }
+
+  viewport.scrollLeft = left;
+}
+
 function setBattlePlanTokenPosition(index, animate) {
   const pos = getBattlePlanTokenPosition(index);
   ui.battlePlanPlayerToken.style.transition = animate
@@ -5059,6 +5107,7 @@ function hideBattlePlanStepper() {
   ui.battlePlanStepper.style.display = 'none';
   ui.battlePlanStepper.classList.remove('paused-underlay');
   ui.battlePlanPrompt.classList.remove('ready');
+  ui.battlePlanRouteViewport.scrollLeft = 0;
 }
 
 function showBattlePlanStepper(fromIndex, toIndex) {
@@ -5070,10 +5119,12 @@ function showBattlePlanStepper(fromIndex, toIndex) {
   syncMusicMode();
 
   requestAnimationFrame(() => {
+    setBattlePlanRouteScroll(fromIndex, false);
     setBattlePlanTokenPosition(fromIndex, false);
     ui.battlePlanPlayerToken.offsetWidth;
 
     requestAnimationFrame(() => {
+      setBattlePlanRouteScroll(toIndex, fromIndex !== toIndex);
       setBattlePlanTokenPosition(toIndex, true);
       window.setTimeout(() => {
         game.battlePlan.stepperReady = true;
@@ -5231,6 +5282,7 @@ function randomCpuSelection() {
 
 function updateCharSelectModeUI() {
   ui.p1SelectLabel.textContent = 'PLAYER 1';
+  ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm';
   if (isBattlePlanMode()) {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
@@ -5241,7 +5293,7 @@ function updateCharSelectModeUI() {
     ui.fightButton.textContent = 'FIGHT CPU';
   } else {
     ui.p2SelectLabel.textContent = 'PLAYER 2';
-    ui.p2SelectControls.innerHTML = 'P2: <kbd>&larr;</kbd><kbd>&rarr;</kbd> Select &bull; <kbd>1</kbd> Confirm';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm';
     ui.fightButton.textContent = 'FIGHT!';
   }
 }
@@ -5341,6 +5393,37 @@ function renderCharPreview(char) {
   return createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
 }
 
+const CHAR_SELECT_COLUMNS = 3;
+
+function moveCharSelection(index, dx, dy) {
+  const total = CHARACTERS.length;
+  if (total === 0) return index;
+
+  const columns = CHAR_SELECT_COLUMNS;
+  const rows = Math.ceil(total / columns);
+  let row = Math.floor(index / columns);
+  let col = index % columns;
+
+  if (dx !== 0) {
+    const rowStart = row * columns;
+    const rowLength = Math.min(columns, total - rowStart);
+    col = (col + dx + rowLength) % rowLength;
+    return rowStart + col;
+  }
+
+  if (dy !== 0) {
+    let nextRow = row;
+    do {
+      nextRow = (nextRow + dy + rows) % rows;
+      const rowStart = nextRow * columns;
+      const rowLength = Math.min(columns, total - rowStart);
+      if (rowLength > 0) return rowStart + Math.min(col, rowLength - 1);
+    } while (nextRow !== row);
+  }
+
+  return index;
+}
+
 function buildTitleLogo() {
   if (!ui.titleLogo) return;
 
@@ -5390,10 +5473,6 @@ function buildCharSelect() {
     name.className = 'char-name';
     name.textContent = char.name;
     opt.appendChild(name);
-    const stats = document.createElement('div');
-    stats.className = 'char-stats';
-    stats.textContent = char.desc;
-    opt.appendChild(stats);
     opt.addEventListener('click', () => {
       ensureAudioReady();
       if (!p1Confirmed) {
@@ -5470,15 +5549,19 @@ document.addEventListener('keydown', e => {
 
   // P1 navigation
   if (!p1Confirmed) {
-    if (k === 'a') { ensureAudioReady(); p1Selection = (p1Selection - 1 + CHARACTERS.length) % CHARACTERS.length; updateCharSelect(); playUiSound('navigate'); }
-    if (k === 'd') { ensureAudioReady(); p1Selection = (p1Selection + 1) % CHARACTERS.length; updateCharSelect(); playUiSound('navigate'); }
+    if (k === 'a') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, -1, 0); updateCharSelect(); playUiSound('navigate'); }
+    if (k === 'd') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 1, 0); updateCharSelect(); playUiSound('navigate'); }
+    if (k === 'w') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 0, -1); updateCharSelect(); playUiSound('navigate'); }
+    if (k === 's') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 0, 1); updateCharSelect(); playUiSound('navigate'); }
     if (k === 'j') { ensureAudioReady(); p1Confirmed = true; updateCharSelect(); playUiSound('confirm'); }
   }
 
   // P2 navigation
   if (!p2Confirmed && !isCpuControlledMode()) {
-    if (e.key === 'ArrowLeft') { ensureAudioReady(); p2Selection = (p2Selection - 1 + CHARACTERS.length) % CHARACTERS.length; updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
-    if (e.key === 'ArrowRight') { ensureAudioReady(); p2Selection = (p2Selection + 1) % CHARACTERS.length; updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, -1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 0, -1); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
+    if (e.key === 'ArrowDown') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 0, 1); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (k === '1' || e.key === 'Numpad1') { ensureAudioReady(); p2Confirmed = true; updateCharSelect(); playUiSound('confirm'); }
   }
 

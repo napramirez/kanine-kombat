@@ -16,7 +16,7 @@
 - [x] Fifth character (`SUBDOG`)
 - [x] Sixth character (`SEKDOG`)
 - [x] Seventh character (`CYDOG`)
-- [x] Eighth character (`TREMDOG`)
+- [x] Eighth character (`TREMODOG`)
 - [x] Character-specific stats and movesets
 - [ ] 3 new background stages
 - [ ] Stage selection
@@ -66,9 +66,9 @@
 
 ## Current Build Notes
 
-- Roster is now 8 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMDOG`, and `SUBDOG`
+- Roster is now 8 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, and `SUBDOG`
 - `CYDOG` uses a bomb-and-net capture special
-- `TREMDOG` uses a planted floor shockwave special stance
+- `TREMODOG` uses a planted floor shockwave special stance
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
 - `Esc` pause flow exists for fights and Battle Plan stepper screens

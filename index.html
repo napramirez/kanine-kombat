@@ -1452,7 +1452,7 @@ updateAudioUI();
 const spriteCache = {};
 
 function isMaskedFighter(name) {
-  return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMDOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG';
 }
 
 function getMaskedTrimColors(name, frozen) {
@@ -1536,7 +1536,7 @@ function getMaskedGearColors(name, frozen) {
     };
   }
 
-  if (name === 'TREMDOG') {
+if (name === 'TREMODOG') {
     return {
       vestColor: '#8b5a2b',
       vestHighlight: '#b07d45',
@@ -1624,7 +1624,7 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
 
   // Legs (no walk animation when frozen) - skip for victory/defeat
   const legSpread = (state === 'walk' && !frozen) ? Math.sin(frame * 0.3) * 8 : 0;
-  const isSpecialCrouch = state === 'special' && name === 'TREMDOG';
+const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   const crouchOffset = (state === 'crouch' || isSpecialCrouch) ? 12 : 0;
 
   const trimColors = getMaskedTrimColors(name, frozen);
@@ -2001,7 +2001,7 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
       x.beginPath();
       x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
-    } else if (name === 'TREMDOG') {
+    } else if (name === 'TREMODOG') {
       x.strokeStyle = '#ff7de9';
       x.lineWidth = 3;
       for (let i = 0; i < 4; i++) {
@@ -2876,7 +2876,7 @@ class Fighter {
 // Combo decay
 if (Date.now() - this.lastHitTime > COMBAT.comboResetMs) this.comboCount = 0;
 
-if (this.name === 'TREMDOG' && this.attackTimer > 0 && this.lastAttackType === 'special') {
+if (this.name === 'TREMODOG' && this.attackTimer > 0 && this.lastAttackType === 'special') {
   this.vx = 0;
   this.vy = 0;
   this.isCrouching = true;
@@ -3131,7 +3131,7 @@ function spawnProjectile(owner) {
     kb = 0;
     const bomb = spawnCydogBomb(owner);
     owner.pendingCydogBomb = bomb;
-  } else if (owner.name === 'TREMDOG') {
+  } else if (owner.name === 'TREMODOG') {
     spawnTremdogShockwaveField(owner);
     return;
   } else if (owner.name === 'SUBDOG') {
@@ -3921,6 +3921,17 @@ function drawKanineLogo(x, cx, cy, scale = 1, palette = {}) {
   x.restore();
 }
 
+const BACKGROUND_STAGES = {
+  BORKO_LAIR: 'borkoLair',
+  NIGHT_CITY: 'nightCity',
+  TEMPLE: 'temple'
+};
+
+function pickRandomBackgroundStage() {
+  const stages = [BACKGROUND_STAGES.BORKO_LAIR, BACKGROUND_STAGES.NIGHT_CITY, BACKGROUND_STAGES.TEMPLE];
+  return stages[Math.floor(Math.random() * stages.length)];
+}
+
 function drawTempleDoorLogo(x, y, w, h) {
   drawKanineLogo(ctx, x + w / 2, y + h / 2, 0.72, {
     ring: '#111111',
@@ -3935,7 +3946,204 @@ function drawTempleDoorLogo(x, y, w, h) {
   });
 }
 
-function drawBackground() {
+function drawBuilding(x, y, w, h) {
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = '#251535';
+  ctx.fillRect(x + 5, y + 5, w - 10, h - 5);
+
+  // Window flicker is derived from the building rect so lights stay attached to that facade.
+  ctx.fillStyle = '#f1c40f';
+  for (let wx = x + 12; wx <= x + w - 18; wx += 14) {
+    for (let wy = y + 14; wy <= y + h - 22; wy += 24) {
+      const flicker = 0.55 + Math.sin(Date.now() * 0.001 + wx * 0.2 + wy * 0.08) * 0.18;
+      const lit = Math.sin(wx * 12.9898 + wy * 78.233) > -0.2;
+      if (!lit) continue;
+      ctx.globalAlpha = flicker;
+      ctx.fillRect(wx, wy, 8, 12);
+    }
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#1a1025';
+}
+
+function drawNightCityBackground() {
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND);
+  skyGrad.addColorStop(0, '#1a0a2e');
+  skyGrad.addColorStop(0.5, '#2d1b4e');
+  skyGrad.addColorStop(1, '#4a2c6e');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, GROUND);
+
+  ctx.fillStyle = '#f5f5dc';
+  ctx.beginPath();
+  ctx.arc(850, 80, 40, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#1a0a2e';
+  ctx.beginPath();
+  ctx.arc(865, 72, 35, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#fff';
+  for (let i = 0; i < 50; i++) {
+    const sx = (i * 137 + 50) % W;
+    const sy = (i * 89 + 20) % (GROUND - 100);
+    const ss = (Math.sin(Date.now() * 0.001 + i) + 1) * 1.2;
+    ctx.globalAlpha = 0.3 + Math.sin(Date.now() * 0.002 + i * 0.5) * 0.3;
+    ctx.fillRect(sx, sy, ss, ss);
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = '#1a1025';
+  drawBuilding(50, GROUND - 200, 60, 200);
+  drawBuilding(140, GROUND - 260, 80, 260);
+  drawBuilding(260, GROUND - 180, 50, 180);
+  drawBuilding(700, GROUND - 220, 70, 220);
+  drawBuilding(810, GROUND - 280, 90, 280);
+  drawBuilding(930, GROUND - 160, 55, 160);
+
+  const groundGrad = ctx.createLinearGradient(0, GROUND, 0, H);
+  groundGrad.addColorStop(0, '#2c2c2c');
+  groundGrad.addColorStop(0.3, '#1a1a1a');
+  groundGrad.addColorStop(1, '#111');
+  ctx.fillStyle = groundGrad;
+  ctx.fillRect(0, GROUND, W, H - GROUND);
+
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, GROUND);
+  ctx.lineTo(W, GROUND);
+  ctx.stroke();
+
+  ctx.fillStyle = '#333';
+  for (let i = 0; i < W; i += 40) {
+    ctx.fillRect(i, GROUND + 5, 20, 2);
+  }
+}
+
+function drawBorkosLairBackground() {
+  const wallGrad = ctx.createLinearGradient(0, 0, 0, GROUND);
+  wallGrad.addColorStop(0, '#2e342f');
+  wallGrad.addColorStop(0.45, '#3f453f');
+  wallGrad.addColorStop(1, '#1e231f');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(0, 0, W, GROUND);
+
+  ctx.fillStyle = '#1f241f';
+  for (let x = -20; x <= W + 20; x += 44) {
+    for (let y = 28; y <= GROUND - 80; y += 24) {
+      const offset = (Math.floor(y / 24) % 2) * 18;
+      ctx.fillRect(x + offset, y, 40, 20);
+    }
+  }
+
+  ctx.strokeStyle = 'rgba(18, 24, 18, 0.45)';
+  ctx.lineWidth = 2;
+  for (let y = 52; y <= GROUND - 76; y += 48) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = '#121612';
+  ctx.beginPath();
+  ctx.ellipse(816, 224, 112, 88, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const eyeGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 16);
+  eyeGlow.addColorStop(0, '#ffe66d');
+  eyeGlow.addColorStop(0.45, '#f1c40f');
+  eyeGlow.addColorStop(1, 'rgba(241, 196, 15, 0)');
+  ctx.fillStyle = eyeGlow;
+  ctx.save();
+  ctx.translate(786, 220 + Math.sin(Date.now() * 0.002) * 2);
+  ctx.scale(1.2, 0.8);
+  ctx.beginPath();
+  ctx.arc(0, 0, 15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.translate(846, 220 + Math.cos(Date.now() * 0.0022) * 2);
+  ctx.scale(1.2, 0.8);
+  ctx.beginPath();
+  ctx.arc(0, 0, 15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = '#676f62';
+  ctx.fillRect(74, 126, 146, 34);
+  ctx.fillRect(820, 104, 112, 28);
+  ctx.fillStyle = '#50584d';
+  ctx.beginPath();
+  ctx.arc(220, 143, 18, -Math.PI / 2, Math.PI / 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(820, 118, 16, Math.PI / 2, Math.PI * 1.5);
+  ctx.fill();
+
+  ctx.strokeStyle = '#7aa35c';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(170, 160);
+  ctx.lineTo(182, 212);
+  ctx.lineTo(164, 256);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(888, 132);
+  ctx.lineTo(874, 184);
+  ctx.lineTo(892, 232);
+  ctx.stroke();
+
+  ctx.fillStyle = '#4c5550';
+  ctx.fillRect(0, GROUND - 118, W, 24);
+  ctx.fillStyle = '#69736d';
+  for (let x = 0; x <= W; x += 64) {
+    ctx.fillRect(x + 8, GROUND - 114, 40, 8);
+  }
+
+  const canalTop = GROUND - 94;
+  const canalBottom = H;
+  const waterGrad = ctx.createLinearGradient(0, canalTop, 0, canalBottom);
+  waterGrad.addColorStop(0, '#50766a');
+  waterGrad.addColorStop(0.4, '#2f584f');
+  waterGrad.addColorStop(1, '#173530');
+  ctx.fillStyle = waterGrad;
+  ctx.fillRect(0, canalTop, W, canalBottom - canalTop);
+
+  ctx.fillStyle = 'rgba(156, 209, 171, 0.16)';
+  for (let x = -40; x <= W + 40; x += 52) {
+    const y = canalTop + 12 + Math.sin((x * 0.04) + Date.now() * 0.003) * 4;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 34, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = '#9dd1ab';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 18) {
+    const y = canalTop + Math.sin((x / 28) + Date.now() * 0.004) * 4;
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(220, 255, 226, 0.18)';
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += 24) {
+    const y = canalTop + 20 + Math.cos((x / 24) + Date.now() * 0.0035) * 5;
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  ctx.fillStyle = '#272d29';
+  ctx.fillRect(0, GROUND, W, H - GROUND);
+}
+
+function drawTempleBackground() {
   const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND);
   skyGrad.addColorStop(0, '#7fc2f3');
   skyGrad.addColorStop(0.45, '#a9daf7');
@@ -4073,10 +4281,25 @@ function drawBackground() {
   }
 }
 
+function drawBackground() {
+  if (game.stage === BACKGROUND_STAGES.BORKO_LAIR) {
+    drawBorkosLairBackground();
+    return;
+  }
+
+  if (game.stage === BACKGROUND_STAGES.NIGHT_CITY) {
+    drawNightCityBackground();
+    return;
+  }
+
+  drawTempleBackground();
+}
+
 // Game state and roster
 let game = {
   state: GAME_STATES.MENU,
   mode: MATCH_MODES.VERSUS,
+  stage: BACKGROUND_STAGES.TEMPLE,
   battlePlan: {
     route: [],
     currentIndex: 0,
@@ -4175,7 +4398,7 @@ const CHARACTERS = [
   },
   {
     id: 'tremdog',
-    name: 'TREMDOG',
+    name: 'TREMODOG',
     color1: '#ffffff',
     color2: '#111111',
     eyeColor: '#e74c3c',
@@ -4275,6 +4498,7 @@ function getBattlePlanCurrentOpponent() {
 function loadBattlePlanMatch() {
   const playerChar = getCharacterById(game.battlePlan.playerCharacterId);
   const opponentChar = getBattlePlanCurrentOpponent();
+  game.stage = pickRandomBackgroundStage();
 
   p1 = new Fighter(PLAYER_SPAWNS.p1, playerChar, 1);
   p2 = new Fighter(PLAYER_SPAWNS.p2, opponentChar, -1);
@@ -4782,6 +5006,7 @@ function confirmSelection() {
     }
     loadBattlePlanMatch();
   } else {
+    game.stage = pickRandomBackgroundStage();
     p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
     p2 = new Fighter(PLAYER_SPAWNS.p2, CHARACTERS[p2Selection], -1);
     ui.p1Name.textContent = p1.name;
@@ -4851,7 +5076,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMDOG') || attacker.lastAttackType === 'special') {
+    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

@@ -18,7 +18,7 @@ Players choose from a shared roster before each match.
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
-| `TREMDOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
+| `TREMODOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System
@@ -37,7 +37,7 @@ Players choose from a shared roster before each match.
 - `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
-- `TREMDOG`: creates a floor-wide pink shockwave field for 600 frames while TREMDOG stays planted in a crouched special stance
+- `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -56,12 +56,12 @@ Players choose from a shared roster before each match.
 ### Special Meter
 
 - Base passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMDOG`, and `SUBDOG` passively gain `0.25` per frame
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, and `SUBDOG` passively gain `0.25` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
 - Full meter is required to use a special
 - Meter blinks when ready
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMDOG`, and `SUBDOG` do not gain special from punch or kick hits
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, and `SUBDOG` do not gain special from punch or kick hits
 
 ### Physics
 
@@ -133,7 +133,8 @@ fight or battlePlanStepper -> paused
 
 ### Background
 
-- `The Temple` stage uses an afternoon sky gradient with warm sunlight
-- Chinese-style temple facade in the midground
-- Lush forest layered behind the temple
-- Large front doors bearing the `KANINE KOMBAT` logo
+- Background stage is chosen at random at the start of each match
+- Current stages:
+  - `The Temple`: afternoon sky, Chinese-style temple facade, lush forest, and `KANINE KOMBAT` doors
+  - `Night City`: moonlit skyline, stars, lit windows, and dark pavement
+  - `Borko's Lair`: indoor sewer canal, flowing waste water, and glowing yellow eyes in the darkness

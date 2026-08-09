@@ -32,9 +32,10 @@ Optional music files:
   - `SKORPDOG`
   - `SEKDOG`
   - `CYDOG`
-  - `TREMDOG`
+  - `TREMODOG`
   - `SUBDOG`
 - Character select screen with shared roster
+- Randomized background stages each match
 - Procedural sprite animation and portrait previews
 - Punch, kick, block, jump, crouch, and special attacks
 - Combo scaling, hit stop, screen shake, particles, and KO effects
@@ -42,6 +43,13 @@ Optional music files:
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights
+
+## Background Stages
+
+- `The Temple`: afternoon Chinese-style temple with lush forest behind it and logo doors
+- `Night City`: moonlit skyline with stars, lit windows, and dark pavement
+- `Borko's Lair`: indoor sewer stage with a flowing canal and glowing yellow eyes in the dark
+- Each new match picks one of the available stages at random
 
 ## Battle Plan
 

@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 8 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMDOG`, `SUBDOG`
+- 8 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `SUBDOG`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - `VS CPU` already exists with a basic AI opponent
 - `BATTLE PLAN` already exists with a route stepper, a `BORKO` sub-boss, and a `SHAO CATNIP` final fight
@@ -48,7 +48,7 @@ Add a ninth character to expand the roster beyond the current eight fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, and TREMDOG as quake/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, and TREMODOG as quake/control.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.

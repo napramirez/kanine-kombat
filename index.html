@@ -2055,21 +2055,50 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
     } else if (name === 'BORKO') {
+      const leftArm = { x: 44, y: bodyY + 14, angle: -2.85, length: 26, rise: -4 };
+      const rightArm = { x: 72, y: bodyY + 14, angle: -0.25, length: 26, rise: 4 };
+      const leftPawX = leftArm.x + leftArm.length * Math.cos(leftArm.angle) - leftArm.rise * Math.sin(leftArm.angle);
+      const leftPawY = leftArm.y + leftArm.length * Math.sin(leftArm.angle) + leftArm.rise * Math.cos(leftArm.angle);
+      const rightPawX = rightArm.x + rightArm.length * Math.cos(rightArm.angle) - rightArm.rise * Math.sin(rightArm.angle);
+      const rightPawY = rightArm.y + rightArm.length * Math.sin(rightArm.angle) + rightArm.rise * Math.cos(rightArm.angle);
+
+      x.strokeStyle = frozenColor1;
+      x.lineWidth = 8;
+      x.lineCap = 'round';
+
+      x.save();
+      x.translate(leftArm.x, leftArm.y);
+      x.rotate(leftArm.angle);
+      x.beginPath();
+      x.moveTo(0, 0);
+      x.lineTo(leftArm.length, leftArm.rise);
+      x.stroke();
+      x.restore();
+
+      x.save();
+      x.translate(rightArm.x, rightArm.y);
+      x.rotate(rightArm.angle);
+      x.beginPath();
+      x.moveTo(0, 0);
+      x.lineTo(rightArm.length, rightArm.rise);
+      x.stroke();
+      x.restore();
+
+      x.fillStyle = frozenColor2;
+      x.beginPath();
+      x.arc(leftPawX, leftPawY, 5, 0, Math.PI * 2);
+      x.arc(rightPawX, rightPawY, 5, 0, Math.PI * 2);
+      x.fill();
+
       x.strokeStyle = '#74b9ff';
       x.lineWidth = 3;
       for (let i = 0; i < 3; i++) {
         const trailX = 44 + i * 16;
         x.beginPath();
-        x.moveTo(trailX, bodyY + 30);
-        x.lineTo(trailX - 8, bodyY + 58);
+        x.moveTo(trailX - 4, bodyY + 54);
+        x.lineTo(trailX - 18, bodyY + 88);
         x.stroke();
       }
-
-      x.fillStyle = '#dfe6e9';
-      x.beginPath();
-      x.arc(82, bodyY - 12, 7, 0, Math.PI * 2);
-      x.arc(94, bodyY - 2, 5, 0, Math.PI * 2);
-      x.fill();
     } else if (name === 'RAYNDOG') {
       x.fillStyle = '#6c5ce7';
       x.beginPath();

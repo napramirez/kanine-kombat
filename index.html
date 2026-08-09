@@ -1013,7 +1013,7 @@ const COMBAT = {
     tremdog: {
       durationFrames: 600,
       pulseIntervalFrames: 120,
-      shockDamage: 10,
+      shockDamage: 5,
       shockKnockback: 6,
       shockStunMs: 900
     },
@@ -2001,6 +2001,17 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
       x.beginPath();
       x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
+    } else if (name === 'TREMDOG') {
+      x.strokeStyle = '#ff7de9';
+      x.lineWidth = 3;
+      for (let i = 0; i < 4; i++) {
+        const waveY = bodyY + 30 + i * 6;
+        x.beginPath();
+        x.moveTo(28, waveY);
+        x.quadraticCurveTo(46, waveY - 4, 62, waveY);
+        x.quadraticCurveTo(78, waveY + 4, 94, waveY);
+        x.stroke();
+      }
     } else {
       const sf = frame % 12;
       const ballX = 95 + sf * 4;
@@ -3261,22 +3272,22 @@ function updateProjectiles(opponent) {
       p.owner.vy = 0;
 
       // Pull opponent all the way into point-blank follow-up range.
-      const targetX = getPointBlankTargetX(p.owner, opponent);
-      const dx = targetX - opponent.x;
+      const targetX = getPointBlankTargetX(p.owner, target);
+      const dx = targetX - target.x;
       const pullSpeed = 12;
 
       if (Math.abs(dx) > 5) {
-        opponent.x += Math.sign(dx) * Math.min(pullSpeed, Math.abs(dx));
-        opponent.vx = Math.sign(dx) * pullSpeed;
+        target.x += Math.sign(dx) * Math.min(pullSpeed, Math.abs(dx));
+        target.vx = Math.sign(dx) * pullSpeed;
       } else {
         // Opponent is close enough, finish pull
-        opponent.x = targetX;
+        target.x = targetX;
         projectiles.splice(i, 1);
       }
 
       // Keep the harpoon visually lodged in the opponent so the chain retracts as they are reeled in.
-      p.x = opponent.x - pullDir * (opponent.width / 2 - 6);
-      p.y = opponent.y - 50;
+      p.x = target.x - pullDir * (target.width / 2 - 6);
+      p.y = target.y - 50;
 
       // Timeout safety for pathological cases only; allow long pulls to finish.
       if (p.pullTimer > 120) {
@@ -3946,8 +3957,8 @@ const CHARACTERS = [
     color1: '#ffffff',
     color2: '#111111',
     eyeColor: '#e74c3c',
-    scale: 1.15,
-    speed: 4,
+    scale: 1.1,
+    speed: 5,
     health: 100,
     specialGain: 0.25,
     desc: 'QUAKE'

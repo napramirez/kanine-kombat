@@ -18,7 +18,7 @@ Players choose from a shared roster before each match.
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
-| `TREMDOG` | Quake | 4 | 100 | White/black gear, red eyes, `scale: 1.15` |
+| `TREMDOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System

@@ -3881,10 +3881,11 @@ function buildBattlePlanRoute(playerCharacterId) {
   const route = shuffleCharacterIds(
     CHARACTERS
       .map(char => char.id)
-      .filter(id => id !== playerCharacterId && id !== 'catnip')
+      .filter(id => id !== playerCharacterId && id !== 'borko' && id !== 'catnip')
   );
 
-  route.push(playerCharacterId);
+  if (playerCharacterId !== 'borko') route.push(playerCharacterId);
+  route.push('borko');
   route.push('catnip');
   return route;
 }
@@ -3924,6 +3925,10 @@ function buildBattlePlanStepPortrait(char, container) {
 function getBattlePlanStepMeta(char, index) {
   if (index === game.battlePlan.route.length - 1) {
     return { badge: 'FINAL', note: 'CATNIP showdown' };
+  }
+
+  if (index === game.battlePlan.route.length - 2 && char.id === 'borko') {
+    return { badge: 'SUB-BOSS', note: 'BORKO blockade' };
   }
 
   if (char.id === game.battlePlan.playerCharacterId) {

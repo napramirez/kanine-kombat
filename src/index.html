@@ -2516,6 +2516,7 @@ class Fighter {
     this.color2 = char.color2;
     this.eyeColor = char.eyeColor;
     this.speed = char.speed;
+    this.scale = char.scale || 1;
     this.specialGain = char.specialGain;
     this.maxHealth = char.health;
     this.facing = facing;
@@ -2531,8 +2532,8 @@ class Fighter {
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
-    this.width = FIGHTER_LAYOUT.width;
-    this.height = FIGHTER_LAYOUT.height;
+    this.width = FIGHTER_LAYOUT.width * this.scale;
+    this.height = FIGHTER_LAYOUT.height * this.scale;
     this.roundsWon = 0;
     this.hitCooldown = 0;
     this.shakeX = 0;
@@ -2924,19 +2925,20 @@ class Fighter {
       sprite = tintSprite(sprite, 'rgba(0,0,0,0.3)');
     }
 
-    const sx = this.x - FIGHTER_LAYOUT.spriteSize / 2 + this.shakeX;
-    let sy = this.y - FIGHTER_LAYOUT.spriteSize + this.shakeY;
+    const spriteSize = FIGHTER_LAYOUT.spriteSize * this.scale;
+    const sx = this.x - spriteSize / 2 + this.shakeX;
+    let sy = this.y - spriteSize + this.shakeY;
 
     if (this.teleportPhase) {
       sy += this.teleportOffset;
       ctx.globalAlpha = this.teleportPhase === 'descend'
-        ? Math.max(0, 1 - this.teleportOffset / (H + FIGHTER_LAYOUT.spriteSize))
+        ? Math.max(0, 1 - this.teleportOffset / (H + spriteSize))
         : (this.teleportPhase === 'reappear'
           ? Math.min(1, 1 - this.teleportOffset / H)
           : 1);
     }
 
-    ctx.drawImage(sprite, sx, sy);
+    ctx.drawImage(sprite, sx, sy, spriteSize, spriteSize);
     ctx.globalAlpha = 1;
   }
 }
@@ -3589,9 +3591,12 @@ function drawProjectiles() {
       });
 
       // Glow
+      const flashGreen = p.owner && p.owner.name === 'CATNIP' && Math.sin(Date.now() * 0.03) > 0;
+      const flashColor1 = flashGreen ? '#7bed9f' : '#2ecc71';
+      const flashColor2 = flashGreen ? '#2ecc71' : '#27ae60';
       ctx.globalAlpha = alpha * 0.3;
       const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
-      glow.addColorStop(0, p.color1);
+      glow.addColorStop(0, p.owner && p.owner.name === 'CATNIP' ? flashColor1 : p.color1);
       glow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
@@ -3602,8 +3607,8 @@ function drawProjectiles() {
       ctx.globalAlpha = alpha;
       const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
       grad.addColorStop(0, '#fff');
-      grad.addColorStop(0.3, p.color1);
-      grad.addColorStop(0.7, p.color2);
+      grad.addColorStop(0.3, p.owner && p.owner.name === 'CATNIP' ? flashColor1 : p.color1);
+      grad.addColorStop(0.7, p.owner && p.owner.name === 'CATNIP' ? flashColor2 : p.color2);
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -3761,8 +3766,9 @@ const CHARACTERS = [
     color1: '#808080',
     color2: '#d3d3d3',
     eyeColor: '#e74c3c',
+    scale: 1.3,
     speed: 4,
-    health: 110,
+    health: 125,
     specialGain: 0.08,
     desc: 'POWER'
   },
@@ -3772,6 +3778,7 @@ const CHARACTERS = [
     color1: '#9b59b6',
     color2: '#d2b4de',
     eyeColor: '#f1c40f',
+    scale: 1.3,
     speed: 8,
     health: 150,
     specialGain: 0.08,

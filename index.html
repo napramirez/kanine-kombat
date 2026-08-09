@@ -995,6 +995,14 @@ const COMBAT = {
   },
   special: {
     duration: 30,
+    borko: {
+      airFrames: 42,
+      jumpHeight: 240,
+      shockRadius: 240,
+      shockDamage: 10,
+      shockKnockback: 8,
+      shockStunMs: 1000
+    },
     skorpdog: {
       ownerLockFrames: 2,
       pointBlankGap: 6
@@ -2001,6 +2009,22 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.beginPath();
       x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
+    } else if (name === 'BORKO') {
+      x.strokeStyle = '#74b9ff';
+      x.lineWidth = 3;
+      for (let i = 0; i < 3; i++) {
+        const trailX = 44 + i * 16;
+        x.beginPath();
+        x.moveTo(trailX, bodyY + 30);
+        x.lineTo(trailX - 8, bodyY + 58);
+        x.stroke();
+      }
+
+      x.fillStyle = '#dfe6e9';
+      x.beginPath();
+      x.arc(82, bodyY - 12, 7, 0, Math.PI * 2);
+      x.arc(94, bodyY - 2, 5, 0, Math.PI * 2);
+      x.fill();
     } else if (name === 'TREMODOG') {
       x.strokeStyle = '#ff7de9';
       x.lineWidth = 3;
@@ -2577,6 +2601,10 @@ class Fighter {
     this.teleportOffset = 0;
     this.teleportPunchDone = false;
     this.harpoonLockTimer = 0;
+    this.borkoImpactX = x;
+    this.borkoImpactY = GROUND - 24;
+    this.borkoLeapActive = false;
+    this.borkoLeapStartX = x;
   }
 
   reset(x) {
@@ -2608,6 +2636,10 @@ class Fighter {
     this.teleportOffset = 0;
     this.teleportPunchDone = false;
     this.harpoonLockTimer = 0;
+    this.borkoImpactX = x;
+    this.borkoImpactY = GROUND - 24;
+    this.borkoLeapActive = false;
+    this.borkoLeapStartX = x;
   }
 
   getHurtbox() {
@@ -2673,6 +2705,23 @@ class Fighter {
         this.teleportPhaseTimer = COMBAT.special.sekdog.descendFrames;
         this.teleportOffset = 0;
         this.teleportPunchDone = false;
+      } else if (this.name === 'BORKO') {
+        const opponent = this === p1 ? p2 : p1;
+        const special = COMBAT.special.borko;
+        this.attackTimer = special.airFrames;
+        this.borkoImpactX = Math.max(
+          FIGHTER_LAYOUT.boundaryPadding,
+          Math.min(W - FIGHTER_LAYOUT.boundaryPadding, opponent.x)
+        );
+        this.borkoImpactY = GROUND - 24;
+        this.borkoLeapActive = true;
+        this.borkoLeapStartX = this.x;
+        this.facing = this.borkoImpactX >= this.x ? 1 : -1;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = false;
+        this.isBlocking = false;
+        this.isCrouching = false;
       } else {
         this.attackTimer = COMBAT.special.duration;
       }
@@ -2722,6 +2771,68 @@ class Fighter {
     this.state = 'stunned';
     this.vx = 0;
     this.vy = 0;
+  }
+
+  landBorkoShockwave(opponent) {
+    const special = COMBAT.special.borko;
+    const shockX = this.borkoImpactX;
+    const shockY = this.borkoImpactY;
+    const opponentCenterY = opponent.y - opponent.height / 2;
+    const caught = Math.hypot(opponent.x - shockX, opponentCenterY - shockY) <= special.shockRadius;
+
+    particles.push({
+      x: shockX,
+      y: shockY,
+      vx: 0,
+      vy: 0,
+      life: 24,
+      maxLife: 24,
+      radius: special.shockRadius,
+      type: 'borkoShockwave'
+    });
+    addParticle(shockX, shockY, 'hit');
+    addParticle(shockX - 28, shockY + 8, 'hit');
+    addParticle(shockX + 28, shockY + 8, 'hit');
+    game.screenShake = COMBAT.effects.projectileShake;
+    game.hitStop = COMBAT.effects.projectileHitStop;
+
+    if (caught) {
+      opponent.takeHit(special.shockDamage, special.shockKnockback, this.facing);
+      if (opponent.health > 0) opponent.applyStunnedStatus(special.shockStunMs);
+      addParticle(opponent.x, opponent.y - 50, 'stunned');
+      if (opponent.health <= 0) playImpactSound('ko');
+    } else {
+      playImpactSound('hit');
+    }
+
+    this.borkoLeapActive = false;
+    this.attackTimer = 0;
+    this.state = 'idle';
+    this.vx = 0;
+    this.vy = 0;
+  }
+
+  updateBorkoSpecial(opponent) {
+    const special = COMBAT.special.borko;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.onGround = false;
+    this.vx = 0;
+    this.vy = 0;
+
+    const elapsedFrames = special.airFrames - this.attackTimer + 1;
+    const progress = Math.min(1, elapsedFrames / special.airFrames);
+    this.x = this.borkoLeapStartX + (this.borkoImpactX - this.borkoLeapStartX) * progress;
+    this.y = GROUND - Math.sin(progress * Math.PI) * special.jumpHeight;
+    this.attackTimer = Math.max(0, this.attackTimer - 1);
+
+    if (progress >= 1 || this.attackTimer <= 0) {
+      this.x = this.borkoImpactX;
+      this.y = GROUND;
+      this.onGround = true;
+      this.landBorkoShockwave(opponent);
+    }
   }
 
   landSekdogTeleportPunch(opponent) {
@@ -2854,6 +2965,11 @@ class Fighter {
 
     if (this.teleportPhase) {
       this.updateSekdogTeleport(opponent);
+      return;
+    }
+
+    if (this.borkoLeapActive) {
+      this.updateBorkoSpecial(opponent);
       return;
     }
 
@@ -3074,6 +3190,10 @@ function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.life--;
+    if (p.type === 'borkoShockwave') {
+      if (p.life <= 0) particles.splice(i, 1);
+      continue;
+    }
     p.x += p.vx;
     p.y += p.vy;
     p.vy += 0.2;
@@ -3085,7 +3205,27 @@ function drawParticles() {
   particles.forEach(p => {
     const alpha = p.life / p.maxLife;
     ctx.globalAlpha = alpha;
-    if (p.type === 'text') {
+    if (p.type === 'borkoShockwave') {
+      const progress = 1 - alpha;
+      const radiusX = p.radius * (0.3 + progress * 0.7);
+      const radiusY = 12 + progress * 16;
+      const bandHeight = 14 + progress * 10;
+
+      ctx.strokeStyle = '#74b9ff';
+      ctx.lineWidth = 5 - progress * 2;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y + 4, radiusX, radiusY, 0, Math.PI, 0, true);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#dfe6e9';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y + 4, radiusX * 0.82, radiusY * 0.65, 0, Math.PI, 0, true);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(116, 185, 255, ${0.18 * alpha})`;
+      ctx.fillRect(p.x - radiusX, p.y - bandHeight / 2, radiusX * 2, bandHeight);
+    } else if (p.type === 'text') {
       ctx.fillStyle = p.color;
       ctx.font = `bold ${16 + (1 - alpha) * 10}px 'Press Start 2P', monospace`;
       ctx.textAlign = 'center';
@@ -3121,6 +3261,8 @@ function spawnProjectile(owner) {
     radius = COMBAT.special.sekdog.missileRadius;
     dmg = COMBAT.special.sekdog.missileDamage;
     kb = COMBAT.special.sekdog.missileKnockback;
+  } else if (owner.name === 'BORKO') {
+    return;
   } else if (owner.name === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';

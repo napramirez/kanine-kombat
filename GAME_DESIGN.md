@@ -32,7 +32,7 @@ Players choose from a shared roster before each match.
 ### Special Attacks
 
 - `DOGGO CAGE`: gold/red energy ball
-- `BORKO`: blue/purple energy ball
+- `BORKO`: remembers the opponent's position, leaps high toward it, and creates a landing shockwave that deals 10 damage and 1 second of stun if the opponent is caught in the radius
 - `SHAO CATNIP`: blue/purple energy ball
 - `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun
 - `SEKDOG`: missile followed by a teleport punch from behind

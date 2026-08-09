@@ -39,7 +39,7 @@ Optional music files:
 - Procedural sprite animation and portrait previews
 - Punch, kick, block, jump, crouch, and special attacks
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights

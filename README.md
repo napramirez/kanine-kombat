@@ -1,65 +1,75 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game featuring a six-fighter animal roster, built as a static web page.
+A 2-player 2D fighting game with an eight-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
-Open `src/index.html` in a browser. No build step, no dependencies. Click `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`, choose fighters, then begin the match.
+Open `index.html` in a browser. There is no build step and no dependency install.
 
-To enable title-screen music, place a licensed MP3 at `src/assets/title-screen-bgm.mp3`.
+From the title screen, click `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`.
 
-To enable character-select music, place a loopable music file at `src/assets/char-select-bgm.mp3`.
-
-To enable round music, place a loopable music file at `src/assets/fight-bgm.mp3`.
+Optional music files:
+- `assets/title-screen-bgm.mp3`
+- `assets/char-select-bgm.mp3`
+- `assets/fight-bgm.mp3`
 
 ## Tech Stack
 
-- **Single HTML file** - all CSS + JS inline
-- **Canvas API** - 2D sprite rendering
-- **Google Fonts** - Press Start 2P pixel font
-- **Zero dependencies** - pure vanilla JS
+- Single HTML file with inline CSS and JavaScript
+- Canvas API rendering
+- Google Fonts: `Press Start 2P`
+- Zero runtime dependencies
 
 ## Current Features
 
-- 2-player local multiplayer
-- Single player vs CPU mode
-- Battle Plan gauntlet mode
-- 6 playable fighters: DOGGO CAGE, BORKO, SHAO CATNIP, SKORPDOG, SEKDOG, SUBDOG
-- Character select screen before each match
-- Procedural sprite animation
-- Punch, kick, and special attacks
-- Combo system with damage scaling
-- Blocking mechanics
-- Health bars, special meters, round system
-- Character-specific specials, including pull-and-stun, freeze, missile, and teleport-punch effects
-- Title screen mode select for `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`
-- Particle effects (hit sparks, KO explosions)
-- Screen shake and hit stop
-- Web Audio API soundtrack and synthesized combat/UI sound effects
-- Optional licensed title-screen MP3 loop at `src/assets/title-screen-bgm.mp3`
-- Optional character-select BGM loop at `src/assets/char-select-bgm.mp3`
-- Optional in-fight BGM loop at `src/assets/fight-bgm.mp3`, restarted every round
-- Victory/defeat poses and flawless victory messaging
-- City night background with animated elements
+- Local 2-player versus mode
+- `VS CPU` single-player mode
+- `BATTLE PLAN` gauntlet mode with a route stepper between matches
+- 8 playable fighters:
+  - `DOGGO CAGE`
+  - `BORKO`
+  - `SHAO CATNIP`
+  - `SKORPDOG`
+  - `SEKDOG`
+  - `CYDOG`
+  - `TREMDOG`
+  - `SUBDOG`
+- Character select screen with shared roster
+- Procedural sprite animation and portrait previews
+- Punch, kick, block, jump, crouch, and special attacks
+- Combo scaling, hit stop, screen shake, particles, and KO effects
+- Character-specific specials including harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Pause flow on `Esc` during fights and Battle Plan route screens
+- Title screen logo and mode-select layout
+- Optional MP3 music hooks for title, character select, and fights
 
-## File Structure
+## Battle Plan
 
-```
+- Player keeps one selected fighter for the full route
+- Early route matches are shuffled from the roster, excluding `BORKO` and `SHAO CATNIP`
+- A mirror match is inserted unless the player picked `BORKO`
+- Penultimate match is `BORKO` as the sub-boss
+- Final match is always `SHAO CATNIP`
+- The route stepper appears before the first match and between wins
+- Press `Space` when prompted to start the next match
+
+## Project Structure
+
+```text
 kanine-kombat/
-├── src/
-│   ├── index.html      # Complete game (single file)
-│   └── assets/         # Optional music assets
-├── README.md           # This file
-├── GAME_DESIGN.md      # Game mechanics documentation
-├── DEVELOPMENT_PROMPTS.md  # Prompts for iterating
-├── ROADMAP.md          # Feature roadmap
-├── CONTROLS.md         # Player controls reference
-└── BUG_TRACKER.md      # Known issues and fixes
+├── index.html
+├── assets/
+├── README.md
+├── GAME_DESIGN.md
+├── DEVELOPMENT_PROMPTS.md
+├── ROADMAP.md
+├── CONTROLS.md
+└── BUG_TRACKER.md
 ```
 
-## Development Loop
+## Development
 
-See `DEVELOPMENT_PROMPTS.md` for structured prompts to iterate on features. Each prompt targets a specific improvement area.
+See `DEVELOPMENT_PROMPTS.md` for feature and polish prompts.
 
 ## License
 

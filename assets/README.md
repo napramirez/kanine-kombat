@@ -1,14 +1,14 @@
 Place the licensed title-screen music file here as:
 
-- `src/assets/title-screen-bgm.mp3`
+- `assets/title-screen-bgm.mp3`
 
 Place the in-fight background music file here as:
 
-- `src/assets/fight-bgm.mp3`
+- `assets/fight-bgm.mp3`
 
 Place the character-select background music file here as:
 
-- `src/assets/char-select-bgm.mp3`
+- `assets/char-select-bgm.mp3`
 
 The title-screen track will loop on the title screen and stop when the player moves to character select.
 

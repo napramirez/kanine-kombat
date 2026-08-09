@@ -90,6 +90,7 @@ Players choose from a shared roster before each match.
 - Early opponents are shuffled from the roster excluding `BORKO` and `SHAO CATNIP`
 - A mirror match is added unless the player selected `BORKO`
 - Penultimate match is always `BORKO`
+- The `BORKO` match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
 - A route stepper appears before the first match and after each win
 - `Space` advances from the route stepper into the next fight

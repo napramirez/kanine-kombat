@@ -57,6 +57,7 @@ Optional music files:
 - Early route matches are shuffled from the roster, excluding `BORKO` and `SHAO CATNIP`
 - A mirror match is inserted unless the player picked `BORKO`
 - Penultimate match is `BORKO` as the sub-boss
+- The `BORKO` sub-boss match always uses `Borko's Lair`
 - Final match is always `SHAO CATNIP`
 - The route stepper appears before the first match and between wins
 - Press `Space` when prompted to start the next match

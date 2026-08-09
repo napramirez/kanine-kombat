@@ -4498,7 +4498,9 @@ function getBattlePlanCurrentOpponent() {
 function loadBattlePlanMatch() {
   const playerChar = getCharacterById(game.battlePlan.playerCharacterId);
   const opponentChar = getBattlePlanCurrentOpponent();
-  game.stage = pickRandomBackgroundStage();
+  game.stage = opponentChar.id === 'borko'
+    ? BACKGROUND_STAGES.BORKO_LAIR
+    : pickRandomBackgroundStage();
 
   p1 = new Fighter(PLAYER_SPAWNS.p1, playerChar, 1);
   p2 = new Fighter(PLAYER_SPAWNS.p2, opponentChar, -1);

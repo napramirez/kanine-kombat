@@ -3766,89 +3766,311 @@ function drawProjectiles() {
 }
 
 // Background
+function drawCloud(cx, cy, scale, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = '#fff6df';
+  ctx.beginPath();
+  ctx.ellipse(cx - 34 * scale, cy + 5 * scale, 34 * scale, 20 * scale, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 4 * scale, 46 * scale, 26 * scale, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 40 * scale, cy + 7 * scale, 32 * scale, 18 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawForestBand(baseY, color, highlight, seed, heightScale) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, GROUND);
+  ctx.lineTo(0, baseY);
+  for (let x = 0; x <= W + 32; x += 16) {
+    const wave = Math.sin((x + seed) * 0.025) * 10 + Math.cos((x + seed) * 0.06) * 7;
+    const crown = Math.sin((x + seed) * 0.11) * 6;
+    ctx.lineTo(x, baseY + wave - crown - heightScale);
+  }
+  ctx.lineTo(W, GROUND);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = highlight;
+  ctx.lineWidth = 2;
+  for (let x = 14; x <= W; x += 48) {
+    const trunkTop = baseY - 16 - ((x + seed) % 18);
+    ctx.beginPath();
+    ctx.moveTo(x, baseY + 8);
+    ctx.lineTo(x, trunkTop);
+    ctx.stroke();
+  }
+}
+
+function drawTempleRoof(cx, topY, width, height, roofColor, trimColor) {
+  const left = cx - width / 2;
+  const right = cx + width / 2;
+  const ridgeY = topY;
+  const eaveY = topY + height;
+
+  ctx.fillStyle = roofColor;
+  ctx.beginPath();
+  ctx.moveTo(left - 28, eaveY + 10);
+  ctx.quadraticCurveTo(left - 8, eaveY + 22, left + 16, eaveY);
+  ctx.lineTo(cx - width * 0.18, ridgeY + 14);
+  ctx.lineTo(cx, ridgeY - 10);
+  ctx.lineTo(cx + width * 0.18, ridgeY + 14);
+  ctx.lineTo(right - 16, eaveY);
+  ctx.quadraticCurveTo(right + 8, eaveY + 22, right + 28, eaveY + 10);
+  ctx.lineTo(right + 8, eaveY + 30);
+  ctx.lineTo(left - 8, eaveY + 30);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = trimColor;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.strokeStyle = '#5a1d1a';
+  ctx.lineWidth = 2;
+  for (let x = left + 20; x <= right - 20; x += 18) {
+    ctx.beginPath();
+    ctx.moveTo(x, eaveY + 4);
+    ctx.lineTo(x + 10, ridgeY + 16);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = trimColor;
+  ctx.fillRect(cx - 6, ridgeY - 18, 12, 22);
+}
+
+function drawKanineLogo(x, cx, cy, scale = 1, palette = {}) {
+  const {
+    ring = '#e74c3c',
+    main = '#e74c3c',
+    lower = '#c0392b',
+    innerEar = '#f1948a',
+    snout = '#f5b7b1',
+    eyeWhite = '#fff',
+    pupil = '#f1c40f',
+    nose = '#2b2b2b',
+    mouth = '#7b241c'
+  } = palette;
+
+  x.save();
+
+  x.strokeStyle = ring;
+  x.lineWidth = 8 * scale;
+  x.beginPath();
+  x.arc(cx, cy, 56 * scale, 0, Math.PI * 2);
+  x.stroke();
+
+  x.fillStyle = lower;
+  x.beginPath();
+  x.ellipse(cx - 9 * scale, cy + 31 * scale, 26 * scale, 25 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = main;
+  x.beginPath();
+  x.ellipse(cx + 7 * scale, cy - 6 * scale, 23 * scale, 21 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.beginPath();
+  x.ellipse(cx - 8 * scale, cy - 28 * scale, 9 * scale, 15 * scale, -0.35, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(cx + 20 * scale, cy - 26 * scale, 8 * scale, 13 * scale, 0.35, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = innerEar;
+  x.beginPath();
+  x.ellipse(cx - 5 * scale, cy - 27 * scale, 4 * scale, 8 * scale, -0.35, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(cx + 19 * scale, cy - 25 * scale, 3.5 * scale, 7 * scale, 0.35, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = snout;
+  x.beginPath();
+  x.ellipse(cx + 18 * scale, cy, 15 * scale, 11 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = eyeWhite;
+  x.beginPath();
+  x.ellipse(cx + 3 * scale, cy - 16 * scale, 7 * scale, 8 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(cx + 15 * scale, cy - 16 * scale, 6 * scale, 7 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = pupil;
+  x.beginPath();
+  x.ellipse(cx + 5 * scale, cy - 15 * scale, 3.8 * scale, 4.8 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(cx + 17 * scale, cy - 15 * scale, 3.2 * scale, 4.2 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.fillStyle = nose;
+  x.beginPath();
+  x.ellipse(cx + 25 * scale, cy - 7 * scale, 4.5 * scale, 3.5 * scale, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.strokeStyle = mouth;
+  x.lineWidth = 2 * scale;
+  x.beginPath();
+  x.arc(cx + 18 * scale, cy + 1 * scale, 6 * scale, 0.2, Math.PI - 0.1);
+  x.stroke();
+
+  x.restore();
+}
+
+function drawTempleDoorLogo(x, y, w, h) {
+  drawKanineLogo(ctx, x + w / 2, y + h / 2, 0.72, {
+    ring: '#111111',
+    main: '#1f1f1f',
+    lower: '#161616',
+    innerEar: '#404040',
+    snout: '#565656',
+    eyeWhite: '#d8d8d8',
+    pupil: '#0a0a0a',
+    nose: '#000000',
+    mouth: '#000000'
+  });
+}
+
 function drawBackground() {
-  // Sky gradient
   const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND);
-  skyGrad.addColorStop(0, '#1a0a2e');
-  skyGrad.addColorStop(0.5, '#2d1b4e');
-  skyGrad.addColorStop(1, '#4a2c6e');
+  skyGrad.addColorStop(0, '#7fc2f3');
+  skyGrad.addColorStop(0.45, '#a9daf7');
+  skyGrad.addColorStop(0.78, '#f0cf8c');
+  skyGrad.addColorStop(1, '#d59d63');
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, W, GROUND);
 
-  // Moon
-  ctx.fillStyle = '#f5f5dc';
+  const sunGlow = ctx.createRadialGradient(186, 112, 0, 186, 112, 84);
+  sunGlow.addColorStop(0, 'rgba(255, 244, 196, 0.95)');
+  sunGlow.addColorStop(0.45, 'rgba(255, 220, 140, 0.55)');
+  sunGlow.addColorStop(1, 'rgba(255, 220, 140, 0)');
+  ctx.fillStyle = sunGlow;
   ctx.beginPath();
-  ctx.arc(850, 80, 40, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#1a0a2e';
-  ctx.beginPath();
-  ctx.arc(865, 72, 35, 0, Math.PI * 2);
+  ctx.arc(186, 112, 84, 0, Math.PI * 2);
   ctx.fill();
 
-  // Stars
-  ctx.fillStyle = '#fff';
-  for (let i = 0; i < 50; i++) {
-    const sx = (i * 137 + 50) % W;
-    const sy = (i * 89 + 20) % (GROUND - 100);
-    const ss = (Math.sin(Date.now() * 0.001 + i) + 1) * 1.2;
-    ctx.globalAlpha = 0.3 + Math.sin(Date.now() * 0.002 + i * 0.5) * 0.3;
-    ctx.fillRect(sx, sy, ss, ss);
+  ctx.fillStyle = '#ffe29a';
+  ctx.beginPath();
+  ctx.arc(186, 112, 36, 0, Math.PI * 2);
+  ctx.fill();
+
+  drawCloud(270, 102, 1.1, 0.45);
+  drawCloud(610, 88, 0.9, 0.35);
+  drawCloud(824, 134, 1.15, 0.3);
+
+  ctx.fillStyle = '#8ea06c';
+  ctx.beginPath();
+  ctx.moveTo(0, GROUND);
+  for (let x = 0; x <= W; x += 40) {
+    const ridgeY = 236 + Math.sin(x * 0.012) * 18 + Math.cos(x * 0.026) * 12;
+    ctx.lineTo(x, ridgeY);
   }
-  ctx.globalAlpha = 1;
+  ctx.lineTo(W, GROUND);
+  ctx.closePath();
+  ctx.fill();
 
-  // Background buildings
-  ctx.fillStyle = '#1a1025';
-  drawBuilding(50, GROUND - 200, 60, 200);
-  drawBuilding(140, GROUND - 260, 80, 260);
-  drawBuilding(260, GROUND - 180, 50, 180);
-  drawBuilding(700, GROUND - 220, 70, 220);
-  drawBuilding(810, GROUND - 280, 90, 280);
-  drawBuilding(930, GROUND - 160, 55, 160);
+  drawForestBand(304, '#547b45', '#415f34', 12, 12);
+  drawForestBand(338, '#3f6337', '#2f4c29', 90, 20);
 
-  ctx.globalAlpha = 1;
+  const templeCenterX = W / 2;
+  const templeBaseY = 228;
 
-  // Ground
+  ctx.fillStyle = '#75624a';
+  ctx.fillRect(templeCenterX - 300, templeBaseY + 156, 600, 42);
+
+  ctx.fillStyle = '#d9c6a1';
+  ctx.fillRect(templeCenterX - 248, templeBaseY + 18, 496, 154);
+  ctx.fillStyle = '#cdb48c';
+  ctx.fillRect(templeCenterX - 228, templeBaseY + 34, 456, 126);
+
+  drawTempleRoof(templeCenterX, templeBaseY - 38, 430, 88, '#6f2722', '#d8b36a');
+  drawTempleRoof(templeCenterX, templeBaseY + 12, 580, 98, '#7e2d28', '#e2bd72');
+
+  ctx.fillStyle = '#8d1f1d';
+  for (let i = -2; i <= 2; i++) {
+    const columnX = templeCenterX + i * 92 - 14;
+    ctx.fillRect(columnX, templeBaseY + 52, 28, 120);
+    ctx.fillStyle = '#d8b36a';
+    ctx.fillRect(columnX - 2, templeBaseY + 48, 32, 8);
+    ctx.fillRect(columnX - 2, templeBaseY + 168, 32, 8);
+    ctx.fillStyle = '#8d1f1d';
+  }
+
+  ctx.fillStyle = '#b89466';
+  ctx.fillRect(templeCenterX - 146, templeBaseY + 74, 292, 98);
+  ctx.fillStyle = '#724829';
+  ctx.fillRect(templeCenterX - 132, templeBaseY + 74, 264, 98);
+  ctx.fillStyle = '#57331d';
+  ctx.fillRect(templeCenterX - 4, templeBaseY + 74, 8, 98);
+
+  ctx.strokeStyle = '#916038';
+  ctx.lineWidth = 3;
+  for (let y = templeBaseY + 84; y <= templeBaseY + 162; y += 18) {
+    ctx.beginPath();
+    ctx.moveTo(templeCenterX - 126, y);
+    ctx.lineTo(templeCenterX + 126, y);
+    ctx.stroke();
+  }
+  for (let x = templeCenterX - 114; x <= templeCenterX + 114; x += 28) {
+    ctx.beginPath();
+    ctx.moveTo(x, templeBaseY + 76);
+    ctx.lineTo(x, templeBaseY + 170);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = '#d8b36a';
+  for (let row = 0; row < 4; row++) {
+    for (let col = 0; col < 6; col++) {
+      const studX = templeCenterX - 96 + col * 38;
+      const studY = templeBaseY + 92 + row * 20;
+      ctx.beginPath();
+      ctx.arc(studX, studY, 3, 0, Math.PI * 2);
+      ctx.arc(studX + 152, studY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  drawTempleDoorLogo(templeCenterX - 132, templeBaseY + 74, 264, 98);
+
+  ctx.fillStyle = '#4d3726';
+  ctx.fillRect(templeCenterX - 204, templeBaseY + 174, 408, 18);
+  ctx.fillStyle = '#7c5d40';
+  ctx.fillRect(templeCenterX - 232, templeBaseY + 192, 464, 22);
+
   const groundGrad = ctx.createLinearGradient(0, GROUND, 0, H);
-  groundGrad.addColorStop(0, '#2c2c2c');
-  groundGrad.addColorStop(0.3, '#1a1a1a');
-  groundGrad.addColorStop(1, '#111');
+  groundGrad.addColorStop(0, '#8f7b5a');
+  groundGrad.addColorStop(0.42, '#65513e');
+  groundGrad.addColorStop(1, '#413328');
   ctx.fillStyle = groundGrad;
   ctx.fillRect(0, GROUND, W, H - GROUND);
 
-  // Ground line
-  ctx.strokeStyle = '#444';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#ad916e';
+  ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(0, GROUND);
   ctx.lineTo(W, GROUND);
   ctx.stroke();
 
-  // Ground texture
-  ctx.fillStyle = '#333';
-  for (let i = 0; i < W; i += 40) {
-    ctx.fillRect(i, GROUND + 5, 20, 2);
-  }
-}
-
-function drawBuilding(x, y, w, h) {
-  ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = '#251535';
-  ctx.fillRect(x + 5, y + 5, w - 10, h - 5);
-
-  // Window flicker is derived from the building rect so lights stay attached to that facade.
-  ctx.fillStyle = '#f1c40f';
-  for (let wx = x + 12; wx <= x + w - 18; wx += 14) {
-    for (let wy = y + 14; wy <= y + h - 22; wy += 24) {
-      const flicker = 0.55 + Math.sin(Date.now() * 0.001 + wx * 0.2 + wy * 0.08) * 0.18;
-      const lit = Math.sin(wx * 12.9898 + wy * 78.233) > -0.2;
-      if (!lit) continue;
-      ctx.globalAlpha = flicker;
-      ctx.fillRect(wx, wy, 8, 12);
-    }
+  ctx.strokeStyle = 'rgba(66, 46, 32, 0.55)';
+  ctx.lineWidth = 2;
+  for (let y = GROUND + 8; y <= H; y += 16) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y - 6);
+    ctx.stroke();
   }
 
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = '#1a1025';
+  ctx.strokeStyle = 'rgba(219, 196, 151, 0.18)';
+  for (let x = 18; x <= W; x += 46) {
+    ctx.beginPath();
+    ctx.moveTo(x, GROUND + 2);
+    ctx.lineTo(x + 20, H);
+    ctx.stroke();
+  }
 }
 
 // Game state and roster
@@ -4468,69 +4690,7 @@ function buildTitleLogo() {
   const x = c.getContext('2d');
 
   x.imageSmoothingEnabled = false;
-
-  x.strokeStyle = '#e74c3c';
-  x.lineWidth = 8;
-  x.beginPath();
-  x.arc(70, 70, 56, 0, Math.PI * 2);
-  x.stroke();
-
-  x.fillStyle = '#c0392b';
-  x.beginPath();
-  x.ellipse(61, 101, 26, 25, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#e74c3c';
-  x.beginPath();
-  x.ellipse(77, 64, 23, 21, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.beginPath();
-  x.ellipse(62, 42, 9, 15, -0.35, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(90, 44, 8, 13, 0.35, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#f1948a';
-  x.beginPath();
-  x.ellipse(65, 43, 4, 8, -0.35, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(89, 45, 3.5, 7, 0.35, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#f5b7b1';
-  x.beginPath();
-  x.ellipse(88, 70, 15, 11, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#fff';
-  x.beginPath();
-  x.ellipse(73, 54, 7, 8, 0, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(85, 54, 6, 7, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#f1c40f';
-  x.beginPath();
-  x.ellipse(75, 55, 3.8, 4.8, 0, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(87, 55, 3.2, 4.2, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.fillStyle = '#2b2b2b';
-  x.beginPath();
-  x.ellipse(95, 63, 4.5, 3.5, 0, 0, Math.PI * 2);
-  x.fill();
-
-  x.strokeStyle = '#7b241c';
-  x.lineWidth = 2;
-  x.beginPath();
-  x.arc(88, 71, 6, 0.2, Math.PI - 0.1);
-  x.stroke();
+  drawKanineLogo(x, 70, 70, 1);
 
   ui.titleLogo.appendChild(c);
 }

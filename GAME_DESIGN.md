@@ -133,7 +133,7 @@ fight or battlePlanStepper -> paused
 
 ### Background
 
-- Night sky gradient
-- Crescent moon and procedural stars
-- City skyline with lit windows
-- Ground texture lines
+- `The Temple` stage uses an afternoon sky gradient with warm sunlight
+- Chinese-style temple facade in the midground
+- Lush forest layered behind the temple
+- Large front doors bearing the `KANINE KOMBAT` logo

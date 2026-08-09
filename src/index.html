@@ -205,12 +205,26 @@
 
   #cpu-btn:hover { background: #2b4f81; }
 
+  #pause-cpu-btn {
+    background: #1d3557;
+    border-color: #457b9d;
+  }
+
+  #pause-cpu-btn:hover { background: #2b4f81; }
+
   #battle-plan-btn {
     background: #4a1f5f;
     border-color: #b46cff;
   }
 
   #battle-plan-btn:hover { background: #6c2d8d; }
+
+  #pause-battle-plan-btn {
+    background: #4a1f5f;
+    border-color: #b46cff;
+  }
+
+  #pause-battle-plan-btn:hover { background: #6c2d8d; }
 
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
@@ -677,6 +691,55 @@
     animation: pulse 1.2s infinite;
   }
 
+  .paused-underlay * {
+    animation-play-state: paused !important;
+  }
+
+  #pause-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    text-align: center;
+    padding: 30px;
+  }
+
+  #pause-overlay h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    text-shadow: 3px 3px #000;
+    margin-bottom: 14px;
+  }
+
+  #pause-overlay p {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.9;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 26px;
+  }
+
+  #pause-mode-buttons {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 20px;
+    pointer-events: all;
+  }
+
+  #pause-overlay .mode-btn {
+    animation: none;
+  }
+
+  #pause-resume-note {
+    color: #74b9ff;
+    font-size: 10px;
+    text-shadow: 2px 2px #000;
+  }
+
   #special-bars {
     display: flex;
     justify-content: space-between;
@@ -800,28 +863,6 @@
   <div id="start-screen">
     <h1>KANINE KOMBAT</h1>
     <h2>such fight. very punch. wow.</h2>
-    <div class="controls-info">
-      <div class="control-box">
-        <h3>DOGGO CAGE</h3>
-        <kbd>A</kbd> <kbd>D</kbd> Move<br>
-        <kbd>W</kbd> Jump<br>
-        <kbd>S</kbd> Crouch<br>
-        <kbd>H</kbd> Block<br>
-        <kbd>J</kbd> Punch<br>
-        <kbd>K</kbd> Kick<br>
-        <kbd>L</kbd> Special
-      </div>
-      <div class="control-box">
-        <h3>BORKO</h3>
-        <kbd>&larr;</kbd> <kbd>&rarr;</kbd> Move<br>
-        <kbd>&uarr;</kbd> Jump<br>
-        <kbd>&darr;</kbd> Crouch<br>
-        <kbd>4</kbd> Block<br>
-        <kbd>1</kbd> Punch<br>
-        <kbd>2</kbd> Kick<br>
-        <kbd>3</kbd> Special
-      </div>
-    </div>
     <div id="mode-buttons">
       <button class="mode-btn" id="start-btn">2 PLAYER</button>
       <button class="mode-btn" id="cpu-btn">VS CPU</button>
@@ -859,6 +900,16 @@
     </div>
     <div id="battle-plan-prompt"></div>
   </div>
+  <div id="pause-overlay">
+    <h1 id="pause-title">PAUSED</h1>
+    <p id="pause-copy">Press ESC to resume or choose a new mode.</p>
+    <div id="pause-mode-buttons">
+      <button class="mode-btn" data-mode="versus">2 PLAYER</button>
+      <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
+      <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
+    </div>
+    <div id="pause-resume-note">ESC resumes the current session</div>
+  </div>
 </div>
 
 <script>
@@ -870,6 +921,7 @@ const GAME_STATES = {
   MENU: 'menu',
   CHAR_SELECT: 'charSelect',
   BATTLE_PLAN_STEPPER: 'battlePlanStepper',
+  PAUSED: 'paused',
   COUNTDOWN: 'countdown',
   FIGHT: 'fight',
   ROUND_END: 'roundEnd',
@@ -1000,6 +1052,10 @@ const ui = {
   battlePlanRouteSteps: document.getElementById('battle-plan-route-steps'),
   battlePlanPlayerToken: document.getElementById('battle-plan-player-token'),
   battlePlanPrompt: document.getElementById('battle-plan-prompt'),
+  pauseOverlay: document.getElementById('pause-overlay'),
+  pauseTitle: document.getElementById('pause-title'),
+  pauseCopy: document.getElementById('pause-copy'),
+  pauseModeButtons: document.getElementById('pause-mode-buttons'),
   startButton: document.getElementById('start-btn'),
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
@@ -1050,7 +1106,9 @@ const audio = {
   titleTrack: null,
   charSelectTrack: null,
   fightTrack: null,
-  readyCues: { p1: false, p2: false }
+  readyCues: { p1: false, p2: false },
+  pausedTracks: { title: false, charSelect: false, fight: false },
+  pauseSuspendedContext: false
 };
 
 const cpuState = {
@@ -2773,10 +2831,14 @@ class Fighter {
     }
 
     const isFrozen = this.freezeTimer > 0;
-    const sprite = createDogSprite(
+    let sprite = createDogSprite(
       this.color1, this.color2, this.eyeColor,
       this.name, this.facing, this.frame, state, 1, isFrozen
     );
+
+    if (this.health <= 0 && this.defeatTimer > 0) {
+      sprite = tintSprite(sprite, 'rgba(0,0,0,0.3)');
+    }
 
     const sx = this.x - FIGHTER_LAYOUT.spriteSize / 2 + this.shakeX;
     let sy = this.y - FIGHTER_LAYOUT.spriteSize + this.shakeY;
@@ -2792,14 +2854,6 @@ class Fighter {
 
     ctx.drawImage(sprite, sx, sy);
     ctx.globalAlpha = 1;
-
-    // Darken defeated fighters slightly
-    if (this.health <= 0 && this.defeatTimer > 0) {
-      ctx.globalAlpha = 0.3;
-      ctx.fillStyle = '#000';
-      ctx.fillRect(sx, sy, FIGHTER_LAYOUT.spriteSize, FIGHTER_LAYOUT.spriteSize);
-      ctx.globalAlpha = 1;
-    }
   }
 }
 
@@ -3405,6 +3459,11 @@ let game = {
     stepperFromIndex: -1,
     stepperReady: false
   },
+  pause: {
+    active: false,
+    returnState: '',
+    snapshotCanvas: null
+  },
   timer: ROUND_RULES.timerSeconds,
   timerInterval: null,
   round: 1,
@@ -3680,6 +3739,7 @@ function setBattlePlanTokenPosition(index, animate) {
 
 function hideBattlePlanStepper() {
   ui.battlePlanStepper.style.display = 'none';
+  ui.battlePlanStepper.classList.remove('paused-underlay');
   ui.battlePlanPrompt.classList.remove('ready');
 }
 
@@ -3733,6 +3793,102 @@ function proceedBattlePlanStepper() {
     hideBattlePlanStepper();
     startRound();
   }
+}
+
+function pauseTrackForOverlay(track, key) {
+  audio.pausedTracks[key] = Boolean(track && !track.paused);
+  if (audio.pausedTracks[key]) track.pause();
+}
+
+function pauseAudioForOverlay() {
+  pauseTrackForOverlay(audio.titleTrack, 'title');
+  pauseTrackForOverlay(audio.charSelectTrack, 'charSelect');
+  pauseTrackForOverlay(audio.fightTrack, 'fight');
+
+  audio.pauseSuspendedContext = Boolean(audio.context && audio.context.state === 'running');
+  if (audio.pauseSuspendedContext) audio.context.suspend();
+}
+
+function resumeAudioFromOverlay() {
+  if (audio.pauseSuspendedContext && audio.context && audio.context.state === 'suspended') {
+    audio.context.resume();
+  }
+
+  if (audio.pausedTracks.title && audio.titleTrack) playTrack(audio.titleTrack);
+  if (audio.pausedTracks.charSelect && audio.charSelectTrack) playTrack(audio.charSelectTrack);
+  if (audio.pausedTracks.fight && audio.fightTrack) playTrack(audio.fightTrack);
+
+  audio.pausedTracks.title = false;
+  audio.pausedTracks.charSelect = false;
+  audio.pausedTracks.fight = false;
+  audio.pauseSuspendedContext = false;
+}
+
+function hidePauseOverlay() {
+  ui.pauseOverlay.style.display = 'none';
+  ui.battlePlanStepper.classList.remove('paused-underlay');
+  game.pause.active = false;
+  game.pause.returnState = '';
+  game.pause.snapshotCanvas = null;
+}
+
+function showPauseOverlay(returnState) {
+  game.pause.active = true;
+  game.pause.returnState = returnState;
+  game.pause.snapshotCanvas = cloneCanvas(canvas);
+  game.state = GAME_STATES.PAUSED;
+  resetInputState(keys1);
+  resetInputState(keys2);
+
+  if (returnState === GAME_STATES.FIGHT) {
+    ui.pauseTitle.textContent = 'FIGHT PAUSED';
+    ui.pauseCopy.textContent = 'Press ESC to resume or choose a new mode.';
+  } else {
+    ui.pauseTitle.textContent = 'BATTLE PLAN PAUSED';
+    ui.pauseCopy.textContent = 'Press ESC to resume the route or choose a new mode.';
+    ui.battlePlanStepper.classList.add('paused-underlay');
+  }
+
+  pauseAudioForOverlay();
+  ui.pauseOverlay.style.display = 'flex';
+}
+
+function resumePausedSession() {
+  if (!game.pause.active) return;
+
+  const returnState = game.pause.returnState;
+  hidePauseOverlay();
+  game.state = returnState;
+  resumeAudioFromOverlay();
+}
+
+function leavePausedSessionForMode(mode) {
+  hidePauseOverlay();
+  resumeAudioFromOverlay();
+  game.mode = mode;
+  ensureAudioReady();
+  playUiSound('start');
+  openCharacterSelect(true);
+}
+
+function openTitleScreen() {
+  if (selectionConfirmTimer) {
+    clearTimeout(selectionConfirmTimer);
+    selectionConfirmTimer = null;
+  }
+
+  if (game.timerInterval) clearInterval(game.timerInterval);
+
+  hidePauseOverlay();
+  hideBattlePlanStepper();
+  resetInputState(keys1);
+  resetInputState(keys2);
+  resetCpuState();
+  resetBattlePlanState();
+  ui.charSelect.style.display = 'none';
+  ui.startScreen.style.display = 'flex';
+  game.state = GAME_STATES.MENU;
+  syncMusicMode();
 }
 
 function resetInputState(keys) {
@@ -3853,6 +4009,16 @@ function cloneCanvas(src) {
   return c;
 }
 
+function tintSprite(src, fillStyle) {
+  const c = cloneCanvas(src);
+  const x = c.getContext('2d');
+  x.globalCompositeOperation = 'source-atop';
+  x.fillStyle = fillStyle;
+  x.fillRect(0, 0, c.width, c.height);
+  x.globalCompositeOperation = 'source-over';
+  return c;
+}
+
 function renderCharPreview(char) {
   return createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
 }
@@ -3962,6 +4128,7 @@ function confirmSelection() {
 
 // Character select keyboard input
 document.addEventListener('keydown', e => {
+  if (game.state === GAME_STATES.PAUSED) return;
   if (game.state !== GAME_STATES.CHAR_SELECT) return;
   const k = e.key.toLowerCase();
 
@@ -4196,6 +4363,7 @@ function openCharacterSelect(resetRounds = false) {
   ui.startScreen.style.display = 'none';
   ui.charSelect.style.display = 'flex';
   hideBattlePlanStepper();
+  hidePauseOverlay();
   game.state = GAME_STATES.CHAR_SELECT;
   syncMusicMode();
   p1Confirmed = false;
@@ -4216,6 +4384,7 @@ ui.startScreen.addEventListener('pointerdown', () => {
 
 // Input handling
 document.addEventListener('keydown', e => {
+  if (game.state === GAME_STATES.PAUSED) return;
   if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
 
   const k = e.key.toLowerCase();
@@ -4241,6 +4410,7 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
+  if (game.state === GAME_STATES.PAUSED) return;
   if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
 
   const k = e.key.toLowerCase();
@@ -4262,6 +4432,13 @@ document.addEventListener('keyup', e => {
 // Main game loop
 function gameLoop() {
   requestAnimationFrame(gameLoop);
+
+  if (game.state === GAME_STATES.PAUSED) {
+    ctx.save();
+    if (game.pause.snapshotCanvas) ctx.drawImage(game.pause.snapshotCanvas, 0, 0);
+    ctx.restore();
+    return;
+  }
 
   if (game.hitStop > 0) {
     game.hitStop--;
@@ -4432,8 +4609,40 @@ ui.battlePlanButton.addEventListener('click', () => {
   openCharacterSelect();
 });
 
+ui.pauseModeButtons.addEventListener('click', e => {
+  const button = e.target.closest('[data-mode]');
+  if (!button) return;
+
+  const mode = button.dataset.mode;
+  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN) {
+    leavePausedSessionForMode(mode);
+  }
+});
+
 // Restart - go back to character select
 document.addEventListener('keydown', e => {
+  if (e.code === 'Escape') {
+    if (game.state === GAME_STATES.CHAR_SELECT) {
+      openTitleScreen();
+      return;
+    }
+
+    if (game.state === GAME_STATES.FIGHT) {
+      showPauseOverlay(GAME_STATES.FIGHT);
+      return;
+    }
+
+    if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
+      showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
+      return;
+    }
+
+    if (game.state === GAME_STATES.PAUSED) {
+      resumePausedSession();
+      return;
+    }
+  }
+
   if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     ensureAudioReady();
     proceedBattlePlanStepper();

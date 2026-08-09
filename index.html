@@ -444,6 +444,29 @@
     background: linear-gradient(180deg, #0f2a3d 0%, #0a1f2a 100%);
   }
 
+  .char-option.randomizing-p1 {
+    border-color: #ff9f9f;
+    box-shadow: 0 0 22px rgba(255,107,107,0.85);
+    animation: charSelectShuffle 0.12s ease-in-out infinite alternate;
+  }
+
+  .char-option.randomizing-p2 {
+    border-color: #9fd4ff;
+    box-shadow: 0 0 22px rgba(116,185,255,0.85);
+    animation: charSelectShuffle 0.12s ease-in-out infinite alternate;
+  }
+
+  @keyframes charSelectShuffle {
+    from {
+      transform: scale(1.03);
+      filter: brightness(1);
+    }
+    to {
+      transform: scale(1.08);
+      filter: brightness(1.16);
+    }
+  }
+
   .char-option canvas {
     border: none;
     image-rendering: pixelated;
@@ -914,8 +937,8 @@
       </div>
     </div>
     <div id="char-select-controls">
-      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm</span>
-      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm</span>
+      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm &bull; <kbd>L</kbd> Random 8</span>
+      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm &bull; <kbd>3</kbd> Random 8</span>
     </div>
     <button id="fight-btn">FIGHT!</button>
   </div>
@@ -1025,6 +1048,11 @@ const COMBAT = {
       zapDamage: 10,
       zapKnockback: 3
     },
+    raydog: {
+      damage: 5,
+      knockback: 4,
+      displayFrames: 12
+    },
     skorpdog: {
       ownerLockFrames: 2,
       pointBlankGap: 6
@@ -1076,6 +1104,7 @@ const COMBAT = {
     onHitMultiplier: 0.8,
     onHurtMultiplier: 0.5,
     onBlockMultiplier: 0.3,
+    onBlockBorkoMultiplier: 0.75,
     onBlockBonusMultiplier: 0.5
   },
   attackBox: {
@@ -1188,6 +1217,10 @@ const cpuState = {
 
 let gameLoopStarted = false;
 let selectionConfirmTimer = null;
+let p1Randomizing = false;
+let p2Randomizing = false;
+let p1RandomizeTimer = null;
+let p2RandomizeTimer = null;
 
 function updateAudioUI() {
   return audio.supported;
@@ -1610,6 +1643,10 @@ function isDoggoCage(name) {
   return name === 'DOGGO CAGE';
 }
 
+function isRaydog(name) {
+  return name === 'RAYDOG';
+}
+
 function getPointBlankTargetX(attacker, defender) {
   const spacing = attacker.width / 2 + defender.width / 2 - COMBAT.special.skorpdog.pointBlankGap;
   return attacker.x + attacker.facing * spacing;
@@ -1643,6 +1680,42 @@ function drawDoggoCageSunglasses(x, headY, frozen) {
   x.fillStyle = shineColor;
   x.fillRect(61, headY - 10, 4, 2);
   x.fillRect(75, headY - 10, 4, 2);
+}
+
+function drawRaydogGear(x, bodyY, headY, frozen) {
+  const apronColor = frozen ? '#87ceeb' : '#3498db';
+  const hatColor = frozen ? '#5f9ea0' : '#8b5a2b';
+  const hatShadow = frozen ? '#4682b4' : '#5c3b1e';
+  const outlineColor = frozen ? '#4169e1' : '#111';
+
+  x.fillStyle = apronColor;
+  x.beginPath();
+  x.moveTo(49, bodyY + 2);
+  x.lineTo(71, bodyY + 2);
+  x.lineTo(76, bodyY + 35);
+  x.lineTo(44, bodyY + 35);
+  x.closePath();
+  x.fill();
+  x.strokeStyle = outlineColor;
+  x.lineWidth = 2;
+  x.stroke();
+  x.beginPath();
+  x.moveTo(49, bodyY + 6);
+  x.quadraticCurveTo(58, bodyY - 6, 67, bodyY + 6);
+  x.stroke();
+
+  x.fillStyle = hatColor;
+  x.beginPath();
+  x.moveTo(46, headY - 13);
+  x.lineTo(70, headY - 42);
+  x.lineTo(94, headY - 13);
+  x.closePath();
+  x.fill();
+  x.stroke();
+
+  x.fillStyle = hatShadow;
+  x.fillRect(50, headY - 13, 40, 5);
+  x.strokeRect(50, headY - 13, 40, 5);
 }
 
 function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false) {
@@ -1886,6 +1959,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   x.fill();
 
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
+  if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
 
   // Eyebrows
   if (state === 'hit' || state === 'attack_punch' || state === 'attack_kick' || state === 'special' || frozen) {
@@ -2114,6 +2188,24 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.lineTo(78, bodyY + 8);
       x.lineTo(86, bodyY + 8);
       x.lineTo(80, bodyY + 20);
+      x.stroke();
+    } else if (name === 'RAYDOG') {
+      x.strokeStyle = '#f5f3ff';
+      x.lineWidth = 3;
+      x.beginPath();
+      x.moveTo(84, bodyY - 8);
+      x.lineTo(95, bodyY - 18);
+      x.lineTo(90, bodyY - 4);
+      x.lineTo(102, bodyY - 8);
+      x.lineTo(92, bodyY + 12);
+      x.stroke();
+
+      x.strokeStyle = '#74b9ff';
+      x.lineWidth = 2;
+      x.beginPath();
+      x.moveTo(80, bodyY - 2);
+      x.lineTo(92, bodyY + 4);
+      x.lineTo(86, bodyY + 16);
       x.stroke();
     } else if (name === 'TREMODOG') {
       x.strokeStyle = '#ff7de9';
@@ -2407,6 +2499,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
+    if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
 
     // Victory stars/sparkles
     for (let i = 0; i < 5; i++) {
@@ -2512,6 +2605,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, defHeadY, frozen);
+    if (isRaydog(name)) drawRaydogGear(x, defBodyY, defHeadY, frozen);
 
     // Snout
     x.fillStyle = frozenColor2;
@@ -2849,9 +2943,11 @@ class Fighter {
     this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
-    const blockedMeterGain = (this.name === 'BORKO' || this.name === 'SHAO CATNIP')
-      ? incomingDamage * COMBAT.meter.onBlockBonusMultiplier
-      : incomingDamage * COMBAT.meter.onBlockMultiplier;
+    const blockedMeterGain = this.name === 'BORKO'
+      ? incomingDamage * COMBAT.meter.onBlockBorkoMultiplier
+      : (this.name === 'SHAO CATNIP'
+        ? incomingDamage * COMBAT.meter.onBlockBonusMultiplier
+        : incomingDamage * COMBAT.meter.onBlockMultiplier);
     this.special = Math.min(SPECIAL_METER_MAX, this.special + (this.isBlocking ? blockedMeterGain : dmg * COMBAT.meter.onHurtMultiplier));
   }
 
@@ -3360,6 +3456,9 @@ function spawnProjectile(owner) {
   } else if (owner.name === 'RAYNDOG') {
     spawnRayndogLightningCloud(owner, owner === p1 ? p2 : p1);
     return;
+  } else if (owner.name === 'RAYDOG') {
+    spawnRaydogArcLightning(owner, owner === p1 ? p2 : p1);
+    return;
   } else if (owner.name === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
@@ -3464,6 +3563,47 @@ function spawnRayndogLightningCloud(owner, target) {
     strikeFrames: 0,
     targetX: target.x,
     targetY: target.y - target.height / 2
+  });
+}
+
+function spawnRaydogArcLightning(owner, target) {
+  const special = COMBAT.special.raydog;
+  const startX = owner.x + owner.facing * 36;
+  const startY = owner.y - 70;
+  const targetX = target.x;
+  const targetY = target.y - target.height / 2;
+
+  target.takeHit(special.damage, special.knockback, owner.facing);
+  game.screenShake = COMBAT.effects.projectileShake;
+  game.hitStop = COMBAT.effects.projectileHitStop;
+  if (target.health <= 0) addParticle(target.x, target.y - 50, 'ko');
+
+  projectiles.push({
+    x: (startX + targetX) / 2,
+    y: (startY + targetY) / 2,
+    vx: 0,
+    vy: 0,
+    owner,
+    dmg: special.damage,
+    kb: special.knockback,
+    life: special.displayFrames,
+    radius: 0,
+    color1: '#f5f3ff',
+    color2: '#74b9ff',
+    type: 'arcLightning',
+    trail: [],
+    hit: true,
+    pullTimer: 0,
+    rotation: 0,
+    ownerAnchorX: owner.x,
+    ownerAnchorY: owner.y,
+    ownerAnchorFacing: owner.facing,
+    fuseFrames: 0,
+    exploded: false,
+    startX,
+    startY,
+    targetX,
+    targetY
   });
 }
 
@@ -3620,6 +3760,13 @@ function updateProjectiles(opponent) {
         else playImpactSound('hit');
       }
 
+      if (p.life <= 0) {
+        projectiles.splice(i, 1);
+      }
+      continue;
+    }
+
+    if (p.type === 'arcLightning') {
       if (p.life <= 0) {
         projectiles.splice(i, 1);
       }
@@ -3909,6 +4056,28 @@ function drawProjectiles() {
         ctx.ellipse(p.targetX, p.targetY + 8, 34, 10, 0, 0, Math.PI * 2);
         ctx.fill();
       }
+    } else if (p.type === 'arcLightning') {
+      const alphaPulse = alpha * Math.max(0, p.life / COMBAT.special.raydog.displayFrames);
+      ctx.globalAlpha = alphaPulse;
+      ctx.strokeStyle = '#f5f3ff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(p.startX, p.startY);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.25, p.startY - 18);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.45, p.startY + 8);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.68, p.targetY - 24);
+      ctx.lineTo(p.targetX, p.targetY + 8);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#74b9ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(p.startX, p.startY);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.18, p.startY - 6);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.42, p.startY + 18);
+      ctx.lineTo(p.startX + (p.targetX - p.startX) * 0.7, p.targetY - 10);
+      ctx.lineTo(p.targetX, p.targetY + 12);
+      ctx.stroke();
     } else if (p.type === 'missile') {
       p.rotation = Math.atan2(p.vy, p.vx || p.owner.facing);
 
@@ -4895,6 +5064,17 @@ const CHARACTERS = [
     desc: 'STORM'
   },
   {
+    id: 'raydog',
+    name: 'RAYDOG',
+    color1: '#ffffff',
+    color2: '#f5f5f5',
+    eyeColor: '#c0c0c0',
+    speed: 5,
+    health: 100,
+    specialGain: 0.75,
+    desc: 'ARC'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',
@@ -5286,6 +5466,7 @@ function openTitleScreen() {
     selectionConfirmTimer = null;
   }
 
+  clearCharSelectRandomizers();
   if (game.timerInterval) clearInterval(game.timerInterval);
 
   hidePauseOverlay();
@@ -5322,7 +5503,7 @@ function randomCpuSelection() {
 
 function updateCharSelectModeUI() {
   ui.p1SelectLabel.textContent = 'PLAYER 1';
-  ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm';
+  ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm &bull; <kbd>L</kbd> Random 8';
   if (isBattlePlanMode()) {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
@@ -5333,7 +5514,7 @@ function updateCharSelectModeUI() {
     ui.fightButton.textContent = 'FIGHT CPU';
   } else {
     ui.p2SelectLabel.textContent = 'PLAYER 2';
-    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm &bull; <kbd>3</kbd> Random 8';
     ui.fightButton.textContent = 'FIGHT!';
   }
 }
@@ -5434,6 +5615,10 @@ function renderCharPreview(char) {
 }
 
 const CHAR_SELECT_COLUMNS = 3;
+const CHAR_SELECT_RANDOM_STEPS = 8;
+const CHAR_SELECT_RANDOM_DELAY_MS = 80;
+const CHAR_SELECT_RANDOM_DELAY_STEP_MS = 15;
+const CHAR_SELECT_RANDOM_DELAY_JITTER_MS = 20;
 
 function moveCharSelection(index, dx, dy) {
   const total = CHARACTERS.length;
@@ -5462,6 +5647,83 @@ function moveCharSelection(index, dx, dy) {
   }
 
   return index;
+}
+
+function getRandomCharStep(index) {
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1]
+  ];
+  const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
+  return moveCharSelection(index, dx, dy);
+}
+
+function clearCharSelectRandomizers() {
+  if (p1RandomizeTimer) clearTimeout(p1RandomizeTimer);
+  if (p2RandomizeTimer) clearTimeout(p2RandomizeTimer);
+  p1RandomizeTimer = null;
+  p2RandomizeTimer = null;
+  p1Randomizing = false;
+  p2Randomizing = false;
+}
+
+function queueSelectionConfirmIfReady() {
+  if (p1Randomizing || p2Randomizing) return;
+  if (p1Confirmed && p2Confirmed && !selectionConfirmTimer) {
+    selectionConfirmTimer = setTimeout(confirmSelection, 400);
+  }
+}
+
+function startRandomCharacterSelect(player) {
+  const isP1 = player === 'p1';
+  let stepsRemaining = CHAR_SELECT_RANDOM_STEPS;
+
+  if (isP1) {
+    if (p1RandomizeTimer) clearTimeout(p1RandomizeTimer);
+    p1RandomizeTimer = null;
+    p1Randomizing = true;
+    p1Confirmed = false;
+  } else {
+    if (p2RandomizeTimer) clearTimeout(p2RandomizeTimer);
+    p2RandomizeTimer = null;
+    p2Randomizing = true;
+    p2Confirmed = false;
+  }
+
+  const runStep = () => {
+    if (isP1) p1Selection = getRandomCharStep(p1Selection);
+    else p2Selection = getRandomCharStep(p2Selection);
+
+    updateCharSelect();
+    playUiSound(stepsRemaining > 1 ? 'navigate' : 'confirm');
+    stepsRemaining--;
+
+    if (stepsRemaining <= 0) {
+      if (isP1) {
+        p1Randomizing = false;
+        p1RandomizeTimer = null;
+        p1Confirmed = true;
+      } else {
+        p2Randomizing = false;
+        p2RandomizeTimer = null;
+        p2Confirmed = true;
+      }
+      updateCharSelect();
+      queueSelectionConfirmIfReady();
+      return;
+    }
+
+    const completedSteps = CHAR_SELECT_RANDOM_STEPS - stepsRemaining;
+    const delay = CHAR_SELECT_RANDOM_DELAY_MS
+      + completedSteps * CHAR_SELECT_RANDOM_DELAY_STEP_MS
+      + Math.floor(Math.random() * CHAR_SELECT_RANDOM_DELAY_JITTER_MS);
+    if (isP1) p1RandomizeTimer = setTimeout(runStep, delay);
+    else p2RandomizeTimer = setTimeout(runStep, delay);
+  };
+
+  runStep();
 }
 
 function buildTitleLogo() {
@@ -5515,11 +5777,11 @@ function buildCharSelect() {
     opt.appendChild(name);
     opt.addEventListener('click', () => {
       ensureAudioReady();
-      if (!p1Confirmed) {
+      if (!p1Confirmed && !p1Randomizing) {
         p1Selection = i;
         updateCharSelect();
         playUiSound('navigate');
-      } else if (!p2Confirmed && !isCpuControlledMode()) {
+      } else if (!p2Confirmed && !p2Randomizing && !isCpuControlledMode()) {
         p2Selection = i;
         updateCharSelect();
         playUiSound('navigate');
@@ -5541,6 +5803,8 @@ function updateCharSelect() {
     let cls = 'char-option';
     if (i === p1Selection) cls += ' highlight-p1';
     if (i === p2Selection) cls += ' highlight-p2';
+    if (i === p1Selection && p1Randomizing) cls += ' randomizing-p1';
+    if (i === p2Selection && p2Randomizing) cls += ' randomizing-p2';
     if (i === p1Selection && p1Confirmed) cls += ' confirmed-p1';
     if (i === p2Selection && p2Confirmed) cls += ' confirmed-p2';
     opt.className = cls;
@@ -5555,6 +5819,7 @@ function confirmSelection() {
     clearTimeout(selectionConfirmTimer);
     selectionConfirmTimer = null;
   }
+  clearCharSelectRandomizers();
 
   if (isBattlePlanMode()) {
     if (!game.battlePlan.route.length || game.battlePlan.playerCharacterId !== CHARACTERS[p1Selection].id) {
@@ -5588,31 +5853,40 @@ document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
 
   // P1 navigation
-  if (!p1Confirmed) {
+  if (!p1Confirmed && !p1Randomizing) {
     if (k === 'a') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, -1, 0); updateCharSelect(); playUiSound('navigate'); }
     if (k === 'd') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 1, 0); updateCharSelect(); playUiSound('navigate'); }
     if (k === 'w') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 0, -1); updateCharSelect(); playUiSound('navigate'); }
     if (k === 's') { ensureAudioReady(); p1Selection = moveCharSelection(p1Selection, 0, 1); updateCharSelect(); playUiSound('navigate'); }
     if (k === 'j') { ensureAudioReady(); p1Confirmed = true; updateCharSelect(); playUiSound('confirm'); }
+    if (k === 'l') {
+      ensureAudioReady();
+      startRandomCharacterSelect('p1');
+      e.preventDefault();
+    }
   }
 
   // P2 navigation
-  if (!p2Confirmed && !isCpuControlledMode()) {
+  if (!p2Confirmed && !p2Randomizing && !isCpuControlledMode()) {
     if (e.key === 'ArrowLeft') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, -1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (e.key === 'ArrowRight') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (e.key === 'ArrowUp') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 0, -1); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (e.key === 'ArrowDown') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 0, 1); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (k === '1' || e.key === 'Numpad1') { ensureAudioReady(); p2Confirmed = true; updateCharSelect(); playUiSound('confirm'); }
+    if (k === '3' || e.key === 'Numpad3') {
+      ensureAudioReady();
+      startRandomCharacterSelect('p2');
+      e.preventDefault();
+    }
   }
 
-  if (p1Confirmed && p2Confirmed) {
-    if (!selectionConfirmTimer) selectionConfirmTimer = setTimeout(confirmSelection, 400);
-  }
+  queueSelectionConfirmIfReady();
 });
 
 // Fight button
 ui.fightButton.addEventListener('click', () => {
   ensureAudioReady();
+  if (p1Randomizing || p2Randomizing) return;
   p1Confirmed = true;
   p2Confirmed = true;
   confirmSelection();
@@ -5636,7 +5910,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y < defBox.y + defBox.h &&
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
-    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG' || attacker.name === 'RAYNDOG') || attacker.lastAttackType === 'special') {
+    if (!(attacker.name === 'SKORPDOG' || attacker.name === 'SUBDOG' || attacker.name === 'SEKDOG' || attacker.name === 'CYDOG' || attacker.name === 'TREMODOG' || attacker.name === 'RAYNDOG' || attacker.name === 'RAYDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;
@@ -5824,6 +6098,7 @@ function openCharacterSelect(resetRounds = false) {
   hideBattlePlanStepper();
   hidePauseOverlay();
   game.state = GAME_STATES.CHAR_SELECT;
+  clearCharSelectRandomizers();
   syncMusicMode();
   p1Confirmed = false;
   p2Confirmed = isCpuControlledMode();

@@ -67,13 +67,16 @@
 
 ## Current Build Notes
 
-- Roster is now 9 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG`
+- Roster is now 11 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, and `SUBDOG`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
+- `RAYDOG` uses an arc-lightning active special and a passive lightning meter
+- `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
 - Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`
+- Character select supports random-8 selection on the special button with an animated shuffle
 - `Esc` pause flow exists for fights and Battle Plan stepper screens
 
 ## Version History

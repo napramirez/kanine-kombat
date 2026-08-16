@@ -31,9 +31,13 @@
 | Action | Key |
 |---|---|
 | P1 Select Left / Right | `A` / `D` |
+| P1 Select Up / Down | `W` / `S` |
 | P1 Confirm | `J` |
+| P1 Random 8 | `L` |
 | P2 Select Left / Right | `Arrow Left` / `Arrow Right` |
+| P2 Select Up / Down | `Arrow Up` / `Arrow Down` |
 | P2 Confirm | `1` or `Numpad 1` |
+| P2 Random 8 | `3` or `Numpad 3` |
 | Return to Title Screen | `Esc` |
 | CPU Opponent in `VS CPU` | Auto-selects and auto-confirms |
 

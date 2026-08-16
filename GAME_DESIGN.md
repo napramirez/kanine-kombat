@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a nine-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with an eleven-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -20,6 +20,8 @@ Players choose from a shared roster before each match.
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
 | `TREMODOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
 | `RAYNDOG` | Storm | 5 | 100 | SKORPDOG-inspired look with purple gear |
+| `RAYDOG` | Arc | 5 | 100 | White outfit, silver eyes, brown conical hat, blue apron |
+| `DOGGOMELEON` | Shift | 5 | 100 | SKORPDOG-inspired look with flashing rainbow gear |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System
@@ -40,6 +42,8 @@ Players choose from a shared roster before each match.
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
 - `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
+- `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
+- `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -57,14 +61,18 @@ Players choose from a shared roster before each match.
 
 ### Special Meter
 
-- Base passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` passively gain `0.25` per frame
+- `ACTIVE` special meter is the normal player-triggered special meter
+- Base active-meter passive gain is `0.08` per frame
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, and `DOGGOMELEON` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
-- On blocked hits, defenders gain `damage * 0.3`; `BORKO` and `SHAO CATNIP` gain `damage * 0.5`
-- Full meter is required to use a special
-- Meter blinks when ready
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, and `SUBDOG` do not gain special from punch or kick hits
+- On blocked hits, defenders gain `damage * 0.3`; `SHAO CATNIP` gains `damage * 0.5`; `BORKO` gains `damage * 0.75`
+- Full active meter is required to use an active special
+- Active meter blinks when ready
+- `PASSIVE` special meter is shown only for fighters with passive abilities
+- `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
+- `DOGGOMELEON`'s passive meter fills over 8 seconds and advances to the next borrowed form in the morph cycle
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, and `DOGGOMELEON` do not gain active special meter from punch or kick hits
 
 ### Physics
 
@@ -124,14 +132,15 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared nine-fighter roster
+- Shared eleven-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
+- Character select also supports a random-8 cursor action on the special button
 
 ### HUD and Effects
 
-- Health bars, special meters, timer, player names, and round dots
+- Health bars, active/passive special meters, timer, player names, and round dots
 - Hit sparks, block sparks, KO explosions, and text popups
 - Screen shake and hit stop on impactful hits
 - Victory and defeat poses, including flawless victory messaging

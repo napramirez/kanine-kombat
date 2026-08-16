@@ -4,8 +4,9 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 9 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`
+- 11 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, and `SUBDOG`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
+- The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - `VS CPU` already exists with a basic AI opponent
 - `BATTLE PLAN` already exists with a route stepper, a `BORKO` sub-boss, and a `SHAO CATNIP` final fight
 - Pause functionality already exists on `Esc` during fights and Battle Plan stepper screens
@@ -34,10 +35,10 @@ Input feels slightly delayed. Improve responsiveness:
 
 ## Character Improvements
 
-### Add Tenth Character
+### Add Another Character
 
 ```text
-Add a tenth character to expand the roster beyond the current nine fighters:
+Add another character to expand the roster beyond the current eleven fighters:
 - Give the character a distinct silhouette, palette, and idle animation.
 - Add them to character select and roster data.
 - Create a unique projectile, trap, or status-effect special.

@@ -25,7 +25,7 @@ Optional music files:
 - Local 2-player versus mode
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
-- 9 playable fighters:
+- 11 playable fighters:
   - `DOGGO CAGE`
   - `BORKO`
   - `SHAO CATNIP`
@@ -34,13 +34,17 @@ Optional music files:
   - `CYDOG`
   - `TREMODOG`
   - `RAYNDOG`
+  - `RAYDOG`
+  - `DOGGOMELEON`
   - `SUBDOG`
 - Character select screen with shared roster, side portraits, and a navigable grid
+- Character select random-8 action on the special button (`L` for P1, `3` for P2)
 - Randomized background stages each match
 - Procedural sprite animation and portrait previews
-- Punch, kick, block, jump, crouch, and special attacks
+- Punch, kick, block, jump, crouch, active special attacks, and passive specials
+- HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights

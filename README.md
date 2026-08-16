@@ -1,12 +1,14 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with a nine-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a twelve-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
 Open `index.html` in a browser. There is no build step and no dependency install.
 
-From the title screen, click `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`.
+If your browser limits gamepad support from `file://`, run the folder through a simple local HTTP server instead.
+
+From the title screen, click a mode or use controller confirm on the highlighted mode button.
 
 Optional music files:
 - `assets/title-screen-bgm.mp3`
@@ -25,7 +27,8 @@ Optional music files:
 - Local 2-player versus mode
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
-- 11 playable fighters:
+- Keyboard and standard gamepad support with mixed-input play
+- 12 playable fighters:
   - `DOGGO CAGE`
   - `BORKO`
   - `SHAO CATNIP`
@@ -36,15 +39,17 @@ Optional music files:
   - `RAYNDOG`
   - `RAYDOG`
   - `DOGGOMELEON`
+  - `NOOB SAIDOG`
   - `SUBDOG`
 - Character select screen with shared roster, side portraits, and a navigable grid
 - Character select random-8 action on the special button (`L` for P1, `3` for P2)
+- Title screen, character select, pause overlay, Battle Plan stepper, and post-match flow all support gamepad input
 - Randomized background stages each match
 - Procedural sprite animation and portrait previews
 - Punch, kick, block, jump, crouch, active special attacks, and passive specials
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and fireball barrage, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights
@@ -67,7 +72,7 @@ Optional music files:
 - Final match is always `SHAO CATNIP`
 - `SHAO CATNIP` boss match always uses `CATNIP's Domain`
 - The route stepper appears before the first match and between wins, and scrolls to keep progress visible
-- Press `Space` when prompted to start the next match
+- Press `Space` or controller confirm when prompted to start the next match
 
 ## Project Structure
 

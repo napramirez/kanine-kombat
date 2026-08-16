@@ -212,6 +212,12 @@
 
   .mode-btn:hover { background: #e74c3c; }
 
+  .mode-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.35), 0 0 18px rgba(241,196,15,0.75);
+    transform: scale(1.08);
+  }
+
   #cpu-btn {
     background: #1d3557;
     border-color: #457b9d;
@@ -964,8 +970,8 @@
       </div>
     </div>
     <div id="char-select-controls">
-      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm &bull; <kbd>L</kbd> Random 8</span>
-      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm &bull; <kbd>3</kbd> Random 8</span>
+      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Pad Move &bull; <kbd>J</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>L</kbd> or <kbd>Y</kbd> Random 8</span>
+      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8</span>
     </div>
     <button id="fight-btn">FIGHT!</button>
   </div>
@@ -983,13 +989,13 @@
   </div>
   <div id="pause-overlay">
     <h1 id="pause-title">PAUSED</h1>
-    <p id="pause-copy">Press ESC to resume or choose a new mode.</p>
+    <p id="pause-copy">Press ESC or START to resume, or choose a new mode.</p>
     <div id="pause-mode-buttons">
       <button class="mode-btn" data-mode="versus">2 PLAYER</button>
       <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
       <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
     </div>
-    <div id="pause-resume-note">ESC resumes the current session</div>
+    <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
   </div>
 </div>
 
@@ -1115,6 +1121,18 @@ const COMBAT = {
       missileKnockback: 0,
       missileSpeed: 14,
       missileRadius: 10
+    },
+    noobSaidog: {
+      snakeRiseFrames: 30,
+      captureHoldMs: 3000,
+      barrageCount: 5,
+      sequenceFrames: 32,
+      fireballDamage: 2,
+      fireballKnockback: 0,
+      fireballSpeed: 12,
+      fireballRadius: 14,
+      fireballSpread: 1,
+      fireballLaunchFrames: 14
     }
   },
   block: {
@@ -1217,6 +1235,9 @@ const ui = {
   }
 };
 
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton];
+const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]'));
+
 const AudioContextClass = window.AudioContext || window.webkitAudioContext || null;
 const TITLE_SCREEN_BGM_PATH = 'assets/title-screen-bgm.mp3';
 const CHAR_SELECT_BGM_PATH = 'assets/char-select-bgm.mp3';
@@ -1258,6 +1279,41 @@ let p1Randomizing = false;
 let p2Randomizing = false;
 let p1RandomizeTimer = null;
 let p2RandomizeTimer = null;
+const GAMEPAD_DEADZONE = 0.3;
+const GAMEPAD_REPEAT_DELAY_MS = 220;
+const GAMEPAD_REPEAT_INTERVAL_MS = 120;
+const GAMEPAD_BUTTONS = {
+  confirm: 0,
+  back: 1,
+  block: 2,
+  special: 3,
+  start: 9,
+  dpadUp: 12,
+  dpadDown: 13,
+  dpadLeft: 14,
+  dpadRight: 15
+};
+const combinedKeys1 = { left: false, right: false, up: false, down: false, block: false };
+const combinedKeys2 = { left: false, right: false, up: false, down: false, block: false };
+const gamepadInput = {
+  titleSelection: 0,
+  pauseSelection: 0,
+  loopStarted: false,
+  slots: {
+    p1: {
+      index: -1,
+      held: { left: false, right: false, up: false, down: false, block: false },
+      prev: {},
+      repeatAt: { left: 0, right: 0, up: 0, down: 0 }
+    },
+    p2: {
+      index: -1,
+      held: { left: false, right: false, up: false, down: false, block: false },
+      prev: {},
+      repeatAt: { left: 0, right: 0, up: 0, down: 0 }
+    }
+  }
+};
 
 function updateAudioUI() {
   return audio.supported;
@@ -1558,7 +1614,7 @@ const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
 const DOGGOMELEON_MORPH_FRAMES = 480;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -1669,6 +1725,15 @@ function getMaskedGearColors(name, frozen, frame = 0) {
     };
   }
 
+  if (name === 'NOOB SAIDOG') {
+    return {
+      vestColor: '#000',
+      vestHighlight: '#111',
+      maskColor: '#000',
+      maskEdge: '#222'
+    };
+  }
+
   if (name === 'RAYNDOG') {
     return {
       vestColor: '#8e44ad',
@@ -1701,6 +1766,22 @@ function isDoggoCage(name) {
 
 function isRaydog(name) {
   return name === 'RAYDOG';
+}
+
+function drawNoobSaidogEyes(x, headY, frame) {
+  const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
+  const secondary = Math.floor(6 + flash * 28);
+  x.save();
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 7 + flash * 7;
+  x.fillStyle = `rgb(255, ${secondary}, ${secondary})`;
+  x.beginPath();
+  x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
+  x.fill();
+  x.restore();
 }
 
 function getDoggomeleonMorphName(fighter) {
@@ -2131,6 +2212,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   x.arc(83 + pupilOffset, headY - 7, 1.2, 0, Math.PI * 2);
   x.fill();
 
+  if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
+
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
   if (isRaydog(name)) drawRaydogSparks(x, bodyY, headY, frame, frozen);
@@ -2248,7 +2331,23 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   }
 
   if (state === 'special') {
-    if (name === 'SKORPDOG') {
+    if (name === 'NOOB SAIDOG') {
+      const flash = 0.55 + (Math.sin(frame * 0.45) + 1) * 0.2;
+      x.strokeStyle = `rgba(255, 20, 45, ${flash})`;
+      x.lineWidth = 3;
+      for (let i = 0; i < 3; i++) {
+        x.beginPath();
+        x.moveTo(76 + i * 5, bodyY - 2 + i * 4);
+        x.lineTo(90 + i * 7, bodyY - 12 + i * 3);
+        x.stroke();
+      }
+      x.fillStyle = '#050505';
+      x.beginPath();
+      x.ellipse(92, bodyY, 14, 10, 0, 0, Math.PI * 2);
+      x.fill();
+      x.strokeStyle = '#ff1744';
+      x.stroke();
+    } else if (name === 'SKORPDOG') {
       const harpoonX = 102;
       const harpoonY = bodyY + 1;
       x.strokeStyle = '#888';
@@ -2672,6 +2771,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.arc(83, vicHeadY - 7, 1.2, 0, Math.PI * 2);
     x.fill();
 
+    if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
+
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogSparks(x, vicBodyY, vicHeadY, frame, frozen);
@@ -2955,6 +3056,9 @@ class Fighter {
     this.lastAttackType = '';
     this.freezeTimer = 0;
     this.stunnedTimer = 0;
+    this.noobCaptureTimer = 0;
+    this.noobCaptureX = x;
+    this.noobCaptureY = GROUND;
     this.victoryTimer = 0;
     this.defeatTimer = 0;
     this.victoryPose = 0;
@@ -2993,6 +3097,9 @@ class Fighter {
     this.shakeY = 0;
     this.freezeTimer = 0;
     this.stunnedTimer = 0;
+    this.noobCaptureTimer = 0;
+    this.noobCaptureX = x;
+    this.noobCaptureY = GROUND;
     this.victoryTimer = 0;
     this.defeatTimer = 0;
     this.victoryPose = 0;
@@ -3090,6 +3197,11 @@ class Fighter {
         this.onGround = false;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'NOOB SAIDOG') {
+        this.attackTimer = COMBAT.special.noobSaidog.sequenceFrames;
+        if (this.onGround) this.vx = 0;
+        this.isBlocking = false;
+        this.isCrouching = false;
       } else {
         this.attackTimer = COMBAT.special.duration;
       }
@@ -3143,6 +3255,23 @@ class Fighter {
     this.isBlocking = false;
     this.hitTimer = 0;
     this.state = 'stunned';
+    this.vx = 0;
+    this.vy = 0;
+  }
+
+  applyNoobSnakeCapture(durationMs) {
+    this.noobCaptureTimer = durationMs;
+    this.noobCaptureX = this.x;
+    this.noobCaptureY = this.y;
+    this.freezeTimer = 0;
+    this.stunnedTimer = 0;
+    this.attackTimer = 0;
+    this.lastAttackType = '';
+    this.specialFormSource = '';
+    this.blockTimer = 0;
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.state = 'idle';
     this.vx = 0;
     this.vy = 0;
   }
@@ -3349,6 +3478,17 @@ class Fighter {
       return;
     }
 
+    const noobSnakeCaptured = this.noobCaptureTimer > 0;
+    if (noobSnakeCaptured) {
+      this.noobCaptureTimer -= PHYSICS.freezeTickMs;
+      if (this.noobCaptureTimer <= 0) this.noobCaptureTimer = 0;
+      this.x = this.noobCaptureX;
+      this.y = this.noobCaptureY;
+      this.vx = 0;
+      this.vy = 0;
+      this.isCrouching = false;
+    }
+
     if (this.harpoonLockTimer > 0) {
       this.harpoonLockTimer--;
       this.state = 'special';
@@ -3400,49 +3540,60 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
   return;
 }
 
-// Movement (only if not attacking or hit)
-const speed = this.speed;
+    const speed = this.speed;
     if (this.attackTimer <= 0 && this.hitTimer <= 0) {
-      if (keys.left && !keys.right) {
-        this.vx = -speed;
-        this.state = this.isCrouching ? 'crouch' : 'walk';
-      } else if (keys.right && !keys.left) {
-        this.vx = speed;
-        this.state = this.isCrouching ? 'crouch' : 'walk';
+      if (noobSnakeCaptured) {
+        this.isBlocking = keys.block;
+        this.state = this.isBlocking ? 'block' : 'idle';
       } else {
-        this.vx *= 0.7;
-        if (Math.abs(this.vx) < 0.5) this.vx = 0;
-        this.state = this.isCrouching ? 'crouch' : 'idle';
+        if (keys.left && !keys.right) {
+          this.vx = -speed;
+          this.state = this.isCrouching ? 'crouch' : 'walk';
+        } else if (keys.right && !keys.left) {
+          this.vx = speed;
+          this.state = this.isCrouching ? 'crouch' : 'walk';
+        } else {
+          this.vx *= 0.7;
+          if (Math.abs(this.vx) < 0.5) this.vx = 0;
+          this.state = this.isCrouching ? 'crouch' : 'idle';
+        }
+
+        // Jump
+        if (keys.up && this.onGround) {
+          this.vy = PHYSICS.jumpVelocity;
+          this.onGround = false;
+        }
+
+        // Crouch
+        this.isCrouching = keys.down;
+        if (this.isCrouching) this.state = 'crouch';
+
+        // Block
+        this.isBlocking = keys.block;
+        if (this.isBlocking) this.state = 'block';
       }
-
-      // Jump
-      if (keys.up && this.onGround) {
-        this.vy = PHYSICS.jumpVelocity;
-        this.onGround = false;
-      }
-
-      // Crouch
-      this.isCrouching = keys.down;
-      if (this.isCrouching) this.state = 'crouch';
-
-      // Block
-      this.isBlocking = keys.block;
-      if (this.isBlocking) this.state = 'block';
     }
 
     // Physics
-    this.vy += PHYSICS.gravity;
-    this.x += this.vx;
-    this.y += this.vy;
-
-    if (this.y >= GROUND) {
-      this.y = GROUND;
+    if (noobSnakeCaptured) {
+      this.x = this.noobCaptureX;
+      this.y = this.noobCaptureY;
+      this.vx = 0;
       this.vy = 0;
-      this.onGround = true;
-    }
+    } else {
+      this.vy += PHYSICS.gravity;
+      this.x += this.vx;
+      this.y += this.vy;
 
-    // Boundaries
-    this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
+      if (this.y >= GROUND) {
+        this.y = GROUND;
+        this.vy = 0;
+        this.onGround = true;
+      }
+
+      // Boundaries
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
+    }
 
     // Passive special gain
     this.special = Math.min(SPECIAL_METER_MAX, this.special + this.specialGain);
@@ -3670,6 +3821,9 @@ function spawnProjectile(owner) {
   } else if (specialName === 'RAYDOG') {
     spawnRaydogArcLightning(owner, owner === p1 ? p2 : p1);
     return;
+  } else if (specialName === 'NOOB SAIDOG') {
+    spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1);
+    return;
   } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
@@ -3736,6 +3890,51 @@ function spawnProjectile(owner) {
   });
 
   owner.pendingCydogBomb = null;
+}
+
+function spawnNoobSaidogSequence(owner, target) {
+  const special = COMBAT.special.noobSaidog;
+  const holdFrames = Math.ceil(special.captureHoldMs / PHYSICS.freezeTickMs);
+
+  projectiles.push({
+    x: target.x,
+    y: GROUND,
+    owner,
+    target,
+    type: 'noobSnake',
+    life: special.snakeRiseFrames + holdFrames,
+    maxLife: special.snakeRiseFrames + holdFrames,
+    riseFrames: special.snakeRiseFrames,
+    elapsedFrames: 0,
+    captured: false,
+    lastOwnerFrame: owner.frame,
+    trail: []
+  });
+}
+
+function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount) {
+  const special = COMBAT.special.noobSaidog;
+  const x = owner.x + owner.facing * 42;
+  const y = owner.y - 58;
+  const targetY = target.y - target.height / 2;
+  const angle = Math.atan2(targetY - y, target.x - x) + (shotIndex - (shotCount - 1) / 2) * special.fireballSpread;
+  projectiles.push({
+    x,
+    y,
+    owner,
+    target,
+    type: 'noobFireball',
+    life: 120,
+    radius: special.fireballRadius,
+    speed: special.fireballSpeed,
+    dmg: special.fireballDamage,
+    kb: special.fireballKnockback,
+    vx: Math.cos(angle) * special.fireballSpeed,
+    vy: Math.sin(angle) * special.fireballSpeed,
+    launchFrames: special.fireballLaunchFrames,
+    trail: [],
+    lastOwnerFrame: owner.frame
+  });
 }
 
 function spawnRayndogLightningCloud(owner, target) {
@@ -3911,10 +4110,112 @@ function spawnTremdogShockwaveField(owner) {
   });
 }
 
+function updateNoobSnakeSequence(p, index) {
+  if (p.lastOwnerFrame === p.owner.frame) return;
+  p.lastOwnerFrame = p.owner.frame;
+
+  if (p.owner.health <= 0 || p.target.health <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
+
+  const special = COMBAT.special.noobSaidog;
+  p.elapsedFrames++;
+  p.life--;
+
+  if (!p.captured) {
+    p.x = p.target.x;
+    if (p.elapsedFrames >= p.riseFrames) {
+      p.captured = true;
+      p.target.applyNoobSnakeCapture(special.captureHoldMs);
+      p.target.vx = 0;
+      p.target.vy = 0;
+      p.owner.attackTimer = 0;
+      p.owner.lastAttackType = '';
+      p.owner.specialFormSource = '';
+      p.owner.state = 'idle';
+      addParticle(p.target.x, p.target.y - 50, 'stunned');
+      game.screenShake = COMBAT.effects.harpoonShake;
+      game.hitStop = COMBAT.effects.harpoonHitStop;
+      playImpactSound('hit');
+      for (let i = 0; i < special.barrageCount; i++) {
+        spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount);
+      }
+      playAttackSound('special');
+    }
+  }
+
+  if (p.life <= 0) projectiles.splice(index, 1);
+}
+
+function updateNoobFireball(p, index) {
+  if (p.lastOwnerFrame === p.owner.frame) return;
+  p.lastOwnerFrame = p.owner.frame;
+  p.life--;
+
+  if (p.owner.health <= 0 || p.target.health <= 0 || p.life <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
+
+  if (p.launchFrames > 0) {
+    p.launchFrames--;
+    p.trail.push({ x: p.x, y: p.y, life: 12 });
+    if (p.trail.length > 10) p.trail.shift();
+    p.trail.forEach(point => point.life--);
+    p.trail = p.trail.filter(point => point.life > 0);
+    p.x += p.vx;
+    p.y += p.vy;
+    return;
+  }
+
+  const targetX = p.target.x;
+  const targetY = p.target.y - p.target.height / 2;
+  const dx = targetX - p.x;
+  const dy = targetY - p.y;
+  const distance = Math.hypot(dx, dy);
+  const hitDistance = p.radius + Math.min(p.target.width, p.target.height) * 0.3;
+
+  if (distance <= p.speed + hitDistance) {
+    if (p.target.hitCooldown > 0) {
+      p.x = targetX;
+      p.y = targetY;
+      return;
+    }
+
+    p.target.takeHit(p.dmg, p.kb, p.owner.facing);
+    addParticle(targetX, targetY, 'hit');
+    game.screenShake = COMBAT.effects.projectileShake;
+    game.hitStop = COMBAT.effects.projectileHitStop;
+    if (p.target.health <= 0) playImpactSound('ko');
+    else playImpactSound('hit');
+    projectiles.splice(index, 1);
+    return;
+  }
+
+  p.trail.push({ x: p.x, y: p.y, life: 12 });
+  if (p.trail.length > 10) p.trail.shift();
+  p.trail.forEach(point => point.life--);
+  p.trail = p.trail.filter(point => point.life > 0);
+  p.x += dx / distance * p.speed;
+  p.y += dy / distance * p.speed;
+}
+
 function updateProjectiles(opponent) {
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
     const target = p.owner === p1 ? p2 : p1;
+
+    if (p.type === 'noobSnake') {
+      updateNoobSnakeSequence(p, i);
+      continue;
+    }
+
+    if (p.type === 'noobFireball') {
+      updateNoobFireball(p, i);
+      continue;
+    }
+
     p.life--;
 
     // Harpoon pull logic
@@ -4139,7 +4440,126 @@ function drawProjectiles() {
   projectiles.forEach(p => {
     const alpha = Math.min(1, p.life / 20);
 
-    if (p.type === 'harpoon') {
+    if (p.type === 'noobSnake') {
+      const rise = Math.min(1, p.elapsedFrames / p.riseFrames);
+      const easedRise = 1 - Math.pow(1 - rise, 3);
+      const bottomY = H + 36;
+      const headY = bottomY + (p.target.y - 24 - bottomY) * easedRise;
+      const neckHeight = Math.max(0, bottomY - headY - 16);
+      const facing = p.target.facing;
+      const headX = p.target.x - facing * 46;
+      const redFlash = 0.65 + (Math.sin(Date.now() * 0.025) + 1) * 0.17;
+      const tongueWag = Math.sin(Date.now() * 0.024) * 6;
+
+      ctx.globalAlpha = alpha * 0.35;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(p.x, GROUND + 6, 54 + rise * 20, 14 + rise * 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#030303';
+      ctx.beginPath();
+      ctx.moveTo(p.x - 28, bottomY);
+      ctx.bezierCurveTo(p.x - 37, bottomY - neckHeight * 0.36, headX - 31, headY + 42, headX - 25, headY + 16);
+      ctx.bezierCurveTo(headX - 18, headY + 4, headX + 17, headY + 4, headX + 25, headY + 16);
+      ctx.bezierCurveTo(headX + 31, headY + 42, p.x + 37, bottomY - neckHeight * 0.36, p.x + 28, bottomY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#121212';
+      ctx.lineWidth = 2;
+      for (let y = headY + 38; y < bottomY - 16; y += 18) {
+        const taper = Math.min(1, (y - headY) / Math.max(1, neckHeight));
+        const centerX = headX + (p.x - headX) * taper;
+        const halfWidth = 20 + taper * 8;
+        ctx.beginPath();
+        ctx.moveTo(centerX - halfWidth, y);
+        ctx.lineTo(centerX + halfWidth, y);
+        ctx.stroke();
+      }
+
+      ctx.save();
+      ctx.translate(headX, headY);
+      ctx.scale(facing, 1);
+      ctx.fillStyle = '#050505';
+      ctx.beginPath();
+      ctx.moveTo(-31, 5);
+      ctx.lineTo(-22, -19);
+      ctx.lineTo(13, -24);
+      ctx.lineTo(38, -10);
+      ctx.lineTo(52, 2);
+      ctx.lineTo(38, 17);
+      ctx.lineTo(8, 23);
+      ctx.lineTo(-24, 17);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#101010';
+      ctx.beginPath();
+      ctx.moveTo(15, -8);
+      ctx.lineTo(48, -2);
+      ctx.lineTo(52, 2);
+      ctx.lineTo(43, 9);
+      ctx.lineTo(13, 8);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(39, -1, 3, 2, 0, 0, Math.PI * 2);
+      ctx.ellipse(39, 7, 3, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowColor = '#ff1744';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = `rgba(255, 20, 45, ${redFlash})`;
+      ctx.beginPath();
+      ctx.ellipse(9, -9, 5, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(-9, -8, 4, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = '#ff1744';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(50, 5);
+      ctx.lineTo(64, 7 + tongueWag * 0.35);
+      ctx.lineTo(73, 2 + tongueWag);
+      ctx.moveTo(64, 7 + tongueWag * 0.35);
+      ctx.lineTo(73, 13 + tongueWag);
+      ctx.stroke();
+      ctx.restore();
+    } else if (p.type === 'noobFireball') {
+      const flash = 0.55 + (Math.sin(Date.now() * 0.04) + 1) * 0.2;
+      p.trail.forEach(point => {
+        ctx.globalAlpha = alpha * (point.life / 12) * 0.45;
+        ctx.fillStyle = '#9b001c';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, p.radius * point.life / 14, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.globalAlpha = alpha * 0.55;
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.4);
+      glow.addColorStop(0, `rgba(255, 255, 255, ${flash})`);
+      glow.addColorStop(0.25, '#ff1744');
+      glow.addColorStop(1, 'rgba(120, 0, 18, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 2.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = Math.sin(Date.now() * 0.05) > 0 ? '#ff1744' : '#8b0018';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(p.x - 3, p.y - 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.type === 'harpoon') {
       const ownerX = p.owner.x;
       const ownerY = p.owner.y - 50;
 
@@ -5326,6 +5746,17 @@ const CHARACTERS = [
     desc: 'SHIFT'
   },
   {
+    id: 'noob-saidog',
+    name: 'NOOB SAIDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#ff1744',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'SHADOW'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',
@@ -5599,7 +6030,7 @@ function showBattlePlanStepper(fromIndex, toIndex) {
       setBattlePlanTokenPosition(toIndex, true);
       window.setTimeout(() => {
         game.battlePlan.stepperReady = true;
-        ui.battlePlanPrompt.textContent = 'Press SPACE to start the next match';
+        ui.battlePlanPrompt.textContent = 'Press SPACE or A to start the next match';
         ui.battlePlanPrompt.classList.add('ready');
       }, 900);
     });
@@ -5679,18 +6110,21 @@ function showPauseOverlay(returnState) {
   game.state = GAME_STATES.PAUSED;
   resetInputState(keys1);
   resetInputState(keys2);
+  clearAllGamepadHeld();
+  gamepadInput.pauseSelection = 0;
 
   if (returnState === GAME_STATES.FIGHT) {
     ui.pauseTitle.textContent = 'FIGHT PAUSED';
-    ui.pauseCopy.textContent = 'Press ESC to resume or choose a new mode.';
+    ui.pauseCopy.textContent = 'Press ESC, START, or B to resume, or choose a new mode.';
   } else {
     ui.pauseTitle.textContent = 'BATTLE PLAN PAUSED';
-    ui.pauseCopy.textContent = 'Press ESC to resume the route or choose a new mode.';
+    ui.pauseCopy.textContent = 'Press ESC, START, or B to resume the route, or choose a new mode.';
     ui.battlePlanStepper.classList.add('paused-underlay');
   }
 
   pauseAudioForOverlay();
   ui.pauseOverlay.style.display = 'flex';
+  updatePauseModeFocus();
 }
 
 function resumePausedSession() {
@@ -5724,11 +6158,14 @@ function openTitleScreen() {
   hideBattlePlanStepper();
   resetInputState(keys1);
   resetInputState(keys2);
+  clearAllGamepadHeld();
   resetCpuState();
   resetBattlePlanState();
   ui.charSelect.style.display = 'none';
   ui.startScreen.style.display = 'flex';
   game.state = GAME_STATES.MENU;
+  gamepadInput.titleSelection = 0;
+  updateTitleModeFocus();
   syncMusicMode();
 }
 
@@ -5738,6 +6175,358 @@ function resetInputState(keys) {
   keys.up = false;
   keys.down = false;
   keys.block = false;
+}
+
+function updateModeButtonFocus(buttons, selectionIndex) {
+  buttons.forEach((button, index) => {
+    button.classList.toggle('focused', index === selectionIndex);
+  });
+}
+
+function updateTitleModeFocus() {
+  updateModeButtonFocus(titleModeButtons, gamepadInput.titleSelection);
+}
+
+function updatePauseModeFocus() {
+  updateModeButtonFocus(pauseModeButtons, gamepadInput.pauseSelection);
+}
+
+function clearGamepadSlotHeld(slot) {
+  resetInputState(slot.held);
+  slot.repeatAt.left = 0;
+  slot.repeatAt.right = 0;
+  slot.repeatAt.up = 0;
+  slot.repeatAt.down = 0;
+}
+
+function clearGamepadSlot(slot, releaseAssignment = false) {
+  clearGamepadSlotHeld(slot);
+  slot.prev = {};
+  if (releaseAssignment) slot.index = -1;
+}
+
+function clearAllGamepadHeld() {
+  clearGamepadSlotHeld(gamepadInput.slots.p1);
+  clearGamepadSlotHeld(gamepadInput.slots.p2);
+}
+
+function resetAllGamepadState(releaseAssignments = false) {
+  clearGamepadSlot(gamepadInput.slots.p1, releaseAssignments);
+  clearGamepadSlot(gamepadInput.slots.p2, releaseAssignments);
+}
+
+function getGamepadBySlot(slotName, pads) {
+  const slot = gamepadInput.slots[slotName];
+  return slot.index >= 0 ? pads[slot.index] : null;
+}
+
+function isGamepadButtonPressed(gamepad, index) {
+  return Boolean(gamepad && gamepad.buttons[index] && gamepad.buttons[index].pressed);
+}
+
+function readGamepadState(gamepad) {
+  const axisX = gamepad.axes[0] || 0;
+  const axisY = gamepad.axes[1] || 0;
+  const left = axisX <= -GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadLeft);
+  const right = axisX >= GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadRight);
+  const up = axisY <= -GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadUp);
+  const down = axisY >= GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadDown);
+
+  return {
+    left,
+    right,
+    up,
+    down,
+    confirm: isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.confirm),
+    back: isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.back),
+    block: isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.block),
+    special: isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.special),
+    start: isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.start)
+  };
+}
+
+function isGamepadStateActive(state) {
+  return state.left || state.right || state.up || state.down || state.confirm || state.back || state.block || state.special || state.start;
+}
+
+function isGamepadEdgePressed(slot, state, key) {
+  return state[key] && !slot.prev[key];
+}
+
+function shouldRepeatMenuDirection(slot, dir, active, now) {
+  if (!active) {
+    slot.repeatAt[dir] = 0;
+    return false;
+  }
+
+  if (!slot.prev[dir]) {
+    slot.repeatAt[dir] = now + GAMEPAD_REPEAT_DELAY_MS;
+    return true;
+  }
+
+  if (now >= slot.repeatAt[dir]) {
+    slot.repeatAt[dir] = now + GAMEPAD_REPEAT_INTERVAL_MS;
+    return true;
+  }
+
+  return false;
+}
+
+function assignGamepadSlot(index) {
+  if (gamepadInput.slots.p1.index === index || gamepadInput.slots.p2.index === index) return;
+  if (gamepadInput.slots.p1.index === -1) gamepadInput.slots.p1.index = index;
+  else if (gamepadInput.slots.p2.index === -1) gamepadInput.slots.p2.index = index;
+}
+
+function syncGamepadAssignments(pads) {
+  ['p1', 'p2'].forEach(slotName => {
+    const slot = gamepadInput.slots[slotName];
+    if (slot.index >= 0 && !pads[slot.index]) clearGamepadSlot(slot, true);
+  });
+
+  pads.forEach(gamepad => {
+    if (!gamepad) return;
+    const state = readGamepadState(gamepad);
+    if (!isGamepadStateActive(state)) return;
+    assignGamepadSlot(gamepad.index);
+  });
+}
+
+function mergeInputStates(keyboardState, gamepadState, output) {
+  output.left = keyboardState.left || gamepadState.left;
+  output.right = keyboardState.right || gamepadState.right;
+  output.up = keyboardState.up || gamepadState.up;
+  output.down = keyboardState.down || gamepadState.down;
+  output.block = keyboardState.block || gamepadState.block;
+  return output;
+}
+
+function navigateTitleSelection(delta) {
+  gamepadInput.titleSelection = (gamepadInput.titleSelection + delta + titleModeButtons.length) % titleModeButtons.length;
+  updateTitleModeFocus();
+  ensureAudioReady();
+  playUiSound('navigate');
+}
+
+function navigatePauseSelection(delta) {
+  gamepadInput.pauseSelection = (gamepadInput.pauseSelection + delta + pauseModeButtons.length) % pauseModeButtons.length;
+  updatePauseModeFocus();
+  ensureAudioReady();
+  playUiSound('navigate');
+}
+
+function handleGamepadTitleInput(slot, state, now) {
+  const left = state.left && !state.right;
+  const right = state.right && !state.left;
+
+  if (shouldRepeatMenuDirection(slot, 'left', left, now)) navigateTitleSelection(-1);
+  else if (shouldRepeatMenuDirection(slot, 'right', right, now)) navigateTitleSelection(1);
+
+  if (isGamepadEdgePressed(slot, state, 'confirm') || isGamepadEdgePressed(slot, state, 'start')) {
+    ensureAudioReady();
+    titleModeButtons[gamepadInput.titleSelection].click();
+  }
+}
+
+function handleGamepadPauseInput(slot, state, now) {
+  const left = state.left && !state.right;
+  const right = state.right && !state.left;
+  const up = state.up && !state.down;
+  const down = state.down && !state.up;
+
+  if (shouldRepeatMenuDirection(slot, 'left', left || up, now)) navigatePauseSelection(-1);
+  else if (shouldRepeatMenuDirection(slot, 'right', right || down, now)) navigatePauseSelection(1);
+
+  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+    ensureAudioReady();
+    pauseModeButtons[gamepadInput.pauseSelection].click();
+  }
+
+  if (isGamepadEdgePressed(slot, state, 'start') || isGamepadEdgePressed(slot, state, 'back')) {
+    resumePausedSession();
+  }
+}
+
+function handleGamepadCharacterSelectInput(slotName, slot, state, now) {
+  if (isGamepadEdgePressed(slot, state, 'back')) {
+    openTitleScreen();
+    return;
+  }
+
+  if (slotName === 'p1') {
+    if (!p1Confirmed && !p1Randomizing) {
+      const left = state.left && !state.right;
+      const right = state.right && !state.left;
+      const up = state.up && !state.down;
+      const down = state.down && !state.up;
+
+      if (shouldRepeatMenuDirection(slot, 'left', left, now)) {
+        ensureAudioReady();
+        p1Selection = moveCharSelection(p1Selection, -1, 0);
+        updateCharSelect();
+        playUiSound('navigate');
+      } else if (shouldRepeatMenuDirection(slot, 'right', right, now)) {
+        ensureAudioReady();
+        p1Selection = moveCharSelection(p1Selection, 1, 0);
+        updateCharSelect();
+        playUiSound('navigate');
+      } else if (shouldRepeatMenuDirection(slot, 'up', up, now)) {
+        ensureAudioReady();
+        p1Selection = moveCharSelection(p1Selection, 0, -1);
+        updateCharSelect();
+        playUiSound('navigate');
+      } else if (shouldRepeatMenuDirection(slot, 'down', down, now)) {
+        ensureAudioReady();
+        p1Selection = moveCharSelection(p1Selection, 0, 1);
+        updateCharSelect();
+        playUiSound('navigate');
+      }
+
+      if (isGamepadEdgePressed(slot, state, 'confirm')) {
+        ensureAudioReady();
+        p1Confirmed = true;
+        updateCharSelect();
+        playUiSound('confirm');
+      }
+
+      if (isGamepadEdgePressed(slot, state, 'special')) {
+        ensureAudioReady();
+        startRandomCharacterSelect('p1');
+      }
+    }
+  } else if (!isCpuControlledMode() && !p2Confirmed && !p2Randomizing) {
+    const left = state.left && !state.right;
+    const right = state.right && !state.left;
+    const up = state.up && !state.down;
+    const down = state.down && !state.up;
+
+    if (shouldRepeatMenuDirection(slot, 'left', left, now)) {
+      ensureAudioReady();
+      p2Selection = moveCharSelection(p2Selection, -1, 0);
+      updateCharSelect();
+      playUiSound('navigate');
+    } else if (shouldRepeatMenuDirection(slot, 'right', right, now)) {
+      ensureAudioReady();
+      p2Selection = moveCharSelection(p2Selection, 1, 0);
+      updateCharSelect();
+      playUiSound('navigate');
+    } else if (shouldRepeatMenuDirection(slot, 'up', up, now)) {
+      ensureAudioReady();
+      p2Selection = moveCharSelection(p2Selection, 0, -1);
+      updateCharSelect();
+      playUiSound('navigate');
+    } else if (shouldRepeatMenuDirection(slot, 'down', down, now)) {
+      ensureAudioReady();
+      p2Selection = moveCharSelection(p2Selection, 0, 1);
+      updateCharSelect();
+      playUiSound('navigate');
+    }
+
+    if (isGamepadEdgePressed(slot, state, 'confirm')) {
+      ensureAudioReady();
+      p2Confirmed = true;
+      updateCharSelect();
+      playUiSound('confirm');
+    }
+
+    if (isGamepadEdgePressed(slot, state, 'special')) {
+      ensureAudioReady();
+      startRandomCharacterSelect('p2');
+    }
+  }
+
+  queueSelectionConfirmIfReady();
+}
+
+function handleGamepadBattlePlanInput(slot, state) {
+  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+    ensureAudioReady();
+    proceedBattlePlanStepper();
+  }
+
+  if (isGamepadEdgePressed(slot, state, 'start')) {
+    showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
+  }
+}
+
+function handleGamepadGameOverInput(slot, state) {
+  if (game.roundMessageTimer >= ROUND_RULES.restartPromptFrames) return;
+  if (isGamepadEdgePressed(slot, state, 'confirm') || isGamepadEdgePressed(slot, state, 'start')) {
+    ensureAudioReady();
+    openCharacterSelect(true);
+  }
+}
+
+function handleGamepadFightInput(slotName, slot, state) {
+  const targetHeld = slot.held;
+  targetHeld.left = state.left && !state.right;
+  targetHeld.right = state.right && !state.left;
+  targetHeld.up = state.up && !state.down;
+  targetHeld.down = state.down;
+  targetHeld.block = state.block;
+
+  if (game.state !== GAME_STATES.FIGHT) return;
+  if (slotName === 'p2' && isCpuControlledMode()) return;
+
+  const fighter = slotName === 'p1' ? p1 : p2;
+  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+    ensureAudioReady();
+    fighter.attack('punch');
+  }
+  if (isGamepadEdgePressed(slot, state, 'back')) {
+    ensureAudioReady();
+    fighter.attack('kick');
+  }
+  if (isGamepadEdgePressed(slot, state, 'special')) {
+    ensureAudioReady();
+    fighter.attack('special');
+  }
+  if (isGamepadEdgePressed(slot, state, 'start')) {
+    showPauseOverlay(GAME_STATES.FIGHT);
+  }
+}
+
+function processGamepadSlot(slotName, slot, state, now) {
+  if (game.state === GAME_STATES.MENU) handleGamepadTitleInput(slot, state, now);
+  else if (game.state === GAME_STATES.CHAR_SELECT) handleGamepadCharacterSelectInput(slotName, slot, state, now);
+  else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) handleGamepadBattlePlanInput(slot, state);
+  else if (game.state === GAME_STATES.PAUSED) handleGamepadPauseInput(slot, state, now);
+  else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slot, state);
+
+  if (game.state === GAME_STATES.FIGHT || game.state === GAME_STATES.COUNTDOWN) handleGamepadFightInput(slotName, slot, state);
+  else clearGamepadSlotHeld(slot);
+}
+
+function pollGamepads() {
+  const pads = navigator.getGamepads ? Array.from(navigator.getGamepads()) : [];
+  const now = Date.now();
+  syncGamepadAssignments(pads);
+
+  ['p1', 'p2'].forEach(slotName => {
+    const slot = gamepadInput.slots[slotName];
+    const gamepad = getGamepadBySlot(slotName, pads);
+    if (!gamepad) {
+      clearGamepadSlotHeld(slot);
+      slot.prev = {};
+      return;
+    }
+
+    const state = readGamepadState(gamepad);
+    processGamepadSlot(slotName, slot, state, now);
+    slot.prev = { ...state };
+  });
+}
+
+function startGamepadLoop() {
+  if (gamepadInput.loopStarted) return;
+  gamepadInput.loopStarted = true;
+
+  const tick = () => {
+    pollGamepads();
+    requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
 }
 
 function resetCpuState() {
@@ -5754,7 +6543,7 @@ function randomCpuSelection() {
 
 function updateCharSelectModeUI() {
   ui.p1SelectLabel.textContent = 'PLAYER 1';
-  ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move &bull; <kbd>J</kbd> Confirm &bull; <kbd>L</kbd> Random 8';
+  ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Pad Move &bull; <kbd>J</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>L</kbd> or <kbd>Y</kbd> Random 8';
   if (isBattlePlanMode()) {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
@@ -5765,7 +6554,7 @@ function updateCharSelectModeUI() {
     ui.fightButton.textContent = 'FIGHT CPU';
   } else {
     ui.p2SelectLabel.textContent = 'PLAYER 2';
-    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> Move &bull; <kbd>1</kbd> Confirm &bull; <kbd>3</kbd> Random 8';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
     ui.fightButton.textContent = 'FIGHT!';
   }
 }
@@ -6162,7 +6951,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;
@@ -6360,6 +7149,7 @@ function openCharacterSelect(resetRounds = false) {
   hidePauseOverlay();
   game.state = GAME_STATES.CHAR_SELECT;
   clearCharSelectRandomizers();
+  clearAllGamepadHeld();
   syncMusicMode();
   p1Confirmed = false;
   p2Confirmed = isCpuControlledMode();
@@ -6454,9 +7244,9 @@ function gameLoop() {
   drawBackground();
 
   if (game.state === GAME_STATES.FIGHT) {
-    p1.update(keys1, p2);
+    p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), p2);
     if (isCpuControlledMode()) updateCpuInput(p2, p1);
-    p2.update(keys2, p1);
+    p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
     checkHit(p1, p2);
     checkHit(p2, p1);
     updateProjectiles(p2);
@@ -6570,7 +7360,7 @@ function gameLoop() {
     if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
       ctx.font = '14px "Press Start 2P", monospace';
       ctx.fillStyle = '#fff';
-      ctx.fillText('Press SPACE to play again', W / 2, H / 2 + 80);
+      ctx.fillText('Press SPACE or A to play again', W / 2, H / 2 + 80);
     }
 
     ctx.globalAlpha = 1;
@@ -6611,6 +7401,47 @@ ui.pauseModeButtons.addEventListener('click', e => {
   const mode = button.dataset.mode;
   if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN) {
     leavePausedSessionForMode(mode);
+  }
+});
+
+titleModeButtons.forEach((button, index) => {
+  const syncFocus = () => {
+    gamepadInput.titleSelection = index;
+    updateTitleModeFocus();
+  };
+  button.addEventListener('mouseenter', syncFocus);
+  button.addEventListener('focus', syncFocus);
+  button.addEventListener('click', syncFocus);
+});
+
+pauseModeButtons.forEach((button, index) => {
+  const syncFocus = () => {
+    gamepadInput.pauseSelection = index;
+    updatePauseModeFocus();
+  };
+  button.addEventListener('mouseenter', syncFocus);
+  button.addEventListener('focus', syncFocus);
+  button.addEventListener('click', syncFocus);
+});
+
+window.addEventListener('gamepadconnected', startGamepadLoop);
+
+window.addEventListener('gamepaddisconnected', e => {
+  if (gamepadInput.slots.p1.index === e.gamepad.index) clearGamepadSlot(gamepadInput.slots.p1, true);
+  if (gamepadInput.slots.p2.index === e.gamepad.index) clearGamepadSlot(gamepadInput.slots.p2, true);
+});
+
+window.addEventListener('blur', () => {
+  resetAllGamepadState();
+  resetInputState(keys1);
+  resetInputState(keys2);
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    resetAllGamepadState();
+    resetInputState(keys1);
+    resetInputState(keys2);
   }
 });
 
@@ -6655,6 +7486,9 @@ window.addEventListener('keydown', e => {
     e.preventDefault();
   }
 });
+
+updateTitleModeFocus();
+startGamepadLoop();
 </script>
 </body>
 </html>

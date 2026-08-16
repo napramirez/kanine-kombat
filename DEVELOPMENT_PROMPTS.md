@@ -4,9 +4,10 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 11 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, and `SUBDOG`
+- 12 playable fighters are already present: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, and `SUBDOG`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
+- Standard gamepads now work as alternative controllers across the main game states
 - `VS CPU` already exists with a basic AI opponent
 - `BATTLE PLAN` already exists with a route stepper, a `BORKO` sub-boss, and a `SHAO CATNIP` final fight
 - Pause functionality already exists on `Esc` during fights and Battle Plan stepper screens
@@ -38,7 +39,7 @@ Input feels slightly delayed. Improve responsiveness:
 ### Add Another Character
 
 ```text
-Add another character to expand the roster beyond the current eleven fighters:
+Add another character to expand the roster beyond the current twelve fighters:
 - Give the character a distinct silhouette, palette, and idle animation.
 - Add them to character select and roster data.
 - Create a unique projectile, trap, or status-effect special.
@@ -49,7 +50,7 @@ Add another character to expand the roster beyond the current eleven fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, and RAYNDOG as storm/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, and NOOB SAIDOG as shadow/control.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.

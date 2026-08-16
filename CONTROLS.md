@@ -26,6 +26,23 @@
 | Kick | `2` or `Numpad 2` |
 | Special | `3` or `Numpad 3` |
 
+## Gamepad Mapping
+
+Standard gamepads are supported as an alternative controller.
+
+- First active connected pad claims `P1`
+- Next active connected pad claims `P2`
+- In `VS CPU` and `BATTLE PLAN`, Player 2 remains CPU-controlled
+
+| Action | Button |
+|---|---|
+| Move / Navigate | Left stick or D-pad |
+| Punch / Confirm / Proceed | Bottom face button (`A` / `Cross`) |
+| Kick / Back | Right face button (`B` / `Circle`) |
+| Block | Left face button (`X` / `Square`) |
+| Special / Random 8 | Top face button (`Y` / `Triangle`) |
+| Pause / Resume | `Start` / `Options` |
+
 ## Character Select
 
 | Action | Key |
@@ -38,6 +55,9 @@
 | P2 Select Up / Down | `Arrow Up` / `Arrow Down` |
 | P2 Confirm | `1` or `Numpad 1` |
 | P2 Random 8 | `3` or `Numpad 3` |
+| Pad Confirm | Bottom face button (`A` / `Cross`) |
+| Pad Random 8 | Top face button (`Y` / `Triangle`) |
+| Pad Back to Title | Right face button (`B` / `Circle`) |
 | Return to Title Screen | `Esc` |
 | CPU Opponent in `VS CPU` | Auto-selects and auto-confirms |
 
@@ -46,7 +66,9 @@
 | Action | Key |
 |---|---|
 | Start Next Match | `Space` |
+| Start Next Match (Pad) | Bottom face button (`A` / `Cross`) |
 | Pause Route Screen | `Esc` |
+| Pause Route Screen (Pad) | `Start` / `Options` |
 
 ## Pause Flow
 
@@ -59,6 +81,7 @@
 | Pause Overlay | Resume current session |
 
 The pause overlay also lets you switch directly to `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`.
+On a gamepad, `Start` or the right face button resumes, and the bottom face button selects the highlighted mode button.
 
 ## Mouse / UI
 
@@ -73,3 +96,4 @@ The pause overlay also lets you switch directly to `2 PLAYER`, `VS CPU`, or `BAT
 | Action | Key |
 |---|---|
 | Return to character select after Game Over | `Space` |
+| Return to character select after Game Over (Pad) | Bottom face button (`A` / `Cross`) |

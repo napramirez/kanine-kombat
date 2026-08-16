@@ -52,6 +52,9 @@ None currently tracked.
 - [ ] Special meter fills correctly
 - [ ] Combos register and reset properly
 - [ ] Knockback direction is correct
+- [ ] NOOB SAIDOG snake applies a 3-second position lock that prevents movement but allows blocking and attacks
+- [ ] NOOB SAIDOG resumes normal movement and jumping after the leg-latching snake capture; the simultaneous five-projectile barrage deals 10 total damage
+- [ ] NOOB SAIDOG special and five-projectile volley work while airborne, with the fireballs fanning out extremely wide before homing and the snake latching from behind
 
 ### Movement
 - [ ] Jump height is consistent
@@ -66,6 +69,7 @@ None currently tracked.
 - [ ] Round dots update
 - [ ] Messages display properly
 - [ ] Game restarts cleanly
+- [ ] Gamepad focus and prompts stay correct across title, select, pause, and Battle Plan screens
 
 ### Edge Cases
 - [ ] Both players KO simultaneously
@@ -73,3 +77,8 @@ None currently tracked.
 - [ ] Both players at 0 health
 - [ ] Rapid input during transitions
 - [ ] Long play sessions (memory)
+- [ ] Gamepad disconnects clear held input cleanly
+- [ ] Two connected gamepads keep stable P1/P2 assignment
+- [ ] Mixed keyboard and gamepad input do not cancel each other incorrectly
+- [ ] NOOB SAIDOG mirror matches keep snake and barrage ownership separate
+- [ ] NOOB SAIDOG special state clears between rounds and after KO

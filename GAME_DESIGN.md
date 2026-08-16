@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with an eleven-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a twelve-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -22,6 +22,7 @@ Players choose from a shared roster before each match.
 | `RAYNDOG` | Storm | 5 | 100 | SKORPDOG-inspired look with purple gear |
 | `RAYDOG` | Arc | 5 | 100 | White outfit, silver eyes, brown conical hat, blue apron |
 | `DOGGOMELEON` | Shift | 5 | 100 | SKORPDOG-inspired look with flashing rainbow gear |
+| `NOOB SAIDOG` | Shadow | 5 | 100 | SKORPDOG-inspired look with black gear and solid flashing red eyes |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System
@@ -44,6 +45,7 @@ Players choose from a shared roster before each match.
 - `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
 - `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
 - `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
+- `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to latch onto their legs for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out briefly before homing
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -63,7 +65,7 @@ Players choose from a shared roster before each match.
 
 - `ACTIVE` special meter is the normal player-triggered special meter
 - Base active-meter passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, and `DOGGOMELEON` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, and `NOOB SAIDOG` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
 - On blocked hits, defenders gain `damage * 0.3`; `SHAO CATNIP` gains `damage * 0.5`; `BORKO` gains `damage * 0.75`
@@ -72,7 +74,7 @@ Players choose from a shared roster before each match.
 - `PASSIVE` special meter is shown only for fighters with passive abilities
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
 - `DOGGOMELEON`'s passive meter fills over 8 seconds and advances to the next borrowed form in the morph cycle
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, and `DOGGOMELEON` do not gain active special meter from punch or kick hits
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, and `NOOB SAIDOG` do not gain active special meter from punch or kick hits
 
 ### Physics
 
@@ -94,6 +96,7 @@ Players choose from a shared roster before each match.
 - Local `2 PLAYER`
 - `VS CPU`
 - `BATTLE PLAN`
+- Standard gamepads can be used as alternative controllers across menu, select, fight, pause, Battle Plan, and game-over flows
 
 ### Battle Plan
 
@@ -105,7 +108,7 @@ Players choose from a shared roster before each match.
 - Final match is always `SHAO CATNIP`
 - The `SHAO CATNIP` match always uses `CATNIP's Domain`
 - A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
-- `Space` advances from the route stepper into the next fight
+- `Space` or controller confirm advances from the route stepper into the next fight
 
 ## Game States
 
@@ -119,6 +122,7 @@ fight or battlePlanStepper -> paused
 - `Esc` during a fight opens the fight pause overlay
 - `Esc` during the Battle Plan stepper opens the Battle Plan pause overlay
 - `Esc` while paused resumes the current fight or route stepper
+- On gamepad, `Start` pauses or resumes and the right face button acts as back on menu-style screens
 
 ## Visual Design
 
@@ -132,15 +136,17 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared eleven-fighter roster
+- Shared twelve-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
 - Character select also supports a random-8 cursor action on the special button
+- First active gamepad claims Player 1; the next active gamepad claims Player 2
 
 ### HUD and Effects
 
 - Health bars, active/passive special meters, timer, player names, and round dots
+- On gamepad, bottom face button confirms/proceeds, right face button acts as back, left face button blocks, top face button triggers special/random, and `Start` pauses or resumes
 - Hit sparks, block sparks, KO explosions, and text popups
 - Screen shake and hit stop on impactful hits
 - Victory and defeat poses, including flawless victory messaging

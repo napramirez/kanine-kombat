@@ -53,8 +53,11 @@ None currently tracked.
 - [ ] Combos register and reset properly
 - [ ] Knockback direction is correct
 - [ ] NOOB SAIDOG snake applies a 3-second position lock that prevents movement but allows blocking and attacks
-- [ ] NOOB SAIDOG resumes normal movement and jumping after the leg-latching snake capture; the simultaneous five-projectile barrage deals 10 total damage
-- [ ] NOOB SAIDOG special and five-projectile volley work while airborne, with the fireballs fanning out extremely wide before homing and the snake latching from behind
+- [ ] NOOB SAIDOG resumes normal movement and jumping after the 3-second snake coil; the simultaneous five-projectile barrage deals 10 total damage
+- [ ] NOOB SAIDOG special and five-projectile volley work while airborne, with the fireballs fanning out extremely wide before homing and the snake coiling from behind
+- [ ] BORKO and SHAO CATNIP are hidden from character select, Random 8, and regular CPU pools before their Battle Plan defeats
+- [ ] Defeating the BORKO sub-boss and SHAO CATNIP final boss unlocks the correct fighter and shows the unlock message
+- [ ] Hidden-character unlocks persist after returning to the title screen and reopening the game
 
 ### Movement
 - [ ] Jump height is consistent

@@ -13,8 +13,8 @@ Players choose from a shared roster before each match.
 | Fighter | Style | Speed | Health | Notes |
 |---|---|---:|---:|---|
 | `DOGGO CAGE` | Balanced | 5 | 100 | Tan/brown palette, sunglasses |
-| `BORKO` | Power | 4 | 125 | Gray palette, red eyes, `scale: 1.3` |
-| `SHAO CATNIP` | Speed | 8 | 150 | Purple palette, yellow eyes, `scale: 1.3` |
+| `BORKO` | Power | 4 | 125 | Hidden gray boss; unlock by defeating the Battle Plan sub-boss |
+| `SHAO CATNIP` | Speed | 8 | 150 | Hidden purple boss; unlock by defeating the Battle Plan final boss |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
@@ -45,7 +45,7 @@ Players choose from a shared roster before each match.
 - `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
 - `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
 - `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
-- `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to latch onto their legs for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out briefly before homing
+- `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out briefly before homing
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -142,6 +142,9 @@ fight or battlePlanStepper -> paused
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
 - Character select also supports a random-8 cursor action on the special button
 - First active gamepad claims Player 1; the next active gamepad claims Player 2
+- Hidden fighters are absent from character select, Random 8, and unscripted CPU pools until unlocked
+- Defeating the Battle Plan `BORKO` sub-boss unlocks `BORKO`; defeating the `SHAO CATNIP` final boss unlocks `SHAO CATNIP`
+- Unlocks persist in browser local storage; the two bosses remain explicitly scripted Battle Plan encounters rather than random route opponents
 
 ### HUD and Effects
 

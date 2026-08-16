@@ -54,7 +54,7 @@
 
 ## Phase 6: Meta Features
 
-- [ ] Character unlockables
+- [x] Character unlockables
 - [ ] Achievement system
 - [ ] Leaderboard (local storage)
 - [ ] Custom controls
@@ -76,7 +76,8 @@
 - `RAYNDOG` uses a 3-second lightning-cloud special
 - `RAYDOG` uses an arc-lightning active special and a passive lightning meter
 - `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
-- `NOOB SAIDOG` can start a behind-the-opponent leg-latching 3-second capture that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that briefly fan out before homing
+- `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that briefly fan out before homing
+- `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
 - Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`

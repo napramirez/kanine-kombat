@@ -4444,10 +4444,10 @@ function drawProjectiles() {
       const rise = Math.min(1, p.elapsedFrames / p.riseFrames);
       const easedRise = 1 - Math.pow(1 - rise, 3);
       const bottomY = H + 36;
-      const headY = bottomY + (p.target.y - 24 - bottomY) * easedRise;
+      const headY = bottomY + (p.target.y - p.target.height * 0.72 - bottomY) * easedRise;
       const neckHeight = Math.max(0, bottomY - headY - 16);
       const facing = p.target.facing;
-      const headX = p.target.x - facing * 46;
+      const headX = p.target.x - facing * (p.target.width * 0.6 + 32);
       const redFlash = 0.65 + (Math.sin(Date.now() * 0.025) + 1) * 0.17;
       const tongueWag = Math.sin(Date.now() * 0.024) * 6;
 
@@ -4477,6 +4477,48 @@ function drawProjectiles() {
         ctx.moveTo(centerX - halfWidth, y);
         ctx.lineTo(centerX + halfWidth, y);
         ctx.stroke();
+      }
+
+      if (p.captured) {
+        const coilWave = Math.sin(Date.now() * 0.006);
+        const coilBaseY = p.target.y - p.target.height * 0.28;
+        const lowestCoilWidth = p.target.width * 0.72 + 13;
+        const tailEndX = p.target.x - facing * lowestCoilWidth;
+
+        ctx.strokeStyle = '#030303';
+        ctx.lineWidth = 18;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p.x, bottomY);
+        ctx.bezierCurveTo(p.x - facing * 18, bottomY - neckHeight * 0.34, tailEndX - facing * 30, coilBaseY + 44, tailEndX, coilBaseY);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#171717';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(p.x - facing * 3, bottomY - 8);
+        ctx.bezierCurveTo(p.x - facing * 18, bottomY - neckHeight * 0.34, tailEndX - facing * 30, coilBaseY + 44, tailEndX, coilBaseY);
+        ctx.stroke();
+        ctx.lineCap = 'butt';
+
+        for (let i = 0; i < 3; i++) {
+          const coilY = coilBaseY - i * 22 + Math.sin(Date.now() * 0.007 + i) * 3;
+          const coilWidth = p.target.width * 0.72 + 13 + Math.sin(Date.now() * 0.008 + i) * 4;
+          const coilHeight = 11 + i * 2;
+          const coilX = p.target.x + coilWave * (i % 2 === 0 ? 4 : -4);
+
+          ctx.strokeStyle = '#030303';
+          ctx.lineWidth = 14;
+          ctx.beginPath();
+          ctx.ellipse(coilX, coilY, coilWidth, coilHeight, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.strokeStyle = '#171717';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
       }
 
       ctx.save();
@@ -5644,6 +5686,7 @@ const CHARACTERS = [
   {
     id: 'borko',
     name: 'BORKO',
+    hidden: true,
     color1: '#808080',
     color2: '#d3d3d3',
     eyeColor: '#e74c3c',
@@ -5656,6 +5699,7 @@ const CHARACTERS = [
   {
     id: 'catnip',
     name: 'SHAO CATNIP',
+    hidden: true,
     color1: '#9b59b6',
     color2: '#d2b4de',
     eyeColor: '#f1c40f',
@@ -5769,8 +5813,52 @@ const CHARACTERS = [
   }
 ];
 
-let p1Selection = 0;
-let p2Selection = 1;
+const HIDDEN_CHARACTER_UNLOCKS_KEY = 'kanine-kombat-hidden-character-unlocks-v1';
+const unlockedHiddenCharacterIds = (() => {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(HIDDEN_CHARACTER_UNLOCKS_KEY) || '[]');
+    return new Set(stored.filter(id => CHARACTERS.some(char => char.id === id && char.hidden)));
+  } catch {
+    return new Set();
+  }
+})();
+
+function isHiddenCharacter(char) {
+  return Boolean(char && char.hidden);
+}
+
+function isCharacterUnlocked(char) {
+  return !isHiddenCharacter(char) || unlockedHiddenCharacterIds.has(char.id);
+}
+
+function getSelectableCharacterIndices() {
+  return CHARACTERS
+    .map((char, index) => ({ char, index }))
+    .filter(({ char }) => isCharacterUnlocked(char))
+    .map(({ index }) => index);
+}
+
+function getSelectableCharacterIndex(preferredIndex, excludedIndex = -1) {
+  const indices = getSelectableCharacterIndices();
+  if (indices.includes(preferredIndex) && preferredIndex !== excludedIndex) return preferredIndex;
+  return indices.find(index => index !== excludedIndex) ?? indices[0] ?? 0;
+}
+
+function unlockHiddenCharacter(id) {
+  const char = CHARACTERS.find(candidate => candidate.id === id);
+  if (!isHiddenCharacter(char) || unlockedHiddenCharacterIds.has(id)) return false;
+
+  unlockedHiddenCharacterIds.add(id);
+  try {
+    window.localStorage.setItem(HIDDEN_CHARACTER_UNLOCKS_KEY, JSON.stringify([...unlockedHiddenCharacterIds]));
+  } catch {
+    // Keep unlocks available for this session if persistent storage is blocked.
+  }
+  return true;
+}
+
+let p1Selection = getSelectableCharacterIndex(0);
+let p2Selection = getSelectableCharacterIndex(1, p1Selection);
 let p1Confirmed = false;
 let p2Confirmed = false;
 
@@ -5819,8 +5907,8 @@ function resetBattlePlanState() {
 function buildBattlePlanRoute(playerCharacterId) {
   const route = shuffleCharacterIds(
     CHARACTERS
+      .filter(char => char.id !== playerCharacterId && !isHiddenCharacter(char))
       .map(char => char.id)
-      .filter(id => id !== playerCharacterId && id !== 'borko' && id !== 'catnip')
   );
 
   if (playerCharacterId !== 'borko') route.push(playerCharacterId);
@@ -6538,7 +6626,8 @@ function resetCpuState() {
 }
 
 function randomCpuSelection() {
-  return Math.floor(Math.random() * CHARACTERS.length);
+  const selectableIndices = getSelectableCharacterIndices();
+  return selectableIndices[Math.floor(Math.random() * selectableIndices.length)] ?? 0;
 }
 
 function updateCharSelectModeUI() {
@@ -6661,19 +6750,22 @@ const CHAR_SELECT_RANDOM_DELAY_STEP_MS = 15;
 const CHAR_SELECT_RANDOM_DELAY_JITTER_MS = 20;
 
 function moveCharSelection(index, dx, dy) {
-  const total = CHARACTERS.length;
+  const selectableIndices = getSelectableCharacterIndices();
+  const total = selectableIndices.length;
   if (total === 0) return index;
 
   const columns = CHAR_SELECT_COLUMNS;
   const rows = Math.ceil(total / columns);
-  let row = Math.floor(index / columns);
-  let col = index % columns;
+  let visibleIndex = selectableIndices.indexOf(index);
+  if (visibleIndex < 0) visibleIndex = 0;
+  let row = Math.floor(visibleIndex / columns);
+  let col = visibleIndex % columns;
 
   if (dx !== 0) {
     const rowStart = row * columns;
     const rowLength = Math.min(columns, total - rowStart);
     col = (col + dx + rowLength) % rowLength;
-    return rowStart + col;
+    return selectableIndices[rowStart + col];
   }
 
   if (dy !== 0) {
@@ -6682,11 +6774,11 @@ function moveCharSelection(index, dx, dy) {
       nextRow = (nextRow + dy + rows) % rows;
       const rowStart = nextRow * columns;
       const rowLength = Math.min(columns, total - rowStart);
-      if (rowLength > 0) return rowStart + Math.min(col, rowLength - 1);
+      if (rowLength > 0) return selectableIndices[rowStart + Math.min(col, rowLength - 1)];
     } while (nextRow !== row);
   }
 
-  return index;
+  return selectableIndices[visibleIndex];
 }
 
 function getRandomCharStep(index) {
@@ -6806,7 +6898,8 @@ function buildCharSelect() {
 
   ui.charPool.innerHTML = '';
 
-  CHARACTERS.forEach((char, i) => {
+  getSelectableCharacterIndices().forEach(i => {
+    const char = CHARACTERS[i];
     const opt = document.createElement('div');
     opt.className = 'char-option';
     opt.id = 'char-opt-' + i;
@@ -6837,7 +6930,8 @@ function updateCharSelect() {
   ui.p1Portrait.className = 'char-portrait p1 selected';
   ui.p2Portrait.className = 'char-portrait p2 selected';
 
-  CHARACTERS.forEach((char, i) => {
+  getSelectableCharacterIndices().forEach(i => {
+    const char = CHARACTERS[i];
     const opt = document.getElementById('char-opt-' + i);
     if (!opt) return;
     let cls = 'char-option';
@@ -7025,10 +7119,15 @@ function endRound() {
     updateRoundDots();
     const flawless = winner.health >= ROUND_RULES.flawlessHealth;
     const battlePlanMatchComplete = isBattlePlanMode() && winner.roundsWon >= ROUND_RULES.winsToFinish;
+    const unlockedBoss = battlePlanMatchComplete && winner === p1
+      && unlockHiddenCharacter(game.battlePlan.route[game.battlePlan.currentIndex]);
     if (battlePlanMatchComplete && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1) {
       game.roundMessage = 'BATTLE PLAN\nCLEARED!';
+      if (unlockedBoss) game.roundMessage += `\n${p2.name} UNLOCKED!`;
     } else if (battlePlanMatchComplete && winner === p2) {
       game.roundMessage = 'BATTLE PLAN\nFAILED';
+    } else if (unlockedBoss) {
+      game.roundMessage = `${p2.name}\nUNLOCKED!`;
     } else {
       game.roundMessage = flawless ? `${winner.name}\nFLAWLESS VICTORY!` : `${winner.name} WINS!`;
     }
@@ -7154,6 +7253,8 @@ function openCharacterSelect(resetRounds = false) {
   p1Confirmed = false;
   p2Confirmed = isCpuControlledMode();
   resetInputState(keys2);
+  p1Selection = getSelectableCharacterIndex(p1Selection);
+  p2Selection = getSelectableCharacterIndex(p2Selection, p1Selection);
   if (isBattlePlanMode()) {
     resetBattlePlanState();
     p2Selection = randomCpuSelection();

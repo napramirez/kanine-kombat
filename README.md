@@ -28,10 +28,8 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - Keyboard and standard gamepad support with mixed-input play
-- 12 playable fighters:
+- 10 initially selectable fighters, plus 2 Battle Plan unlocks:
   - `DOGGO CAGE`
-  - `BORKO`
-  - `SHAO CATNIP`
   - `SKORPDOG`
   - `SEKDOG`
   - `CYDOG`
@@ -41,6 +39,8 @@ Optional music files:
   - `DOGGOMELEON`
   - `NOOB SAIDOG`
   - `SUBDOG`
+  - Unlock `BORKO` by defeating the Battle Plan sub-boss
+  - Unlock `SHAO CATNIP` by defeating the Battle Plan final boss
 - Character select screen with shared roster, side portraits, and a navigable grid
 - Character select random-8 action on the special button (`L` for P1, `3` for P2)
 - Title screen, character select, pause overlay, Battle Plan stepper, and post-match flow all support gamepad input

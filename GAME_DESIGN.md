@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a twelve-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a thirteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -23,6 +23,7 @@ Players choose from a shared roster before each match.
 | `RAYDOG` | Arc | 5 | 100 | White outfit, silver eyes, brown conical hat, blue apron |
 | `DOGGOMELEON` | Shift | 5 | 100 | SKORPDOG-inspired look with flashing rainbow gear |
 | `NOOB SAIDOG` | Shadow | 5 | 100 | SKORPDOG-inspired look with black gear and solid flashing red eyes |
+| `SNEK` | Constrictor | 7 | 100 | Hidden black python with red eyes; unlock by flawlessly winning both SHAO CATNIP final-showdown rounds as NOOB SAIDOG |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 
 ### Combat System
@@ -46,6 +47,7 @@ Players choose from a shared roster before each match.
 - `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
 - `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
 - `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out briefly before homing
+- `SNEK`: slithers rapidly toward the opponent, coils around them, and applies a 3-second full stun
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
 
 ### Combo System
@@ -65,7 +67,7 @@ Players choose from a shared roster before each match.
 
 - `ACTIVE` special meter is the normal player-triggered special meter
 - Base active-meter passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, and `NOOB SAIDOG` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, and `SNEK` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
 - On blocked hits, defenders gain `damage * 0.3`; `SHAO CATNIP` gains `damage * 0.5`; `BORKO` gains `damage * 0.75`
@@ -74,7 +76,7 @@ Players choose from a shared roster before each match.
 - `PASSIVE` special meter is shown only for fighters with passive abilities
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
 - `DOGGOMELEON`'s passive meter fills over 8 seconds and advances to the next borrowed form in the morph cycle
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, and `NOOB SAIDOG` do not gain active special meter from punch or kick hits
+- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, and `SNEK` do not gain active special meter from punch or kick hits
 
 ### Physics
 
@@ -136,7 +138,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared twelve-fighter roster
+- Shared thirteen-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
@@ -144,6 +146,7 @@ fight or battlePlanStepper -> paused
 - First active gamepad claims Player 1; the next active gamepad claims Player 2
 - Hidden fighters are absent from character select, Random 8, and unscripted CPU pools until unlocked
 - Defeating the Battle Plan `BORKO` sub-boss unlocks `BORKO`; defeating the `SHAO CATNIP` final boss unlocks `SHAO CATNIP`
+- Flawlessly winning both `SHAO CATNIP` final-showdown rounds as `NOOB SAIDOG` unlocks `SNEK`
 - Unlocks persist in browser local storage; the two bosses remain explicitly scripted Battle Plan encounters rather than random route opponents
 
 ### HUD and Effects

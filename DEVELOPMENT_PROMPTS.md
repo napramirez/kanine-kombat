@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 12 fighters are present: 10 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss and `SHAO CATNIP` unlocks after defeating the Battle Plan final boss
+- 13 fighters are present: 10 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when `NOOB SAIDOG` flawlessly wins both SHAO CATNIP final-showdown rounds
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states
@@ -39,7 +39,7 @@ Input feels slightly delayed. Improve responsiveness:
 ### Add Another Character
 
 ```text
-Add another character to expand the roster beyond the current twelve fighters:
+Add another character to expand the roster beyond the current thirteen fighters:
 - Give the character a distinct silhouette, palette, and idle animation.
 - Add them to character select and roster data.
 - Create a unique projectile, trap, or status-effect special.
@@ -50,7 +50,7 @@ Add another character to expand the roster beyond the current twelve fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, and NOOB SAIDOG as shadow/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, and SNEK as constrictor/control.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.

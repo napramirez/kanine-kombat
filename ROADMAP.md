@@ -21,6 +21,7 @@
 - [x] Tenth character (`RAYDOG`)
 - [x] Eleventh character (`DOGGOMELEON`)
 - [x] Twelfth character (`NOOB SAIDOG`)
+- [x] Thirteenth character (`SNEK`)
 - [x] Character-specific stats and movesets
 - [ ] 3 new background stages
 - [ ] Stage selection
@@ -70,7 +71,7 @@
 
 ## Current Build Notes
 
-- Roster is now 12 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, and `SUBDOG`
+- Roster is now 13 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `SNEK`, and `SUBDOG`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
@@ -78,6 +79,7 @@
 - `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
 - `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that briefly fan out before homing
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
+- `SNEK` is hidden until `NOOB SAIDOG` flawlessly wins both SHAO CATNIP final-showdown rounds
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
 - Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`

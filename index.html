@@ -1133,6 +1133,13 @@ const COMBAT = {
       fireballRadius: 14,
       fireballSpread: 1,
       fireballLaunchFrames: 14
+    },
+    snek: {
+      slitherSpeed: 18,
+      coilRange: 42,
+      maxFrames: 90,
+      coilStunMs: 3000,
+      coilDisplayFrames: 180
     }
   },
   block: {
@@ -1972,6 +1979,76 @@ function drawRaydogSparks(x, bodyY, headY, frame, frozen) {
   });
 }
 
+function drawSnekSprite(x, frame, state, frozen) {
+  const bodyColor = frozen ? '#5f9ea0' : '#030303';
+  const scaleColor = frozen ? '#b0e0e6' : '#171717';
+  const eyeColor = frozen ? '#fff' : '#ff1744';
+  const slitherLength = state === 'special' ? 76 : 62;
+  const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
+  const headX = 20 + slitherLength;
+
+  x.fillStyle = 'rgba(0,0,0,0.3)';
+  x.beginPath();
+  x.ellipse(60, 108, 42, 7, 0, 0, Math.PI * 2);
+  x.fill();
+
+  x.strokeStyle = bodyColor;
+  x.lineWidth = 20;
+  x.lineCap = 'round';
+  x.beginPath();
+  x.moveTo(14, 88);
+  x.bezierCurveTo(35, 76 + wave, 48, 102 - wave, headX - 14, 76);
+  x.stroke();
+
+  x.strokeStyle = scaleColor;
+  x.lineWidth = 4;
+  x.beginPath();
+  x.moveTo(16, 86);
+  x.bezierCurveTo(35, 78 + wave, 50, 98 - wave, headX - 16, 76);
+  x.stroke();
+
+  x.fillStyle = bodyColor;
+  x.beginPath();
+  x.moveTo(headX - 22, 76);
+  x.lineTo(headX - 10, 56);
+  x.lineTo(headX + 16, 54);
+  x.lineTo(headX + 28, 68);
+  x.lineTo(headX + 15, 84);
+  x.lineTo(headX - 12, 86);
+  x.closePath();
+  x.fill();
+
+  x.fillStyle = scaleColor;
+  x.beginPath();
+  x.moveTo(headX + 4, 62);
+  x.lineTo(headX + 23, 67);
+  x.lineTo(headX + 15, 76);
+  x.lineTo(headX - 1, 74);
+  x.closePath();
+  x.fill();
+
+  x.shadowColor = eyeColor;
+  x.shadowBlur = frozen ? 0 : 9;
+  x.fillStyle = eyeColor;
+  x.beginPath();
+  x.ellipse(headX + 2, 62, 4, 3, 0, 0, Math.PI * 2);
+  x.ellipse(headX + 12, 62, 4, 3, 0, 0, Math.PI * 2);
+  x.fill();
+  x.shadowBlur = 0;
+
+  const tongueWave = Math.sin(frame * 0.45) * 3;
+  x.strokeStyle = eyeColor;
+  x.lineWidth = 2;
+  x.beginPath();
+  x.moveTo(headX + 25, 71);
+  x.lineTo(headX + 35, 72 + tongueWave);
+  x.lineTo(headX + 41, 68 + tongueWave);
+  x.moveTo(headX + 35, 72 + tongueWave);
+  x.lineTo(headX + 41, 76 + tongueWave);
+  x.stroke();
+  x.lineCap = 'butt';
+}
+
 function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false) {
   const frozenSuffix = frozen ? '-frozen' : '';
   const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}`;
@@ -1986,6 +2063,13 @@ function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, s
 
   x.save();
   if (flip) { x.translate(FIGHTER_LAYOUT.spriteSize, 0); x.scale(-1, 1); }
+
+  if (name === 'SNEK') {
+    drawSnekSprite(x, frame, state, frozen);
+    x.restore();
+    spriteCache[key] = c;
+    return c;
+  }
 
   // Frozen state: override colors and stop animations
   const frozenColor1 = frozen ? '#87ceeb' : color1;
@@ -3071,6 +3155,7 @@ class Fighter {
     this.borkoImpactY = GROUND - 24;
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
+    this.snekSlitherActive = false;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -3112,6 +3197,7 @@ class Fighter {
     this.borkoImpactY = GROUND - 24;
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
+    this.snekSlitherActive = false;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -3200,6 +3286,11 @@ class Fighter {
       } else if (this.specialFormSource === 'NOOB SAIDOG') {
         this.attackTimer = COMBAT.special.noobSaidog.sequenceFrames;
         if (this.onGround) this.vx = 0;
+        this.isBlocking = false;
+        this.isCrouching = false;
+      } else if (this.specialFormSource === 'SNEK') {
+        this.attackTimer = COMBAT.special.snek.maxFrames;
+        this.snekSlitherActive = true;
         this.isBlocking = false;
         this.isCrouching = false;
       } else {
@@ -3336,6 +3427,42 @@ class Fighter {
       this.onGround = true;
       this.landBorkoShockwave(opponent);
     }
+  }
+
+  updateSnekSlither(opponent) {
+    const special = COMBAT.special.snek;
+    const dx = opponent.x - this.x;
+    const direction = dx === 0 ? this.facing : Math.sign(dx);
+
+    this.state = 'special';
+    this.facing = direction;
+    this.vx = 0;
+    this.vy = 0;
+    this.y = GROUND;
+    this.onGround = true;
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.attackTimer = Math.max(0, this.attackTimer - 1);
+
+    if (Math.abs(dx) > special.coilRange && this.attackTimer > 0) {
+      this.x += direction * Math.min(special.slitherSpeed, Math.abs(dx) - special.coilRange);
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
+      return;
+    }
+
+    if (opponent.health > 0) {
+      opponent.applyStunnedStatus(special.coilStunMs);
+      spawnSnekCoil(this, opponent);
+      addParticle(opponent.x, opponent.y - 50, 'stunned');
+      game.screenShake = COMBAT.effects.harpoonShake;
+      game.hitStop = COMBAT.effects.harpoonHitStop;
+      playImpactSound('hit');
+    }
+
+    this.snekSlitherActive = false;
+    this.attackTimer = 0;
+    this.specialFormSource = '';
+    this.state = 'idle';
   }
 
   landSekdogTeleportPunch(opponent) {
@@ -3506,6 +3633,11 @@ class Fighter {
 
     if (this.borkoLeapActive) {
       this.updateBorkoSpecial(opponent);
+      return;
+    }
+
+    if (this.snekSlitherActive) {
+      this.updateSnekSlither(opponent);
       return;
     }
 
@@ -3824,6 +3956,8 @@ function spawnProjectile(owner) {
   } else if (specialName === 'NOOB SAIDOG') {
     spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1);
     return;
+  } else if (specialName === 'SNEK') {
+    return;
   } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
@@ -3934,6 +4068,21 @@ function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount) {
     launchFrames: special.fireballLaunchFrames,
     trail: [],
     lastOwnerFrame: owner.frame
+  });
+}
+
+function spawnSnekCoil(owner, target) {
+  const special = COMBAT.special.snek;
+  projectiles.push({
+    x: target.x,
+    y: target.y,
+    owner,
+    target,
+    type: 'snekCoil',
+    life: special.coilDisplayFrames,
+    maxLife: special.coilDisplayFrames,
+    lastOwnerFrame: owner.frame,
+    trail: []
   });
 }
 
@@ -4201,6 +4350,13 @@ function updateNoobFireball(p, index) {
   p.y += dy / distance * p.speed;
 }
 
+function updateSnekCoil(p, index) {
+  if (p.lastOwnerFrame === p.owner.frame) return;
+  p.lastOwnerFrame = p.owner.frame;
+  p.life--;
+  if (p.owner.health <= 0 || p.target.health <= 0 || p.life <= 0) projectiles.splice(index, 1);
+}
+
 function updateProjectiles(opponent) {
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
@@ -4213,6 +4369,11 @@ function updateProjectiles(opponent) {
 
     if (p.type === 'noobFireball') {
       updateNoobFireball(p, i);
+      continue;
+    }
+
+    if (p.type === 'snekCoil') {
+      updateSnekCoil(p, i);
       continue;
     }
 
@@ -4601,6 +4762,26 @@ function drawProjectiles() {
       ctx.beginPath();
       ctx.arc(p.x - 3, p.y - 3, 3, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'snekCoil') {
+      const coilWave = Math.sin(Date.now() * 0.007);
+      const coilBaseY = p.target.y - p.target.height * 0.28;
+      ctx.globalAlpha = alpha;
+      for (let i = 0; i < 3; i++) {
+        const coilY = coilBaseY - i * 22 + Math.sin(Date.now() * 0.008 + i) * 3;
+        const coilWidth = p.target.width * 0.72 + 13 + Math.sin(Date.now() * 0.009 + i) * 4;
+        const coilHeight = 11 + i * 2;
+        const coilX = p.target.x + coilWave * (i % 2 === 0 ? 4 : -4);
+        ctx.strokeStyle = '#030303';
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.ellipse(coilX, coilY, coilWidth, coilHeight, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = '#171717';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     } else if (p.type === 'harpoon') {
       const ownerX = p.owner.x;
       const ownerY = p.owner.y - 50;
@@ -5651,7 +5832,8 @@ let game = {
     pendingAdvance: false,
     cleared: false,
     stepperFromIndex: -1,
-    stepperReady: false
+    stepperReady: false,
+    noobFlawlessFinalRounds: 0
   },
   pause: {
     active: false,
@@ -5801,6 +5983,19 @@ const CHARACTERS = [
     desc: 'SHADOW'
   },
   {
+    id: 'snek',
+    name: 'SNEK',
+    hidden: true,
+    color1: '#030303',
+    color2: '#171717',
+    eyeColor: '#ff1744',
+    scale: 1.5,
+    speed: 7,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'CONSTRICTOR'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',
@@ -5901,6 +6096,7 @@ function resetBattlePlanState() {
   game.battlePlan.cleared = false;
   game.battlePlan.stepperFromIndex = -1;
   game.battlePlan.stepperReady = false;
+  game.battlePlan.noobFlawlessFinalRounds = 0;
   hideBattlePlanStepper();
 }
 
@@ -5923,6 +6119,7 @@ function prepareBattlePlanRoute(playerCharacterId) {
   game.battlePlan.currentIndex = 0;
   game.battlePlan.pendingAdvance = false;
   game.battlePlan.cleared = false;
+  game.battlePlan.noobFlawlessFinalRounds = 0;
   p2Selection = CHARACTERS.findIndex(char => char.id === game.battlePlan.route[0]);
 }
 
@@ -5946,6 +6143,7 @@ function loadBattlePlanMatch() {
 
   p1 = new Fighter(PLAYER_SPAWNS.p1, playerChar, 1);
   p2 = new Fighter(PLAYER_SPAWNS.p2, opponentChar, -1);
+  game.battlePlan.noobFlawlessFinalRounds = 0;
   p1Selection = CHARACTERS.findIndex(char => char.id === playerChar.id);
   p2Selection = CHARACTERS.findIndex(char => char.id === opponentChar.id);
   ui.p1Name.textContent = p1.name;
@@ -7045,7 +7243,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'SNEK') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;
@@ -7119,15 +7317,30 @@ function endRound() {
     updateRoundDots();
     const flawless = winner.health >= ROUND_RULES.flawlessHealth;
     const battlePlanMatchComplete = isBattlePlanMode() && winner.roundsWon >= ROUND_RULES.winsToFinish;
+    const isNoobCatnipFinal = isBattlePlanMode()
+      && game.battlePlan.currentIndex === game.battlePlan.route.length - 1
+      && p1.name === 'NOOB SAIDOG';
+    if (isNoobCatnipFinal && winner === p1 && flawless) {
+      game.battlePlan.noobFlawlessFinalRounds++;
+    } else if (isNoobCatnipFinal) {
+      game.battlePlan.noobFlawlessFinalRounds = 0;
+    }
     const unlockedBoss = battlePlanMatchComplete && winner === p1
       && unlockHiddenCharacter(game.battlePlan.route[game.battlePlan.currentIndex]);
+    const unlockedSnek = battlePlanMatchComplete && winner === p1 && isNoobCatnipFinal
+      && p2.roundsWon === 0
+      && game.battlePlan.noobFlawlessFinalRounds === ROUND_RULES.winsToFinish
+      && unlockHiddenCharacter('snek');
+    const unlockMessage = [unlockedBoss ? `${p2.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '']
+      .filter(Boolean)
+      .join('\n');
     if (battlePlanMatchComplete && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1) {
       game.roundMessage = 'BATTLE PLAN\nCLEARED!';
-      if (unlockedBoss) game.roundMessage += `\n${p2.name} UNLOCKED!`;
+      if (unlockMessage) game.roundMessage += `\n${unlockMessage}`;
     } else if (battlePlanMatchComplete && winner === p2) {
       game.roundMessage = 'BATTLE PLAN\nFAILED';
-    } else if (unlockedBoss) {
-      game.roundMessage = `${p2.name}\nUNLOCKED!`;
+    } else if (unlockMessage) {
+      game.roundMessage = unlockMessage;
     } else {
       game.roundMessage = flawless ? `${winner.name}\nFLAWLESS VICTORY!` : `${winner.name} WINS!`;
     }

@@ -58,6 +58,8 @@ None currently tracked.
 - [ ] BORKO and SHAO CATNIP are hidden from character select, Random 8, and regular CPU pools before their Battle Plan defeats
 - [ ] Defeating the BORKO sub-boss and SHAO CATNIP final boss unlocks the correct fighter and shows the unlock message
 - [ ] Hidden-character unlocks persist after returning to the title screen and reopening the game
+- [ ] SNEK remains hidden until NOOB SAIDOG flawlessly wins both SHAO CATNIP final-showdown rounds
+- [ ] SNEK slithers rapidly into a 3-second full-stun coil and its special clears after contact
 
 ### Movement
 - [ ] Jump height is consistent

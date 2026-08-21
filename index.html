@@ -1991,7 +1991,7 @@ function drawSnekSprite(x, frame, state, frozen) {
   const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
   const headX = 20 + slitherLength;
   const bodySpan = headX - 28;
-  const newBodySpan = Math.round(bodySpan * 1.5);
+  const newBodySpan = Math.round(bodySpan * 2);
   const bodyStartX = (headX - 14) - newBodySpan;
   const bodyOffset = bodyStartX - 14;
   const tailEdge = bodyStartX - 14;
@@ -2002,7 +2002,7 @@ function drawSnekSprite(x, frame, state, frozen) {
   const offsetX = (120 - totalWidth * fitScale) / 2 - tailEdge * fitScale;
 
   x.save();
-  x.translate(offsetX, 0);
+  x.translate(offsetX, 108 * (1 - fitScale));
   x.scale(fitScale, fitScale);
 
   x.fillStyle = 'rgba(0,0,0,0.3)';

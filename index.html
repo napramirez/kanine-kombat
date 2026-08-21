@@ -1987,37 +1987,41 @@ function drawSnekSprite(x, frame, state, frozen) {
   const bodyColor = frozen ? '#5f9ea0' : '#030303';
   const scaleColor = frozen ? '#b0e0e6' : '#171717';
   const eyeColor = frozen ? '#fff' : '#ff1744';
-  const slitherLength = state === 'special' ? 114 : 93;
+  const slitherLength = state === 'special' ? 76 : 62;
   const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
   const headX = 20 + slitherLength;
+  const bodySpan = headX - 28;
+  const newBodySpan = Math.round(bodySpan * 1.5);
+  const bodyStartX = (headX - 14) - newBodySpan;
+  const bodyOffset = bodyStartX - 14;
 
   x.fillStyle = 'rgba(0,0,0,0.3)';
   x.beginPath();
   x.ellipse(60, 108, 42, 7, 0, 0, Math.PI * 2);
   x.fill();
 
+  x.fillStyle = bodyColor;
+  x.beginPath();
+  x.moveTo(bodyStartX, 96);
+  x.lineTo(bodyStartX + 12, 96);
+  x.lineTo(bodyStartX + 6, 78);
+  x.closePath();
+  x.fill();
+
   x.strokeStyle = bodyColor;
   x.lineWidth = 20;
   x.lineCap = 'round';
   x.beginPath();
-  x.moveTo(14, 88);
-  x.bezierCurveTo(35, 76 + wave, 48, 102 - wave, headX - 14, 76);
+  x.moveTo(bodyStartX, 88);
+  x.bezierCurveTo(35 + bodyOffset, 76 + wave, 48 + bodyOffset, 102 - wave, headX - 14, 76);
   x.stroke();
 
   x.strokeStyle = scaleColor;
   x.lineWidth = 4;
   x.beginPath();
-  x.moveTo(16, 86);
-  x.bezierCurveTo(35, 78 + wave, 50, 98 - wave, headX - 16, 76);
+  x.moveTo(bodyStartX + 2, 86);
+  x.bezierCurveTo(35 + bodyOffset, 78 + wave, 50 + bodyOffset, 98 - wave, headX - 16, 76);
   x.stroke();
-
-  x.fillStyle = bodyColor;
-  x.beginPath();
-  x.moveTo(8, 96);
-  x.lineTo(20, 96);
-  x.lineTo(14, 78);
-  x.closePath();
-  x.fill();
 
   x.fillStyle = bodyColor;
   x.beginPath();

@@ -1289,6 +1289,8 @@ let p2RandomizeTimer = null;
 const GAMEPAD_DEADZONE = 0.3;
 const GAMEPAD_REPEAT_DELAY_MS = 220;
 const GAMEPAD_REPEAT_INTERVAL_MS = 120;
+const CHAR_SELECT_REPEAT_DELAY_MS = 320;
+const CHAR_SELECT_REPEAT_INTERVAL_MS = 220;
 const GAMEPAD_BUTTONS = {
   confirm: 0,
   back: 1,
@@ -1311,13 +1313,15 @@ const gamepadInput = {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
+      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
     },
     p2: {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
+      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
     }
   }
 };
@@ -6483,6 +6487,10 @@ function clearGamepadSlotHeld(slot) {
   slot.repeatAt.right = 0;
   slot.repeatAt.up = 0;
   slot.repeatAt.down = 0;
+  slot.charSelectRepeatAt.left = 0;
+  slot.charSelectRepeatAt.right = 0;
+  slot.charSelectRepeatAt.up = 0;
+  slot.charSelectRepeatAt.down = 0;
 }
 
 function clearGamepadSlot(slot, releaseAssignment = false) {
@@ -6552,6 +6560,25 @@ function shouldRepeatMenuDirection(slot, dir, active, now) {
 
   if (now >= slot.repeatAt[dir]) {
     slot.repeatAt[dir] = now + GAMEPAD_REPEAT_INTERVAL_MS;
+    return true;
+  }
+
+  return false;
+}
+
+function shouldRepeatCharSelectDirection(slot, dir, active, now) {
+  if (!active) {
+    slot.charSelectRepeatAt[dir] = 0;
+    return false;
+  }
+
+  if (!slot.prev[dir]) {
+    slot.charSelectRepeatAt[dir] = now + CHAR_SELECT_REPEAT_DELAY_MS;
+    return true;
+  }
+
+  if (now >= slot.charSelectRepeatAt[dir]) {
+    slot.charSelectRepeatAt[dir] = now + CHAR_SELECT_REPEAT_INTERVAL_MS;
     return true;
   }
 
@@ -6646,22 +6673,22 @@ function handleGamepadCharacterSelectInput(slotName, slot, state, now) {
       const up = state.up && !state.down;
       const down = state.down && !state.up;
 
-      if (shouldRepeatMenuDirection(slot, 'left', left, now)) {
+      if (shouldRepeatCharSelectDirection(slot, 'left', left, now)) {
         ensureAudioReady();
         p1Selection = moveCharSelection(p1Selection, -1, 0);
         updateCharSelect();
         playUiSound('navigate');
-      } else if (shouldRepeatMenuDirection(slot, 'right', right, now)) {
+      } else if (shouldRepeatCharSelectDirection(slot, 'right', right, now)) {
         ensureAudioReady();
         p1Selection = moveCharSelection(p1Selection, 1, 0);
         updateCharSelect();
         playUiSound('navigate');
-      } else if (shouldRepeatMenuDirection(slot, 'up', up, now)) {
+      } else if (shouldRepeatCharSelectDirection(slot, 'up', up, now)) {
         ensureAudioReady();
         p1Selection = moveCharSelection(p1Selection, 0, -1);
         updateCharSelect();
         playUiSound('navigate');
-      } else if (shouldRepeatMenuDirection(slot, 'down', down, now)) {
+      } else if (shouldRepeatCharSelectDirection(slot, 'down', down, now)) {
         ensureAudioReady();
         p1Selection = moveCharSelection(p1Selection, 0, 1);
         updateCharSelect();
@@ -6686,22 +6713,22 @@ function handleGamepadCharacterSelectInput(slotName, slot, state, now) {
     const up = state.up && !state.down;
     const down = state.down && !state.up;
 
-    if (shouldRepeatMenuDirection(slot, 'left', left, now)) {
+    if (shouldRepeatCharSelectDirection(slot, 'left', left, now)) {
       ensureAudioReady();
       p2Selection = moveCharSelection(p2Selection, -1, 0);
       updateCharSelect();
       playUiSound('navigate');
-    } else if (shouldRepeatMenuDirection(slot, 'right', right, now)) {
+    } else if (shouldRepeatCharSelectDirection(slot, 'right', right, now)) {
       ensureAudioReady();
       p2Selection = moveCharSelection(p2Selection, 1, 0);
       updateCharSelect();
       playUiSound('navigate');
-    } else if (shouldRepeatMenuDirection(slot, 'up', up, now)) {
+    } else if (shouldRepeatCharSelectDirection(slot, 'up', up, now)) {
       ensureAudioReady();
       p2Selection = moveCharSelection(p2Selection, 0, -1);
       updateCharSelect();
       playUiSound('navigate');
-    } else if (shouldRepeatMenuDirection(slot, 'down', down, now)) {
+    } else if (shouldRepeatCharSelectDirection(slot, 'down', down, now)) {
       ensureAudioReady();
       p2Selection = moveCharSelection(p2Selection, 0, 1);
       updateCharSelect();

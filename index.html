@@ -2023,9 +2023,12 @@ function drawSnekSprite(x, frame, state, frozen) {
   const bodyColor = frozen ? '#5f9ea0' : '#030303';
   const scaleColor = frozen ? '#b0e0e6' : '#171717';
   const eyeColor = frozen ? '#fff' : '#ff1744';
+  const isBite = state === 'attack_punch';
+  const isTailWhip = state === 'attack_kick';
+  const biteLunge = isBite ? Math.min(frame * 4, 18) : 0;
   const slitherLength = state === 'special' ? 76 : 62;
   const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
-  const headX = 20 + slitherLength;
+  const headX = 20 + slitherLength + biteLunge;
   const bodySpan = headX - 28;
   const newBodySpan = Math.round(bodySpan * 2);
   const bodyStartX = (headX - 14) - newBodySpan;
@@ -2069,6 +2072,37 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.bezierCurveTo(35 + bodyOffset, 78 + wave, 50 + bodyOffset, 98 - wave, headX - 16, 76);
   x.stroke();
 
+  if (isTailWhip) {
+    const whipAngle = Math.min(frame * 0.25, 1.2);
+    const whipTipX = bodyStartX + 40 + Math.sin(whipAngle) * 50;
+    const whipTipY = 68 - Math.sin(whipAngle) * 30;
+    x.strokeStyle = bodyColor;
+    x.lineWidth = 10;
+    x.lineCap = 'round';
+    x.beginPath();
+    x.moveTo(bodyStartX + 6, 84);
+    x.quadraticCurveTo(bodyStartX + 20, 70, whipTipX, whipTipY);
+    x.stroke();
+    x.fillStyle = bodyColor;
+    x.beginPath();
+    x.moveTo(whipTipX, whipTipY);
+    x.lineTo(whipTipX + 8, whipTipY - 6);
+    x.lineTo(whipTipX + 6, whipTipY + 6);
+    x.closePath();
+    x.fill();
+    if (frame > 2 && frame < 10) {
+      x.strokeStyle = '#f1c40f';
+      x.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const a = -0.5 + i * 0.5;
+        x.beginPath();
+        x.moveTo(whipTipX + 10, whipTipY + Math.sin(a) * 8);
+        x.lineTo(whipTipX + 18, whipTipY + Math.sin(a) * 14);
+        x.stroke();
+      }
+    }
+  }
+
   x.fillStyle = bodyColor;
   x.beginPath();
   x.moveTo(headX - 22, 76);
@@ -2088,6 +2122,31 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.lineTo(headX - 1, 74);
   x.closePath();
   x.fill();
+
+  if (isBite) {
+    const jawOpen = Math.min(frame * 2, 12);
+    x.fillStyle = '#c0392b';
+    x.beginPath();
+    x.moveTo(headX + 22, 74);
+    x.lineTo(headX + 30, 74 + jawOpen);
+    x.lineTo(headX + 18, 80 + jawOpen);
+    x.lineTo(headX + 10, 78);
+    x.closePath();
+    x.fill();
+    x.fillStyle = '#fff';
+    x.beginPath();
+    x.moveTo(headX + 26, 74);
+    x.lineTo(headX + 28, 70);
+    x.lineTo(headX + 24, 72);
+    x.closePath();
+    x.fill();
+    x.beginPath();
+    x.moveTo(headX + 22, 74 + jawOpen);
+    x.lineTo(headX + 24, 78 + jawOpen);
+    x.lineTo(headX + 20, 76 + jawOpen);
+    x.closePath();
+    x.fill();
+  }
 
   x.shadowColor = eyeColor;
   x.shadowBlur = frozen ? 0 : 9;
@@ -4156,15 +4215,18 @@ function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount, variant) {
   const x = owner.x + owner.facing * 42;
   const y = owner.y - 58;
   const targetY = target.y - target.height / 2;
-  const angle = Math.atan2(targetY - y, target.x - x) + (shotIndex - (shotCount - 1) / 2) * special.fireballSpread;
+  const isRepdog = variant === 'REPDOG';
+  const angle = isRepdog
+    ? Math.atan2(targetY - y, target.x - x)
+    : Math.atan2(targetY - y, target.x - x) + (shotIndex - (shotCount - 1) / 2) * special.fireballSpread;
   projectiles.push({
     x,
     y,
     owner,
     target,
-    type: variant === 'REPDOG' ? 'repdogAcid' : 'noobFireball',
+    type: isRepdog ? 'repdogAcid' : 'noobFireball',
     life: 120,
-    radius: special.fireballRadius,
+    radius: isRepdog ? special.fireballRadius * 2 : special.fireballRadius,
     speed: special.fireballSpeed,
     dmg: special.fireballDamage,
     kb: special.fireballKnockback,
@@ -4392,8 +4454,12 @@ function updateNoobSnakeSequence(p, index) {
       game.screenShake = COMBAT.effects.harpoonShake;
       game.hitStop = COMBAT.effects.harpoonHitStop;
       playImpactSound('hit');
-      for (let i = 0; i < special.barrageCount; i++) {
-        spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
+      if (p.variant === 'REPDOG') {
+        spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
+      } else {
+        for (let i = 0; i < special.barrageCount; i++) {
+          spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
+        }
       }
       playAttackSound('special');
     }
@@ -6039,8 +6105,7 @@ let game = {
     pendingAdvance: false,
     cleared: false,
     stepperFromIndex: -1,
-    stepperReady: false,
-    noobFlawlessFinalRounds: 0
+    stepperReady: false
   },
   pause: {
     active: false,
@@ -6314,7 +6379,6 @@ function resetBattlePlanState() {
   game.battlePlan.cleared = false;
   game.battlePlan.stepperFromIndex = -1;
   game.battlePlan.stepperReady = false;
-  game.battlePlan.noobFlawlessFinalRounds = 0;
   hideBattlePlanStepper();
 }
 
@@ -6337,7 +6401,6 @@ function prepareBattlePlanRoute(playerCharacterId) {
   game.battlePlan.currentIndex = 0;
   game.battlePlan.pendingAdvance = false;
   game.battlePlan.cleared = false;
-  game.battlePlan.noobFlawlessFinalRounds = 0;
   p2Selection = CHARACTERS.findIndex(char => char.id === game.battlePlan.route[0]);
 }
 
@@ -6361,7 +6424,6 @@ function loadBattlePlanMatch() {
 
   p1 = new Fighter(PLAYER_SPAWNS.p1, playerChar, 1);
   p2 = new Fighter(PLAYER_SPAWNS.p2, opponentChar, -1);
-  game.battlePlan.noobFlawlessFinalRounds = 0;
   p1Selection = CHARACTERS.findIndex(char => char.id === playerChar.id);
   p2Selection = CHARACTERS.findIndex(char => char.id === opponentChar.id);
   ui.p1Name.textContent = p1.name;
@@ -7561,16 +7623,9 @@ function endRound() {
     const isNoobCatnipFinal = isBattlePlanMode()
       && game.battlePlan.currentIndex === game.battlePlan.route.length - 1
       && p1.name === 'NOOB SAIDOG';
-    if (isNoobCatnipFinal && winner === p1 && flawless) {
-      game.battlePlan.noobFlawlessFinalRounds++;
-    } else if (isNoobCatnipFinal) {
-      game.battlePlan.noobFlawlessFinalRounds = 0;
-    }
     const unlockedBoss = battlePlanMatchComplete && winner === p1
       && unlockHiddenCharacter(game.battlePlan.route[game.battlePlan.currentIndex]);
     const unlockedSnek = battlePlanMatchComplete && winner === p1 && isNoobCatnipFinal
-      && p2.roundsWon === 0
-      && game.battlePlan.noobFlawlessFinalRounds === ROUND_RULES.winsToFinish
       && unlockHiddenCharacter('snek');
     const unlockMessage = [unlockedBoss ? `${p2.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '']
       .filter(Boolean)

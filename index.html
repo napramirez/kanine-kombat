@@ -1625,7 +1625,7 @@ const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
 const DOGGOMELEON_MORPH_FRAMES = 480;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -1677,6 +1677,17 @@ function getMaskedTrimColors(name, frozen) {
       hoodieEdge: '#222',
       centerStripe: '#111',
       innerEar: '#333'
+    };
+  }
+
+  if (name === 'REPDOG') {
+    return {
+      limbColor: '#2e5a2e',
+      pawColor: '#3a6e3a',
+      hoodieColor: '#2e5a2e',
+      hoodieEdge: '#4a8a4a',
+      centerStripe: '#2e5a2e',
+      innerEar: '#5a3a3a'
     };
   }
 
@@ -1745,6 +1756,15 @@ function getMaskedGearColors(name, frozen, frame = 0) {
     };
   }
 
+  if (name === 'REPDOG') {
+    return {
+      vestColor: '#4CAF50',
+      vestHighlight: '#66BB6A',
+      maskColor: '#4CAF50',
+      maskEdge: '#388E3C'
+    };
+  }
+
   if (name === 'RAYNDOG') {
     return {
       vestColor: '#8e44ad',
@@ -1786,6 +1806,22 @@ function drawNoobSaidogEyes(x, headY, frame) {
   x.shadowColor = '#ff1744';
   x.shadowBlur = 7 + flash * 7;
   x.fillStyle = `rgb(255, ${secondary}, ${secondary})`;
+  x.beginPath();
+  x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
+  x.fill();
+  x.restore();
+}
+
+function drawRepdogEyes(x, headY, frame) {
+  const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
+  const green = Math.floor(180 + flash * 75);
+  x.save();
+  x.shadowColor = '#ffeb3b';
+  x.shadowBlur = 7 + flash * 7;
+  x.fillStyle = `rgb(255, ${green}, 20)`;
   x.beginPath();
   x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
   x.fill();
@@ -2324,10 +2360,27 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   x.fill();
 
   if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
+  if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
 
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
   if (isRaydog(name)) drawRaydogSparks(x, bodyY, headY, frame, frozen);
+
+  // Red snake tongue on REPDOG's mask
+  if (name === 'REPDOG') {
+    const tongueWag = Math.sin(frame * 0.35) * 4;
+    x.strokeStyle = '#ff1744';
+    x.lineWidth = 2;
+    x.lineCap = 'round';
+    x.beginPath();
+    x.moveTo(92, headY + 10);
+    x.lineTo(100, headY + 12 + tongueWag * 0.3);
+    x.lineTo(107, headY + 8 + tongueWag);
+    x.moveTo(100, headY + 12 + tongueWag * 0.3);
+    x.lineTo(107, headY + 16 + tongueWag);
+    x.stroke();
+    x.lineCap = 'butt';
+  }
 
   // Eyebrows
   if (state === 'hit' || state === 'attack_punch' || state === 'attack_kick' || state === 'special' || frozen) {
@@ -2458,6 +2511,30 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
       x.strokeStyle = '#ff1744';
       x.stroke();
+    } else if (name === 'REPDOG') {
+      const flash = 0.55 + (Math.sin(frame * 0.45) + 1) * 0.2;
+      x.strokeStyle = `rgba(76, 175, 80, ${flash})`;
+      x.lineWidth = 3;
+      for (let i = 0; i < 3; i++) {
+        x.beginPath();
+        x.moveTo(76 + i * 5, bodyY - 2 + i * 4);
+        x.lineTo(90 + i * 7, bodyY - 12 + i * 3);
+        x.stroke();
+      }
+      x.fillStyle = '#1b5e20';
+      x.beginPath();
+      x.ellipse(92, bodyY, 14, 10, 0, 0, Math.PI * 2);
+      x.fill();
+      x.strokeStyle = '#4CAF50';
+      x.stroke();
+      x.shadowColor = '#ffeb3b';
+      x.shadowBlur = 6;
+      x.fillStyle = '#ffeb3b';
+      x.beginPath();
+      x.ellipse(88, bodyY - 3, 2, 1.5, 0, 0, Math.PI * 2);
+      x.ellipse(96, bodyY - 3, 2, 1.5, 0, 0, Math.PI * 2);
+      x.fill();
+      x.shadowBlur = 0;
     } else if (name === 'SKORPDOG') {
       const harpoonX = 102;
       const harpoonY = bodyY + 1;
@@ -3310,7 +3387,7 @@ class Fighter {
         this.onGround = false;
         this.isBlocking = false;
         this.isCrouching = false;
-      } else if (this.specialFormSource === 'NOOB SAIDOG') {
+      } else if (this.specialFormSource === 'NOOB SAIDOG' || this.specialFormSource === 'REPDOG') {
         this.attackTimer = COMBAT.special.noobSaidog.sequenceFrames;
         if (this.onGround) this.vx = 0;
         this.isBlocking = false;
@@ -3980,8 +4057,8 @@ function spawnProjectile(owner) {
   } else if (specialName === 'RAYDOG') {
     spawnRaydogArcLightning(owner, owner === p1 ? p2 : p1);
     return;
-  } else if (specialName === 'NOOB SAIDOG') {
-    spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1);
+  } else if (specialName === 'NOOB SAIDOG' || specialName === 'REPDOG') {
+    spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1, specialName);
     return;
   } else if (specialName === 'SNEK') {
     return;
@@ -4053,7 +4130,7 @@ function spawnProjectile(owner) {
   owner.pendingCydogBomb = null;
 }
 
-function spawnNoobSaidogSequence(owner, target) {
+function spawnNoobSaidogSequence(owner, target, variant) {
   const special = COMBAT.special.noobSaidog;
   const holdFrames = Math.ceil(special.captureHoldMs / PHYSICS.freezeTickMs);
 
@@ -4063,6 +4140,7 @@ function spawnNoobSaidogSequence(owner, target) {
     owner,
     target,
     type: 'noobSnake',
+    variant: variant || 'NOOB SAIDOG',
     life: special.snakeRiseFrames + holdFrames,
     maxLife: special.snakeRiseFrames + holdFrames,
     riseFrames: special.snakeRiseFrames,
@@ -4073,7 +4151,7 @@ function spawnNoobSaidogSequence(owner, target) {
   });
 }
 
-function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount) {
+function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount, variant) {
   const special = COMBAT.special.noobSaidog;
   const x = owner.x + owner.facing * 42;
   const y = owner.y - 58;
@@ -4084,7 +4162,7 @@ function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount) {
     y,
     owner,
     target,
-    type: 'noobFireball',
+    type: variant === 'REPDOG' ? 'repdogAcid' : 'noobFireball',
     life: 120,
     radius: special.fireballRadius,
     speed: special.fireballSpeed,
@@ -4315,7 +4393,7 @@ function updateNoobSnakeSequence(p, index) {
       game.hitStop = COMBAT.effects.harpoonHitStop;
       playImpactSound('hit');
       for (let i = 0; i < special.barrageCount; i++) {
-        spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount);
+        spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
       }
       playAttackSound('special');
     }
@@ -4394,7 +4472,7 @@ function updateProjectiles(opponent) {
       continue;
     }
 
-    if (p.type === 'noobFireball') {
+    if (p.type === 'noobFireball' || p.type === 'repdogAcid') {
       updateNoobFireball(p, i);
       continue;
     }
@@ -4629,6 +4707,7 @@ function drawProjectiles() {
     const alpha = Math.min(1, p.life / 20);
 
     if (p.type === 'noobSnake') {
+      const isRepdog = p.variant === 'REPDOG';
       const rise = Math.min(1, p.elapsedFrames / p.riseFrames);
       const easedRise = 1 - Math.pow(1 - rise, 3);
       const bottomY = H + 36;
@@ -4636,17 +4715,27 @@ function drawProjectiles() {
       const neckHeight = Math.max(0, bottomY - headY - 16);
       const facing = p.target.facing;
       const headX = p.target.x - facing * (p.target.width * 0.6 + 32);
-      const redFlash = 0.65 + (Math.sin(Date.now() * 0.025) + 1) * 0.17;
+      const eyeFlash = 0.65 + (Math.sin(Date.now() * 0.025) + 1) * 0.17;
       const tongueWag = Math.sin(Date.now() * 0.024) * 6;
+      const snakeBody = isRepdog ? '#1b5e20' : '#030303';
+      const snakeScale = isRepdog ? '#2e7d32' : '#121212';
+      const snakeBodyLight = isRepdog ? '#2e7d32' : '#030303';
+      const snakeScaleLight = isRepdog ? '#388E3C' : '#171717';
+      const snakeHead = isRepdog ? '#1b5e20' : '#050505';
+      const snakeHeadLight = isRepdog ? '#2e7d32' : '#101010';
+      const snakePupil = isRepdog ? '#1b5e20' : '#000';
+      const eyeColor = isRepdog ? '#ffeb3b' : '#ff1744';
+      const eyeGlow = isRepdog ? 'rgba(255, 235, 59,' : 'rgba(255, 20, 45,';
+      const tongueColor = isRepdog ? '#ffeb3b' : '#ff1744';
 
       ctx.globalAlpha = alpha * 0.35;
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = isRepdog ? '#0a3d0a' : '#000';
       ctx.beginPath();
       ctx.ellipse(p.x, GROUND + 6, 54 + rise * 20, 14 + rise * 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = '#030303';
+      ctx.fillStyle = snakeBody;
       ctx.beginPath();
       ctx.moveTo(p.x - 28, bottomY);
       ctx.bezierCurveTo(p.x - 37, bottomY - neckHeight * 0.36, headX - 31, headY + 42, headX - 25, headY + 16);
@@ -4655,7 +4744,7 @@ function drawProjectiles() {
       ctx.closePath();
       ctx.fill();
 
-      ctx.strokeStyle = '#121212';
+      ctx.strokeStyle = snakeScale;
       ctx.lineWidth = 2;
       for (let y = headY + 38; y < bottomY - 16; y += 18) {
         const taper = Math.min(1, (y - headY) / Math.max(1, neckHeight));
@@ -4673,7 +4762,7 @@ function drawProjectiles() {
         const lowestCoilWidth = p.target.width * 0.72 + 13;
         const tailEndX = p.target.x - facing * lowestCoilWidth;
 
-        ctx.strokeStyle = '#030303';
+        ctx.strokeStyle = snakeBody;
         ctx.lineWidth = 18;
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -4681,7 +4770,7 @@ function drawProjectiles() {
         ctx.bezierCurveTo(p.x - facing * 18, bottomY - neckHeight * 0.34, tailEndX - facing * 30, coilBaseY + 44, tailEndX, coilBaseY);
         ctx.stroke();
 
-        ctx.strokeStyle = '#171717';
+        ctx.strokeStyle = snakeScaleLight;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(p.x - facing * 3, bottomY - 8);
@@ -4695,13 +4784,13 @@ function drawProjectiles() {
           const coilHeight = 11 + i * 2;
           const coilX = p.target.x + coilWave * (i % 2 === 0 ? 4 : -4);
 
-          ctx.strokeStyle = '#030303';
+          ctx.strokeStyle = snakeBody;
           ctx.lineWidth = 14;
           ctx.beginPath();
           ctx.ellipse(coilX, coilY, coilWidth, coilHeight, 0, 0, Math.PI * 2);
           ctx.stroke();
 
-          ctx.strokeStyle = '#171717';
+          ctx.strokeStyle = snakeScaleLight;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
@@ -4712,7 +4801,7 @@ function drawProjectiles() {
       ctx.save();
       ctx.translate(headX, headY);
       ctx.scale(facing, 1);
-      ctx.fillStyle = '#050505';
+      ctx.fillStyle = snakeHead;
       ctx.beginPath();
       ctx.moveTo(-31, 5);
       ctx.lineTo(-22, -19);
@@ -4725,7 +4814,7 @@ function drawProjectiles() {
       ctx.closePath();
       ctx.fill();
 
-      ctx.fillStyle = '#101010';
+      ctx.fillStyle = snakeHeadLight;
       ctx.beginPath();
       ctx.moveTo(15, -8);
       ctx.lineTo(48, -2);
@@ -4735,22 +4824,22 @@ function drawProjectiles() {
       ctx.closePath();
       ctx.fill();
 
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = snakePupil;
       ctx.beginPath();
       ctx.ellipse(39, -1, 3, 2, 0, 0, Math.PI * 2);
       ctx.ellipse(39, 7, 3, 2, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.shadowColor = '#ff1744';
+      ctx.shadowColor = eyeColor;
       ctx.shadowBlur = 10;
-      ctx.fillStyle = `rgba(255, 20, 45, ${redFlash})`;
+      ctx.fillStyle = `${eyeGlow} ${eyeFlash})`;
       ctx.beginPath();
       ctx.ellipse(9, -9, 5, 4, 0, 0, Math.PI * 2);
       ctx.ellipse(-9, -8, 4, 3, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.strokeStyle = '#ff1744';
+      ctx.strokeStyle = tongueColor;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(50, 5);
@@ -4782,6 +4871,35 @@ function drawProjectiles() {
 
       ctx.globalAlpha = alpha;
       ctx.fillStyle = Math.sin(Date.now() * 0.05) > 0 ? '#ff1744' : '#8b0018';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(p.x - 3, p.y - 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.type === 'repdogAcid') {
+      const flash = 0.55 + (Math.sin(Date.now() * 0.04) + 1) * 0.2;
+      p.trail.forEach(point => {
+        ctx.globalAlpha = alpha * (point.life / 12) * 0.45;
+        ctx.fillStyle = '#1b5e20';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, p.radius * point.life / 14, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.globalAlpha = alpha * 0.55;
+      const acidGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.4);
+      acidGlow.addColorStop(0, `rgba(255, 255, 255, ${flash})`);
+      acidGlow.addColorStop(0.25, '#4CAF50');
+      acidGlow.addColorStop(1, 'rgba(27, 94, 32, 0)');
+      ctx.fillStyle = acidGlow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * 2.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = Math.sin(Date.now() * 0.05) > 0 ? '#66BB6A' : '#2e7d32';
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fill();
@@ -6008,6 +6126,17 @@ const CHARACTERS = [
     health: 100,
     specialGain: 0.25,
     desc: 'SHADOW'
+  },
+  {
+    id: 'repdog',
+    name: 'REPDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#ffeb3b',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'ACID'
   },
   {
     id: 'snek',
@@ -7293,7 +7422,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'SNEK') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

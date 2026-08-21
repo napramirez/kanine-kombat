@@ -1987,7 +1987,7 @@ function drawSnekSprite(x, frame, state, frozen) {
   const bodyColor = frozen ? '#5f9ea0' : '#030303';
   const scaleColor = frozen ? '#b0e0e6' : '#171717';
   const eyeColor = frozen ? '#fff' : '#ff1744';
-  const slitherLength = state === 'special' ? 76 : 62;
+  const slitherLength = state === 'special' ? 114 : 93;
   const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
   const headX = 20 + slitherLength;
 
@@ -2010,6 +2010,14 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.moveTo(16, 86);
   x.bezierCurveTo(35, 78 + wave, 50, 98 - wave, headX - 16, 76);
   x.stroke();
+
+  x.fillStyle = bodyColor;
+  x.beginPath();
+  x.moveTo(8, 96);
+  x.lineTo(20, 96);
+  x.lineTo(14, 78);
+  x.closePath();
+  x.fill();
 
   x.fillStyle = bodyColor;
   x.beginPath();

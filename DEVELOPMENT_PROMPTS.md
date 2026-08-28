@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 13 fighters are present: 10 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when `NOOB SAIDOG` flawlessly wins both SHAO CATNIP final-showdown rounds
+- 15 fighters are present: 12 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states
@@ -39,7 +39,7 @@ Input feels slightly delayed. Improve responsiveness:
 ### Add Another Character
 
 ```text
-Add another character to expand the roster beyond the current thirteen fighters:
+Add another character to expand the roster beyond the current fifteen fighters:
 - Give the character a distinct silhouette, palette, and idle animation.
 - Add them to character select and roster data.
 - Create a unique projectile, trap, or status-effect special.
@@ -50,7 +50,7 @@ Add another character to expand the roster beyond the current thirteen fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, and SNEK as constrictor/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, KA-9 as blade, REPDOG as acid, and SNEK as constrictor/control.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.
@@ -232,11 +232,11 @@ Add persistent stats:
 ### Code Structure
 
 ```text
-Refactor for maintainability:
-1. Separate the single-file game into modules.
-2. Centralize tuning values.
-3. Formalize the state machine.
-4. Preserve current behavior while reducing file size pressure in `index.html`.
+Codebase is modularized into src/ with build.sh assembling index.html:
+- src/head.html, src/body.html, src/tail.html: HTML structure
+- src/js/01-config.js through src/js/13-game-loop.js: JavaScript modules
+- bash src/build.sh assembles index.html in the repo root
+- To add a character: edit 08-characters.js (definition), 03-sprites.js (visuals), 06-projectiles.js (special), 01-config.js (stats)
 ```
 
 ### Mobile Support

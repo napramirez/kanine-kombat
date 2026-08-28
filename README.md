@@ -1,10 +1,10 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with a thirteen-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a fifteen-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
-Open `index.html` in a browser. There is no build step and no dependency install.
+Run `bash src/build.sh` to assemble `index.html` from the modular source files in `src/`, then open `index.html` in a browser. There is no dependency install beyond bash.
 
 If your browser limits gamepad support from `file://`, run the folder through a simple local HTTP server instead.
 
@@ -17,7 +17,7 @@ Optional music files:
 
 ## Tech Stack
 
-- Single HTML file with inline CSS and JavaScript
+- Modular source files in `src/` assembled into a single HTML file via `bash src/build.sh`
 - Canvas API rendering
 - Google Fonts: `Press Start 2P`
 - Zero runtime dependencies
@@ -28,7 +28,7 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - Keyboard and standard gamepad support with mixed-input play
-- 10 initially selectable fighters, plus 3 Battle Plan unlocks:
+- 12 initially selectable fighters, plus 3 Battle Plan unlocks:
   - `DOGGO CAGE`
   - `SKORPDOG`
   - `SEKDOG`
@@ -38,10 +38,12 @@ Optional music files:
   - `RAYDOG`
   - `DOGGOMELEON`
   - `NOOB SAIDOG`
+  - `KA-9`
+  - `REPDOG`
   - `SUBDOG`
   - Unlock `BORKO` by defeating the Battle Plan sub-boss
   - Unlock `SHAO CATNIP` by defeating the Battle Plan final boss
-  - Unlock `SNEK` by flawlessly defeating SHAO CATNIP in both Battle Plan final-showdown rounds as `NOOB SAIDOG`
+  - Unlock `SNEK` by completing the Battle Plan as `NOOB SAIDOG`
 - Character select screen with shared roster, side portraits, and a navigable grid
 - Character select random-8 action on the special button (`L` for P1, `3` for P2)
 - Title screen, character select, pause overlay, Battle Plan stepper, and post-match flow all support gamepad input
@@ -50,7 +52,7 @@ Optional music files:
 - Punch, kick, block, jump, crouch, active special attacks, and passive specials
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and fireball barrage, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and fireball barrage, KA-9's zigzag knife throw, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights
@@ -79,7 +81,26 @@ Optional music files:
 
 ```text
 kanine-kombat/
-├── index.html
+├── index.html              # Built artifact (do not edit directly)
+├── src/
+│   ├── build.sh            # Assembles index.html from source files
+│   ├── head.html           # HTML head with inline CSS
+│   ├── body.html           # HTML body/DOM structure
+│   ├── tail.html           # Closing tags
+│   └── js/
+│       ├── 01-config.js    # Game constants, COMBAT, enums
+│       ├── 02-audio.js     # Audio system, synthesis, music
+│       ├── 03-sprites.js   # Sprite drawing functions
+│       ├── 04-fighter.js   # Fighter class
+│       ├── 05-particles.js # Particle system
+│       ├── 06-projectiles.js # All projectile spawn/update/draw
+│       ├── 07-backgrounds.js # Background stages
+│       ├── 08-characters.js # CHARACTERS array, unlock system
+│       ├── 09-battle-plan.js # Battle plan route/stepper
+│       ├── 10-pause.js     # Pause overlay
+│       ├── 11-input.js     # Keyboard, gamepad, CPU AI
+│       ├── 12-combat.js    # Char select, combat, round mgmt
+│       └── 13-game-loop.js # Game loop, event listeners
 ├── assets/
 ├── README.md
 ├── GAME_DESIGN.md

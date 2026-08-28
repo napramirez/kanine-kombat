@@ -22,6 +22,8 @@
 - [x] Eleventh character (`DOGGOMELEON`)
 - [x] Twelfth character (`NOOB SAIDOG`)
 - [x] Thirteenth character (`SNEK`)
+- [x] Fourteenth character (`KA-9`)
+- [x] Fifteenth character (`REPDOG`)
 - [x] Character-specific stats and movesets
 - [ ] 3 new background stages
 - [ ] Stage selection
@@ -47,7 +49,7 @@
 
 ## Phase 5: Technical Improvements
 
-- [ ] Code modularization
+- [x] Code modularization
 - [ ] Mobile touch controls
 - [ ] Replay system
 - [ ] Online multiplayer (WebRTC)
@@ -71,15 +73,17 @@
 
 ## Current Build Notes
 
-- Roster is now 13 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `SNEK`, and `SUBDOG`
+- Roster is now 15 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `KA-9`, `REPDOG`, `SNEK`, and `SUBDOG`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
 - `RAYDOG` uses an arc-lightning active special and a passive lightning meter
 - `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
 - `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that briefly fan out before homing
+- `KA-9` throws 2 zigzag-pattern knives
+- `REPDOG` summons a green python capture and spits a single large acid glob
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
-- `SNEK` is hidden until `NOOB SAIDOG` flawlessly wins both SHAO CATNIP final-showdown rounds
+- `SNEK` is hidden until the Battle Plan is completed as `NOOB SAIDOG`
 - `SHAO CATNIP` is the current final Battle Plan opponent
 - `BORKO` is the current Battle Plan sub-boss
 - Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`

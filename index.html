@@ -2025,9 +2025,11 @@ function drawSnekSprite(x, frame, state, frozen) {
   const eyeColor = frozen ? '#fff' : '#ff1744';
   const isBite = state === 'attack_punch';
   const isTailWhip = state === 'attack_kick';
+  const isCoil = state === 'block';
   const biteLunge = isBite ? Math.min(frame * 4, 18) : 0;
-  const slitherLength = state === 'special' ? 76 : 62;
-  const wave = frozen ? 0 : Math.sin(frame * 0.32) * 7;
+  const coilTuck = isCoil ? 18 : 0;
+  const slitherLength = state === 'special' ? 76 : isCoil ? 40 : 62;
+  const wave = frozen ? 0 : Math.sin(frame * 0.32) * (isCoil ? 12 : 7);
   const headX = 20 + slitherLength + biteLunge;
   const bodySpan = headX - 28;
   const newBodySpan = Math.round(bodySpan * 2);
@@ -2061,16 +2063,32 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.lineWidth = 20;
   x.lineCap = 'round';
   x.beginPath();
-  x.moveTo(bodyStartX, 88);
-  x.bezierCurveTo(35 + bodyOffset, 76 + wave, 48 + bodyOffset, 102 - wave, headX - 14, 76);
-  x.stroke();
+  if (isCoil) {
+    x.moveTo(bodyStartX + 20, 92);
+    x.bezierCurveTo(bodyStartX + 50, 60 - wave, headX - 30, 100 + wave, headX - 14, 76 + coilTuck);
+    x.stroke();
+    x.beginPath();
+    x.moveTo(bodyStartX + 10, 86);
+    x.bezierCurveTo(bodyStartX + 35, 105, bodyStartX + 55, 68, bodyStartX + 70, 90);
+    x.stroke();
+  } else {
+    x.moveTo(bodyStartX, 88);
+    x.bezierCurveTo(35 + bodyOffset, 76 + wave, 48 + bodyOffset, 102 - wave, headX - 14, 76);
+    x.stroke();
+  }
 
   x.strokeStyle = scaleColor;
   x.lineWidth = 4;
   x.beginPath();
-  x.moveTo(bodyStartX + 2, 86);
-  x.bezierCurveTo(35 + bodyOffset, 78 + wave, 50 + bodyOffset, 98 - wave, headX - 16, 76);
-  x.stroke();
+  if (isCoil) {
+    x.moveTo(bodyStartX + 22, 90);
+    x.bezierCurveTo(bodyStartX + 50, 62 - wave, headX - 32, 98 + wave, headX - 16, 74 + coilTuck);
+    x.stroke();
+  } else {
+    x.moveTo(bodyStartX + 2, 86);
+    x.bezierCurveTo(35 + bodyOffset, 78 + wave, 50 + bodyOffset, 98 - wave, headX - 16, 76);
+    x.stroke();
+  }
 
   if (isTailWhip) {
     const whipAngle = Math.min(frame * 0.25, 1.2);
@@ -2105,21 +2123,22 @@ function drawSnekSprite(x, frame, state, frozen) {
 
   x.fillStyle = bodyColor;
   x.beginPath();
-  x.moveTo(headX - 22, 76);
-  x.lineTo(headX - 10, 56);
-  x.lineTo(headX + 16, 54);
-  x.lineTo(headX + 28, 68);
-  x.lineTo(headX + 15, 84);
-  x.lineTo(headX - 12, 86);
+  const hd = isCoil ? 12 : 0;
+  x.moveTo(headX - 22, 76 + hd);
+  x.lineTo(headX - 10, 56 + hd);
+  x.lineTo(headX + 16, 54 + hd);
+  x.lineTo(headX + 28, 68 + hd);
+  x.lineTo(headX + 15, 84 + hd);
+  x.lineTo(headX - 12, 86 + hd);
   x.closePath();
   x.fill();
 
   x.fillStyle = scaleColor;
   x.beginPath();
-  x.moveTo(headX + 4, 62);
-  x.lineTo(headX + 23, 67);
-  x.lineTo(headX + 15, 76);
-  x.lineTo(headX - 1, 74);
+  x.moveTo(headX + 4, 62 + hd);
+  x.lineTo(headX + 23, 67 + hd);
+  x.lineTo(headX + 15, 76 + hd);
+  x.lineTo(headX - 1, 74 + hd);
   x.closePath();
   x.fill();
 
@@ -2127,23 +2146,23 @@ function drawSnekSprite(x, frame, state, frozen) {
     const jawOpen = Math.min(frame * 2, 12);
     x.fillStyle = '#c0392b';
     x.beginPath();
-    x.moveTo(headX + 22, 74);
-    x.lineTo(headX + 30, 74 + jawOpen);
-    x.lineTo(headX + 18, 80 + jawOpen);
-    x.lineTo(headX + 10, 78);
+    x.moveTo(headX + 22, 74 + hd);
+    x.lineTo(headX + 30, 74 + hd + jawOpen);
+    x.lineTo(headX + 18, 80 + hd + jawOpen);
+    x.lineTo(headX + 10, 78 + hd);
     x.closePath();
     x.fill();
     x.fillStyle = '#fff';
     x.beginPath();
-    x.moveTo(headX + 26, 74);
-    x.lineTo(headX + 28, 70);
-    x.lineTo(headX + 24, 72);
+    x.moveTo(headX + 26, 74 + hd);
+    x.lineTo(headX + 28, 70 + hd);
+    x.lineTo(headX + 24, 72 + hd);
     x.closePath();
     x.fill();
     x.beginPath();
-    x.moveTo(headX + 22, 74 + jawOpen);
-    x.lineTo(headX + 24, 78 + jawOpen);
-    x.lineTo(headX + 20, 76 + jawOpen);
+    x.moveTo(headX + 22, 74 + hd + jawOpen);
+    x.lineTo(headX + 24, 78 + hd + jawOpen);
+    x.lineTo(headX + 20, 76 + hd + jawOpen);
     x.closePath();
     x.fill();
   }
@@ -2152,8 +2171,8 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.shadowBlur = frozen ? 0 : 9;
   x.fillStyle = eyeColor;
   x.beginPath();
-  x.ellipse(headX + 2, 62, 4, 3, 0, 0, Math.PI * 2);
-  x.ellipse(headX + 12, 62, 4, 3, 0, 0, Math.PI * 2);
+  x.ellipse(headX + 2, 62 + hd, 4, 3, 0, 0, Math.PI * 2);
+  x.ellipse(headX + 12, 62 + hd, 4, 3, 0, 0, Math.PI * 2);
   x.fill();
   x.shadowBlur = 0;
 
@@ -2161,11 +2180,11 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.strokeStyle = eyeColor;
   x.lineWidth = 2;
   x.beginPath();
-  x.moveTo(headX + 25, 71);
-  x.lineTo(headX + 35, 72 + tongueWave);
-  x.lineTo(headX + 41, 68 + tongueWave);
-  x.moveTo(headX + 35, 72 + tongueWave);
-  x.lineTo(headX + 41, 76 + tongueWave);
+  x.moveTo(headX + 25, 71 + hd);
+  x.lineTo(headX + 35, 72 + hd + tongueWave);
+  x.lineTo(headX + 41, 68 + hd + tongueWave);
+  x.moveTo(headX + 35, 72 + hd + tongueWave);
+  x.lineTo(headX + 41, 76 + hd + tongueWave);
   x.stroke();
 
   x.restore();

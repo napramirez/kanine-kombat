@@ -1,0 +1,86 @@
+</head>
+<body>
+
+<div id="gameContainer">
+  <canvas id="gameCanvas" width="1024" height="600"></canvas>
+  <div id="ui-overlay">
+    <div id="health-bars">
+      <div class="health-container"><div class="health-bar" id="p1-health"></div></div>
+      <div id="timer">99</div>
+      <div class="health-container"><div class="health-bar" id="p2-health"></div></div>
+    </div>
+    <span class="player-name" id="p1-name">DOGGO CAGE</span>
+    <span class="player-name" id="p2-name">BORKO</span>
+    <div id="special-bars">
+      <div class="special-container"><div class="special-bar" id="p1-special"></div></div>
+      <div class="special-container"><div class="special-bar" id="p2-special"></div></div>
+    </div>
+    <div id="passive-bars">
+      <div class="special-container" id="p1-passive-container"><div class="special-bar" id="p1-passive"></div></div>
+      <div class="special-container" id="p2-passive-container"><div class="special-bar" id="p2-passive"></div></div>
+    </div>
+    <span class="special-label" id="p1-special-label">ACTIVE</span>
+    <span class="special-label" id="p2-special-label">ACTIVE</span>
+    <span class="passive-label" id="p1-passive-label">PASSIVE</span>
+    <span class="passive-label" id="p2-passive-label">PASSIVE</span>
+    <div class="round-indicator" id="p1-rounds"><span class="round-dot" id="p1-r1"></span><span class="round-dot" id="p1-r2"></span></div>
+    <div class="round-indicator" id="p2-rounds"><span class="round-dot" id="p2-r1"></span><span class="round-dot" id="p2-r2"></span></div>
+    <div class="combo-counter" id="p1-combo"></div>
+    <div class="combo-counter" id="p2-combo"></div>
+    <div id="ko-flash"></div>
+    <div id="message"></div>
+  </div>
+  <div id="start-screen">
+    <div id="title-logo"></div>
+    <h1>KANINE KOMBAT</h1>
+    <h2>such fight. very punch. wow.</h2>
+    <div id="mode-buttons">
+      <button class="mode-btn" id="start-btn">2 PLAYER</button>
+      <button class="mode-btn" id="cpu-btn">VS CPU</button>
+      <button class="mode-btn" id="battle-plan-btn">BATTLE PLAN</button>
+    </div>
+  </div>
+  <div id="char-select">
+    <h1>SELECT YOUR FIGHTER</h1>
+    <div id="char-select-container">
+      <div class="char-select-panel p1">
+        <h2 id="p1-select-label">PLAYER 1</h2>
+        <div class="char-portrait p1" id="p1-portrait"></div>
+      </div>
+      <div id="char-pool"></div>
+      <div class="char-select-panel p2">
+        <h2 id="p2-select-label">PLAYER 2</h2>
+        <div class="char-portrait p2" id="p2-portrait"></div>
+      </div>
+    </div>
+    <div id="char-select-controls">
+      <span id="p1-select-controls">P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Pad Move &bull; <kbd>J</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>L</kbd> or <kbd>Y</kbd> Random 8</span>
+      <span id="p2-select-controls">P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8</span>
+    </div>
+    <button id="fight-btn">FIGHT!</button>
+  </div>
+  <div id="battle-plan-stepper">
+    <h1>BATTLE PLAN</h1>
+    <div id="battle-plan-summary"></div>
+    <div id="battle-plan-route-viewport">
+      <div id="battle-plan-route">
+        <div id="battle-plan-route-line"></div>
+        <div id="battle-plan-route-steps"></div>
+        <div id="battle-plan-player-token"></div>
+      </div>
+    </div>
+    <div id="battle-plan-prompt"></div>
+  </div>
+  <div id="pause-overlay">
+    <h1 id="pause-title">PAUSED</h1>
+    <p id="pause-copy">Press ESC or START to resume, or choose a new mode.</p>
+    <div id="pause-mode-buttons">
+      <button class="mode-btn" data-mode="versus">2 PLAYER</button>
+      <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
+      <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
+    </div>
+    <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
+  </div>
+</div>
+
+<script>

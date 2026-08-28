@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KANINE KOMBAT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    overflow: hidden;
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    user-select: none;
+  }
+
+  #gameContainer {
+    position: relative;
+    width: 1024px;
+    height: 600px;
+  }
+
+  canvas {
+    display: block;
+    border: 3px solid #444;
+    image-rendering: pixelated;
+  }
+
+  #ui-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #health-bars {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+  }
+
+  .health-container {
+    width: 42%;
+    height: 30px;
+    background: #222;
+    border: 3px solid #888;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .health-bar {
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  #p1-health { background: linear-gradient(180deg, #ff6b6b, #c0392b); float: right; width: 100%; }
+  #p2-health { background: linear-gradient(180deg, #74b9ff, #2980b9); width: 100%; }
+
+  .health-container:first-child { margin-right: auto; }
+  .health-container:last-child { margin-left: auto; }
+
+  #timer {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    border: 3px solid #888;
+    color: #f1c40f;
+    font-size: 22px;
+    padding: 4px 16px;
+    font-family: 'Press Start 2P', monospace;
+    min-width: 70px;
+    text-align: center;
+  }
+
+  .player-name {
+    position: absolute;
+    top: 44px;
+    color: #fff;
+    font-size: 11px;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+  }
+
+  #p1-name { left: 22px; color: #ff6b6b; }
+  #p2-name { right: 22px; color: #74b9ff; }
+
+  #ko-flash {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  #message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #f1c40f;
+    font-size: 36px;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 4px 4px #000, -2px -2px #c0392b;
+    text-align: center;
+    pointer-events: none;
+    z-index: 30;
+    display: none;
+    line-height: 1.6;
+  }
+
+  #start-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+
+#title-logo {
+  width: 140px;
+  height: 140px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#title-logo canvas {
+  border: none;
+  image-rendering: pixelated;
+}
+
+  #start-screen h1 {
+    color: #c0392b;
+    font-size: 52px;
+    text-shadow: 4px 4px #000, 0 0 30px #e74c3c;
+    margin-bottom: 10px;
+    letter-spacing: 6px;
+  }
+
+  #start-screen h2 {
+    color: #f39c12;
+    font-size: 14px;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px #000;
+  }
+
+  #start-screen .controls-info {
+    display: flex;
+    gap: 80px;
+    margin-bottom: 40px;
+  }
+
+  #mode-buttons {
+    display: flex;
+    gap: 18px;
+  }
+
+  .control-box {
+    text-align: center;
+    color: #ccc;
+    font-size: 10px;
+    line-height: 2;
+  }
+
+  .control-box h3 {
+    color: #f1c40f;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .control-box kbd {
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 6px;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+  }
+
+  .mode-btn {
+    background: #c0392b;
+    color: #fff;
+    border: 3px solid #e74c3c;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    padding: 14px 40px;
+    cursor: pointer;
+    pointer-events: all;
+    animation: pulse 1.5s infinite;
+    text-shadow: 2px 2px #000;
+  }
+
+  .mode-btn:hover { background: #e74c3c; }
+
+  .mode-btn.focused {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.35), 0 0 18px rgba(241,196,15,0.75);
+    transform: scale(1.08);
+  }
+
+  #cpu-btn {
+    background: #1d3557;
+    border-color: #457b9d;
+  }
+
+  #cpu-btn:hover { background: #2b4f81; }
+
+  #pause-cpu-btn {
+    background: #1d3557;
+    border-color: #457b9d;
+  }
+
+  #pause-cpu-btn:hover { background: #2b4f81; }
+
+  #battle-plan-btn {
+    background: #4a1f5f;
+    border-color: #b46cff;
+  }
+
+  #battle-plan-btn:hover { background: #6c2d8d; }
+
+  #pause-battle-plan-btn {
+    background: #4a1f5f;
+    border-color: #b46cff;
+  }
+
+  #pause-battle-plan-btn:hover { background: #6c2d8d; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  #char-select {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+
+  #char-select h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px #000;
+  }
+
+  #char-select-container {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    align-items: center;
+    gap: 30px;
+    width: min(calc(100% - 48px), 1024px);
+    margin-bottom: 25px;
+  }
+
+  .char-select-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .char-select-panel.p1 { justify-self: start; }
+  .char-select-panel.p2 { justify-self: end; }
+
+  .char-select-panel h2 {
+    font-size: 14px;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px #000;
+  }
+
+  .char-select-panel.p1 h2 { color: #ff6b6b; }
+  .char-select-panel.p2 h2 { color: #74b9ff; }
+
+  #char-pool {
+    display: grid;
+    grid-template-columns: repeat(3, 116px);
+    gap: 12px;
+    justify-content: center;
+    justify-self: center;
+  }
+
+  .char-portrait {
+    width: 220px;
+    height: 240px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border: 4px solid #333;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .char-portrait.selected {
+    border-color: #f1c40f;
+    box-shadow: 0 0 25px rgba(241, 196, 15, 0.6), inset 0 0 30px rgba(241, 196, 15, 0.1);
+  }
+
+  .char-portrait.p1.selected {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 25px rgba(255, 107, 107, 0.6), inset 0 0 30px rgba(255, 107, 107, 0.1);
+  }
+
+  .char-portrait.p2.selected {
+    border-color: #74b9ff;
+    box-shadow: 0 0 25px rgba(116, 185, 255, 0.6), inset 0 0 30px rgba(116, 185, 255, 0.1);
+  }
+
+  .char-portrait::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .char-portrait canvas {
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(2.5);
+    transform-origin: center 70%;
+    margin-bottom: 10px;
+  }
+
+  .char-portrait-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    padding: 30px 10px 10px;
+    text-align: center;
+  }
+
+  .char-portrait-name {
+    font-size: 12px;
+    color: #f1c40f;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 6px;
+  }
+
+  .char-portrait-stats {
+    font-size: 8px;
+    color: #aaa;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.6;
+  }
+
+  .char-portrait-stats span {
+    color: #fff;
+  }
+
+  .char-options {
+    display: flex;
+    gap: 12px;
+  }
+
+  .char-option {
+    width: 116px;
+    height: 156px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #444;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: all;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .char-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .char-option:hover {
+    border-color: #f1c40f;
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(241,196,15,0.4);
+  }
+
+  .char-option.highlight-p1 {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 15px rgba(255,107,107,0.5);
+    transform: scale(1.05);
+  }
+
+  .char-option.highlight-p2 {
+    border-color: #74b9ff;
+    box-shadow: 0 0 15px rgba(116,185,255,0.5);
+    transform: scale(1.05);
+  }
+
+  .char-option.highlight-p1.highlight-p2 {
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px rgba(241,196,15,0.5);
+  }
+
+  .char-option.confirmed-p1 {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 20px rgba(255,107,107,0.7);
+    background: linear-gradient(180deg, #3d1515 0%, #2a0f0f 100%);
+  }
+
+  .char-option.confirmed-p2 {
+    border-color: #74b9ff;
+    box-shadow: 0 0 20px rgba(116,185,255,0.7);
+    background: linear-gradient(180deg, #0f2a3d 0%, #0a1f2a 100%);
+  }
+
+  .char-option.randomizing-p1 {
+    border-color: #ff9f9f;
+    box-shadow: 0 0 22px rgba(255,107,107,0.85);
+    animation: charSelectShuffle 0.12s ease-in-out infinite alternate;
+  }
+
+  .char-option.randomizing-p2 {
+    border-color: #9fd4ff;
+    box-shadow: 0 0 22px rgba(116,185,255,0.85);
+    animation: charSelectShuffle 0.12s ease-in-out infinite alternate;
+  }
+
+  @keyframes charSelectShuffle {
+    from {
+      transform: scale(1.03);
+      filter: brightness(1);
+    }
+    to {
+      transform: scale(1.08);
+      filter: brightness(1.16);
+    }
+  }
+
+  .char-option canvas {
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(1.15);
+    transform-origin: center 58%;
+    margin-bottom: 2px;
+  }
+
+  .char-option .char-name {
+    font-size: 9px;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 1px 1px #000;
+    margin-top: 15px;
+  }
+
+  .char-option .char-stats {
+    font-size: 7px;
+    color: #888;
+    margin-top: 4px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  #char-select-controls {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    font-size: 9px;
+    color: #888;
+    margin-bottom: 25px;
+  }
+
+  #char-select-controls kbd {
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 6px;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+  }
+
+  #fight-btn {
+    background: #c0392b;
+    color: #fff;
+    border: 3px solid #e74c3c;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    padding: 12px 35px;
+    cursor: pointer;
+    pointer-events: all;
+    animation: pulse 1.5s infinite;
+    text-shadow: 2px 2px #000;
+  }
+
+  #fight-btn:hover { background: #e74c3c; }
+
+  #battle-plan-stepper {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 4, 18, 0.95);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 60;
+    padding: 54px 36px 28px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  #battle-plan-stepper h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    text-shadow: 3px 3px #000;
+    margin-bottom: 10px;
+  }
+
+  #battle-plan-summary {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.9;
+    text-shadow: 2px 2px #000;
+    min-height: 52px;
+  }
+
+  #battle-plan-route-viewport {
+    width: min(calc(100vw - 72px), 1120px);
+    max-width: 100%;
+    padding-top: 96px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: visible;
+    margin: 42px 0 18px;
+  }
+
+  #battle-plan-route {
+    position: relative;
+    height: 250px;
+    margin: 0 auto;
+  }
+
+  #battle-plan-route-line {
+    position: absolute;
+    left: 146px;
+    right: 146px;
+    top: 105px;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #5b2c6f, #1f6aa5, #c0392b);
+    box-shadow: 0 0 18px rgba(116, 185, 255, 0.25);
+  }
+
+  #battle-plan-route-steps {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
+    gap: 34px;
+    padding: 0 80px;
+    box-sizing: border-box;
+  }
+
+  .battle-plan-step {
+    width: 132px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .battle-plan-badge {
+    min-width: 56px;
+    padding: 6px 8px;
+    border: 2px solid #666;
+    background: #191919;
+    color: #aaa;
+    font-size: 8px;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+  }
+
+  .battle-plan-step.completed .battle-plan-badge {
+    color: #2ecc71;
+    border-color: #2ecc71;
+  }
+
+  .battle-plan-step.next .battle-plan-badge {
+    color: #f1c40f;
+    border-color: #f1c40f;
+    box-shadow: 0 0 12px rgba(241, 196, 15, 0.45);
+  }
+
+  .battle-plan-step.locked .battle-plan-badge {
+    color: #777;
+    border-color: #444;
+  }
+
+  .battle-plan-step-portrait {
+    width: 110px;
+    height: 118px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid #444;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.completed .battle-plan-step-portrait {
+    border-color: #2ecc71;
+    box-shadow: 0 0 16px rgba(46, 204, 113, 0.25), inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.next .battle-plan-step-portrait {
+    border-color: #f1c40f;
+    box-shadow: 0 0 18px rgba(241, 196, 15, 0.4), inset 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .battle-plan-step.locked .battle-plan-step-portrait {
+    opacity: 0.65;
+  }
+
+  .battle-plan-step-portrait canvas {
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(1.3);
+    transform-origin: center 72%;
+    margin-bottom: -2px;
+  }
+
+  .battle-plan-step-name {
+    color: #fff;
+    font-size: 8px;
+    line-height: 1.5;
+    text-shadow: 2px 2px #000;
+    min-height: 24px;
+  }
+
+  .battle-plan-step-note {
+    color: #999;
+    font-size: 7px;
+    line-height: 1.5;
+    min-height: 20px;
+  }
+
+  #battle-plan-player-token {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 66px;
+    height: 66px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: left 0.85s cubic-bezier(0.22, 1, 0.36, 1), top 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  #battle-plan-player-token::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid #ff6b6b;
+    filter: drop-shadow(0 2px 0 #000);
+  }
+
+  .battle-plan-player-card {
+    position: relative;
+    background: linear-gradient(180deg, #3d1515 0%, #2a0f0f 100%);
+    border: 3px solid #ff6b6b;
+    box-shadow: 0 0 18px rgba(255, 107, 107, 0.45);
+    width: 66px;
+    height: 66px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .battle-plan-player-card canvas {
+    display: block;
+    margin: -12px 0 -6px;
+    border: none;
+    image-rendering: pixelated;
+    transform: scale(0.62);
+    transform-origin: center 72%;
+  }
+
+  #battle-plan-prompt {
+    min-height: 18px;
+    color: #74b9ff;
+    font-size: 10px;
+    text-shadow: 2px 2px #000;
+  }
+
+  #battle-plan-prompt.ready {
+    color: #fff;
+    animation: pulse 1.2s infinite;
+  }
+
+  .paused-underlay * {
+    animation-play-state: paused !important;
+  }
+
+  #pause-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    text-align: center;
+    padding: 30px;
+  }
+
+  #pause-overlay h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    text-shadow: 3px 3px #000;
+    margin-bottom: 14px;
+  }
+
+  #pause-overlay p {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.9;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 26px;
+  }
+
+  #pause-mode-buttons {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 20px;
+    pointer-events: all;
+  }
+
+  #pause-overlay .mode-btn {
+    animation: none;
+  }
+
+  #pause-resume-note {
+    color: #74b9ff;
+    font-size: 10px;
+    text-shadow: 2px 2px #000;
+  }
+
+  #special-bars {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: absolute;
+    top: 60px; left: 0; right: 0;
+  }
+
+  #passive-bars {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: absolute;
+    top: 94px; left: 0; right: 0;
+  }
+
+  .special-container {
+    width: 28%;
+    height: 12px;
+    background: #111;
+    border: 2px solid #555;
+    overflow: hidden;
+  }
+
+  .special-bar { height: 100%; width: 0%; transition: width 0.2s; }
+  #p1-special { background: linear-gradient(90deg, #f39c12, #e74c3c); float: right; }
+  #p2-special { background: linear-gradient(90deg, #2980b9, #9b59b6); }
+  #p1-passive { background: linear-gradient(90deg, #81ecec, #00cec9); float: right; }
+  #p2-passive { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+
+  .special-bar.ready {
+    animation: specialBlink 0.4s infinite;
+  }
+
+  @keyframes specialBlink {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.5; filter: brightness(1.8); }
+  }
+
+  .special-label {
+    position: absolute;
+    top: 76px;
+    color: #888;
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #p1-special-label { left: 22px; }
+  #p2-special-label { right: 22px; }
+
+  .passive-label {
+    position: absolute;
+    top: 110px;
+    color: #6fdde0;
+    font-size: 7px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #p1-passive-label { left: 22px; }
+  #p2-passive-label { right: 22px; }
+
+  .round-indicator {
+    position: absolute;
+    top: 8px;
+    font-size: 10px;
+    font-family: 'Press Start 2P', monospace;
+    color: #888;
+  }
+
+  #p1-rounds { left: 360px; }
+  #p2-rounds { right: 360px; }
+
+  .combo-counter {
+    position: absolute;
+    bottom: 100px;
+    font-size: 18px;
+    font-family: 'Press Start 2P', monospace;
+    color: #fff;
+    text-shadow: 3px 3px #000, -1px -1px #000;
+    opacity: 0;
+    transform: scale(1.5);
+    transition: opacity 0.15s, transform 0.15s;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  .combo-counter.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #p1-combo {
+    left: 22px;
+    color: #ff6b6b;
+  }
+
+  #p2-combo {
+    right: 22px;
+    text-align: right;
+    color: #74b9ff;
+  }
+
+  .round-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 50%;
+    margin: 0 2px;
+  }
+
+  .round-dot.won-p1 { background: #e74c3c; border-color: #ff6b6b; box-shadow: 0 0 6px #e74c3c; }
+  .round-dot.won-p2 { background: #2980b9; border-color: #74b9ff; box-shadow: 0 0 6px #2980b9; }
+
+</style>

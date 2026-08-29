@@ -331,6 +331,7 @@ function checkHit(attacker, defender) {
 
     if (attacker.comboCount >= 30) {
       defender.vx = attacker.facing * 160;
+      defender.maxComboPushback = true;
       addParticle(defender.x, defender.y - 50, 'ko');
       game.screenShake = COMBAT.effects.koShake;
       attacker.comboCount = 0;

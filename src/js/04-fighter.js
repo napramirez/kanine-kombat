@@ -25,6 +25,7 @@ class Fighter {
     this.comboCount = 0;
     this.lastHitTime = 0;
     this.maxComboTimer = 0;
+    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -78,6 +79,7 @@ class Fighter {
     this.blockTimer = 0;
     this.comboCount = 0;
     this.maxComboTimer = 0;
+    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -555,7 +557,8 @@ class Fighter {
     if (this.freezeTimer > 0) {
       this.freezeTimer -= PHYSICS.freezeTickMs;
       this.state = 'frozen';
-      this.vx *= 0.9;
+      if (!this.maxComboPushback) this.vx *= 0.9;
+      if (this.maxComboPushback && Math.abs(this.vx) < 2) this.maxComboPushback = false;
       this.vy += PHYSICS.gravity;
       this.y += this.vy;
       if (this.y >= GROUND) {
@@ -579,7 +582,8 @@ class Fighter {
       this.stunnedTimer -= PHYSICS.freezeTickMs;
       if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
       this.state = 'stunned';
-      this.vx *= 0.9;
+      if (!this.maxComboPushback) this.vx *= 0.9;
+      if (this.maxComboPushback && Math.abs(this.vx) < 2) this.maxComboPushback = false;
       this.isBlocking = false;
       this.isCrouching = false;
       this.vy += PHYSICS.gravity;

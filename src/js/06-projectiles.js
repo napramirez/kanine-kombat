@@ -393,25 +393,34 @@ function updateNoobSnakeSequence(p, index) {
     p.x = p.target.x;
     if (p.elapsedFrames >= p.riseFrames) {
       p.captured = true;
-      p.target.applyNoobSnakeCapture(special.captureHoldMs);
-      p.target.vx = 0;
-      p.target.vy = 0;
-      p.owner.attackTimer = 0;
-      p.owner.lastAttackType = '';
-      p.owner.specialFormSource = '';
-      p.owner.state = 'idle';
-      addParticle(p.target.x, p.target.y - 50, 'stunned');
+      if (p.target.isBlocking) {
+        addParticle(p.target.x, p.target.y - 50, 'block');
+        playImpactSound('block');
+        p.target.blockTimer = COMBAT.block.stunFrames;
+        p.owner.attackTimer = 0;
+        p.owner.lastAttackType = '';
+        p.owner.specialFormSource = '';
+        p.owner.state = 'idle';
+      } else {
+        p.target.applyNoobSnakeCapture(special.captureHoldMs);
+        p.target.vx = 0;
+        p.target.vy = 0;
+        p.owner.attackTimer = 0;
+        p.owner.lastAttackType = '';
+        p.owner.specialFormSource = '';
+        p.owner.state = 'idle';
+        addParticle(p.target.x, p.target.y - 50, 'stunned');
+        if (p.variant === 'REPDOG') {
+          spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
+        } else {
+          for (let i = 0; i < special.barrageCount; i++) {
+            spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
+          }
+        }
+        playAttackSound('special');
+      }
       game.screenShake = COMBAT.effects.harpoonShake;
       game.hitStop = COMBAT.effects.harpoonHitStop;
-      playImpactSound('hit');
-      if (p.variant === 'REPDOG') {
-        spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
-      } else {
-        for (let i = 0; i < special.barrageCount; i++) {
-          spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
-        }
-      }
-      playAttackSound('special');
     }
   }
 
@@ -661,8 +670,8 @@ function updateProjectiles(opponent) {
         p.pulseTimer = p.pulseInterval;
 
         if (target.health > 0 && target.onGround) {
-          target.takeHit(p.dmg, p.kb, p.owner.facing);
-          target.applyStunnedStatus(COMBAT.special.tremdog.shockStunMs);
+          const blocked = target.takeHit(p.dmg, p.kb, p.owner.facing);
+          if (!blocked) target.applyStunnedStatus(COMBAT.special.tremdog.shockStunMs);
           addParticle(target.x, target.y - 26, 'hit');
           addParticle(target.x, target.y - 26, 'stunned');
           game.screenShake = COMBAT.effects.projectileShake;
@@ -728,13 +737,22 @@ function updateProjectiles(opponent) {
           p.owner.vx = 0;
           p.owner.vy = 0;
           opponent.takeHit(p.dmg, p.kb, p.owner.facing);
-          opponent.applyStunnedStatus(COMBAT.status.skorpdogStunMs);
+          if (!opponent.isBlocking) {
+            opponent.applyStunnedStatus(COMBAT.status.skorpdogStunMs);
+          }
           addParticle(p.x, p.y, 'hit');
           addParticle(opponent.x, opponent.y - 65, 'stunned');
           game.screenShake = COMBAT.effects.harpoonShake;
           game.hitStop = COMBAT.effects.harpoonHitStop;
           if (opponent.health <= 0) playImpactSound('ko');
         } else if (p.type === 'net') {
+          if (opponent.isBlocking) {
+            addParticle(p.x, p.y, 'block');
+            playImpactSound('block');
+            opponent.blockTimer = COMBAT.block.stunFrames;
+            projectiles.splice(i, 1);
+            continue;
+          }
           p.hit = true;
           p.vx = 0;
           p.vy = 0;
@@ -749,7 +767,14 @@ function updateProjectiles(opponent) {
           game.screenShake = COMBAT.effects.freezeShake;
           game.hitStop = COMBAT.effects.freezeHitStop;
         } else if (p.type === 'snowflake') {
-          // Snowflake: freeze opponent
+          // Snowflake: freeze opponent (blocked if opponent is blocking)
+          if (opponent.isBlocking) {
+            addParticle(p.x, p.y, 'block');
+            playImpactSound('block');
+            opponent.blockTimer = COMBAT.block.stunFrames;
+            projectiles.splice(i, 1);
+            continue;
+          }
           opponent.freezeTimer = 2000;
           opponent.attackTimer = 0;
           opponent.lastAttackType = '';

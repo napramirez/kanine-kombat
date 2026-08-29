@@ -236,9 +236,10 @@ class Fighter {
   }
 
   takeHit(dmg, kb, attackerFacing) {
-    if (this.hitCooldown > 0) return;
+    if (this.hitCooldown > 0) return null;
     const incomingDamage = dmg;
-    if (this.isBlocking) {
+    const blocked = this.isBlocking;
+    if (blocked) {
       dmg = Math.floor(dmg * COMBAT.block.damageMultiplier);
       kb *= COMBAT.block.knockbackMultiplier;
       this.blockTimer = COMBAT.block.stunFrames;
@@ -262,7 +263,8 @@ class Fighter {
       : (this.name === 'SHAO CATNIP'
         ? incomingDamage * COMBAT.meter.onBlockBonusMultiplier
         : incomingDamage * COMBAT.meter.onBlockMultiplier);
-    this.special = Math.min(SPECIAL_METER_MAX, this.special + (this.isBlocking ? blockedMeterGain : dmg * COMBAT.meter.onHurtMultiplier));
+    this.special = Math.min(SPECIAL_METER_MAX, this.special + (blocked ? blockedMeterGain : dmg * COMBAT.meter.onHurtMultiplier));
+    return blocked;
   }
 
   applyStunnedStatus(durationMs) {
@@ -318,8 +320,8 @@ class Fighter {
     game.hitStop = COMBAT.effects.projectileHitStop;
 
     if (caught) {
-      opponent.takeHit(special.shockDamage, special.shockKnockback, this.facing);
-      if (opponent.health > 0) opponent.applyStunnedStatus(special.shockStunMs);
+      const blocked = opponent.takeHit(special.shockDamage, special.shockKnockback, this.facing);
+      if (opponent.health > 0 && !blocked) opponent.applyStunnedStatus(special.shockStunMs);
       addParticle(opponent.x, opponent.y - 50, 'stunned');
       if (opponent.health <= 0) playImpactSound('ko');
     } else {
@@ -378,12 +380,19 @@ class Fighter {
     }
 
     if (opponent.health > 0) {
-      opponent.applyStunnedStatus(special.coilStunMs);
-      spawnSnekCoil(this, opponent);
-      addParticle(opponent.x, opponent.y - 50, 'stunned');
+      if (opponent.isBlocking) {
+        addParticle(opponent.x, opponent.y - 50, 'block');
+        playImpactSound('block');
+        opponent.blockTimer = COMBAT.block.stunFrames;
+      } else {
+        opponent.applyStunnedStatus(special.coilStunMs);
+        spawnSnekCoil(this, opponent);
+        addParticle(opponent.x, opponent.y - 50, 'stunned');
+      }
       game.screenShake = COMBAT.effects.harpoonShake;
       game.hitStop = COMBAT.effects.harpoonHitStop;
-      playImpactSound('hit');
+      if (opponent.health <= 0) playImpactSound('ko');
+      else if (!opponent.isBlocking) playImpactSound('hit');
     }
 
     this.snekSlitherActive = false;
@@ -410,8 +419,8 @@ class Fighter {
       const myCenter = this.x;
       if (myCenter > hb.x && myCenter < hb.x + hb.w) {
         this.doggbalDashHit = true;
-        opponent.takeHit(special.damage, special.knockback, this.facing);
-        if (opponent.health > 0) {
+        const blocked = opponent.takeHit(special.damage, special.knockback, this.facing);
+        if (opponent.health > 0 && !blocked) {
           opponent.applyStunnedStatus(special.stunMs);
           opponent.doggbalSpinTimer = special.stunMs;
           opponent.doggbalSpinDuration = special.stunMs;

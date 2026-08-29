@@ -343,6 +343,20 @@ function spawnTremdogShockwaveField(owner) {
   });
 }
 
+function spawnSubdogIceClone(owner) {
+  const special = COMBAT.special.subdog;
+  projectiles.push({
+    x: owner.x,
+    y: owner.y,
+    owner,
+    type: 'iceClone',
+    life: special.cloneDurationFrames,
+    radius: owner.width / 2 + 10,
+    hit: false,
+    lastOwnerFrame: owner.frame
+  });
+}
+
 function updateNoobSnakeSequence(p, index) {
   if (p.lastOwnerFrame === p.owner.frame) return;
   p.lastOwnerFrame = p.owner.frame;
@@ -542,6 +556,46 @@ function updateProjectiles(opponent) {
 
     if (p.type === 'snekCoil') {
       updateSnekCoil(p, i);
+      continue;
+    }
+
+    if (p.type === 'iceClone') {
+      if (p.lastOwnerFrame === p.owner.frame) continue;
+      p.lastOwnerFrame = p.owner.frame;
+      p.life--;
+      if (p.owner.health <= 0 || p.life <= 0) {
+        projectiles.splice(i, 1);
+        continue;
+      }
+      if (!p.hit && target.health > 0) {
+        const dx = target.x - p.x;
+        const dy = (target.y - target.height / 2) - (p.y - p.owner.height / 2);
+        const dist = Math.hypot(dx, dy);
+        if (dist < p.radius + target.width / 2) {
+          if (target.isBlocking) {
+            addParticle(target.x, target.y - 50, 'block');
+            playImpactSound('block');
+            target.blockTimer = COMBAT.block.stunFrames;
+          } else {
+            const special = COMBAT.special.subdog;
+            target.freezeTimer = special.cloneFreezeMs;
+            target.attackTimer = 0;
+            target.lastAttackType = '';
+            target.blockTimer = 0;
+            target.isBlocking = false;
+            target.state = 'frozen';
+            target.vx = 0;
+            target.vy = 0;
+            addParticle(p.x, p.y - p.owner.height / 2, 'freeze');
+            playImpactSound('freeze');
+            game.screenShake = COMBAT.effects.freezeShake;
+            game.hitStop = COMBAT.effects.freezeHitStop;
+          }
+          p.hit = true;
+          projectiles.splice(i, 1);
+          continue;
+        }
+      }
       continue;
     }
 
@@ -1015,6 +1069,59 @@ function drawProjectiles() {
         ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
         ctx.stroke();
       }
+    } else if (p.type === 'iceClone') {
+      const cloneAlpha = Math.min(1, p.life / 30) * 0.7;
+      const shimmer = Math.sin(Date.now() * 0.01) * 0.1;
+      ctx.globalAlpha = cloneAlpha + shimmer;
+
+      // Ice dog body
+      ctx.fillStyle = '#87ceeb';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y - 30, 22, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ice dog head
+      ctx.fillStyle = '#add8e6';
+      ctx.beginPath();
+      ctx.ellipse(p.x + 8, p.y - 50, 14, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ice dog ears
+      ctx.fillStyle = '#87ceeb';
+      ctx.beginPath();
+      ctx.ellipse(p.x - 2, p.y - 62, 5, 10, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(p.x + 16, p.y - 60, 4, 8, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Frozen eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(p.x + 4, p.y - 52, 3, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(p.x + 12, p.y - 52, 2.5, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ice crystals
+      ctx.strokeStyle = '#b0e0e6';
+      ctx.lineWidth = 1;
+      for (let j = 0; j < 4; j++) {
+        const angle = (j / 4) * Math.PI * 2 + Date.now() * 0.002;
+        const r = 28 + Math.sin(Date.now() * 0.005 + j) * 4;
+        const cx = p.x + Math.cos(angle) * r;
+        const cy = p.y - 35 + Math.sin(angle) * r * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 5);
+        ctx.lineTo(cx + 3, cy);
+        ctx.lineTo(cx, cy + 5);
+        ctx.lineTo(cx - 3, cy);
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
     } else if (p.type === 'harpoon') {
       const ownerX = p.owner.x;
       const ownerY = p.owner.y - 50;

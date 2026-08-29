@@ -545,10 +545,21 @@ class Fighter {
     this.doggomeleonFormIndex = (this.doggomeleonFormIndex + 1 + DOGGOMELEON_FORMS.length) % DOGGOMELEON_FORMS.length;
   }
 
+  updateSubdogPassive(opponent) {
+    if (this.name !== 'SUBDOG' || this.health <= 0) return;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    this.passiveSpecial = 0;
+    spawnSubdogIceClone(this);
+  }
+
   update(keys, opponent) {
     this.frame++;
     this.updateDoggomeleonMorph();
     this.updateRaydogPassive(opponent);
+    this.updateSubdogPassive(opponent);
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;

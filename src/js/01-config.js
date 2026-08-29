@@ -145,6 +145,11 @@ const COMBAT = {
       stunMs: 3000,
       damage: 5,
       knockback: 3
+    },
+    subdog: {
+      passiveIntervalFrames: 300,
+      cloneDurationFrames: 120,
+      cloneFreezeMs: 2000
     }
   },
   block: {

@@ -57,8 +57,8 @@ Players choose from a shared roster before each match.
 ### Combo System
 
 - Combos reset after 800ms without a hit
-- Every 8 hits increases punch damage by 1
-- Every 8 hits increases kick damage by 2
+- Every 12 hits increases punch damage by 1
+- Every 12 hits increases kick damage by 2
 - Knockback increases with combo count
 
 ### Blocking

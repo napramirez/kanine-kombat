@@ -408,12 +408,18 @@ function updateNoobSnakeSequence(p, index) {
       playImpactSound('hit');
       if (p.variant === 'REPDOG') {
         spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
-      } else {
-        for (let i = 0; i < special.barrageCount; i++) {
-          spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
-        }
       }
+      p.barrageIndex = 0;
+      p.barrageTimer = 0;
       playAttackSound('special');
+    }
+  }
+
+  if (p.captured && p.variant !== 'REPDOG' && p.barrageIndex < special.barrageCount) {
+    p.barrageTimer++;
+    if (p.barrageTimer % 8 === 0) {
+      spawnNoobSaidogFireball(p.owner, p.target, p.barrageIndex, special.barrageCount, p.variant);
+      p.barrageIndex++;
     }
   }
 

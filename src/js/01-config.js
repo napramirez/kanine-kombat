@@ -147,6 +147,13 @@ const COMBAT = {
       knifeRadius: 12,
       zigzagAmplitude: 30,
       zigzagFrequency: 0.15
+    },
+    doggbal: {
+      dashSpeed: 20,
+      dashFrames: 15,
+      stunMs: 3000,
+      damage: 5,
+      knockback: 3
     }
   },
   block: {

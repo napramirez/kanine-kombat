@@ -37,6 +37,9 @@ function spawnProjectile(owner) {
   } else if (specialName === 'KA-9') {
     spawnKa9Knives(owner);
     return;
+  } else if (specialName === 'DOGGABAL') {
+    spawnDoggbalDash(owner, owner === p1 ? p2 : p1);
+    return;
   } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';
@@ -199,6 +202,66 @@ function spawnSnekCoil(owner, target) {
     trail: []
   });
 }
+
+function spawnDoggbalDash(owner, target) {
+  const special = COMBAT.special.doggbal;
+  projectiles.push({
+    x: owner.x + owner.facing * 30,
+    y: owner.y - 50,
+    owner,
+    target,
+    type: 'doggbalDash',
+    life: special.dashFrames * 2,
+    dashFrames: special.dashFrames,
+    elapsed: 0,
+    startX: owner.x,
+    targetX: target.x + owner.facing * 120,
+    hit: false,
+    trail: [],
+    lastOwnerFrame: owner.frame
+  });
+}
+
+function updateDoggbalDash(p, index) {
+  if (p.lastOwnerFrame === p.owner.frame) return;
+  p.lastOwnerFrame = p.owner.frame;
+  p.elapsed++;
+  p.life--;
+
+  if (p.owner.health <= 0 || p.life <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
+
+  var special = COMBAT.special.doggbal;
+  var progress = Math.min(1, p.elapsed / p.dashFrames);
+
+  p.x = p.startX + (p.targetX - p.startX) * progress;
+  p.y = p.owner.y - 50;
+
+  p.trail.push({ x: p.x, y: p.y, life: 10 });
+  if (p.trail.length > 8) p.trail.shift();
+  p.trail.forEach(function(t) { t.life--; });
+  p.trail = p.trail.filter(function(t) { return t.life > 0; });
+
+  if (!p.hit && progress > 0.3 && progress < 0.7) {
+    var target = p.target;
+    var hb = target.getHurtbox();
+    if (p.x > hb.x && p.x < hb.x + hb.w && p.y > hb.y && p.y < hb.y + hb.h) {
+      p.hit = true;
+      target.takeHit(special.damage, special.knockback, p.owner.facing);
+      target.applyStunnedStatus(special.stunMs);
+      addParticle(target.x, target.y - 50, 'stunned');
+      game.screenShake = COMBAT.effects.harpoonShake;
+      game.hitStop = COMBAT.effects.harpoonHitStop;
+      if (target.health <= 0) playImpactSound('ko');
+      else playImpactSound('hit');
+    }
+  }
+
+  if (p.life <= 0) projectiles.splice(index, 1);
+}
+
 
 function spawnRayndogLightningCloud(owner, target) {
   const special = COMBAT.special.rayndog;
@@ -551,6 +614,11 @@ function updateProjectiles(opponent) {
 
     if (p.type === 'snekCoil') {
       updateSnekCoil(p, i);
+      continue;
+    }
+
+    if (p.type === 'doggbalDash') {
+      updateDoggbalDash(p, i);
       continue;
     }
 
@@ -1002,6 +1070,48 @@ function drawProjectiles() {
         ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
         ctx.stroke();
       }
+    } else if (p.type === 'doggbalDash') {
+      // Motion blur / speed line effect
+      var dashAlpha = Math.min(1, p.life / 10);
+
+      // Speed lines trail
+      p.trail.forEach(function(t) {
+        var ta = (t.life / 10) * 0.5 * dashAlpha;
+        ctx.globalAlpha = ta;
+        ctx.strokeStyle = '#556B2F';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(t.x - 20, t.y);
+        ctx.lineTo(t.x + 20, t.y);
+        ctx.stroke();
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(t.x - 15, t.y + 5);
+        ctx.lineTo(t.x + 15, t.y + 5);
+        ctx.stroke();
+      });
+
+      // Main dash body
+      ctx.globalAlpha = dashAlpha;
+      ctx.fillStyle = '#556B2F';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, 25, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#8B4513';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y + 3, 20, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Glow
+      var dashGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 30);
+      dashGlow.addColorStop(0, 'rgba(85, 107, 47, 0.4)');
+      dashGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = dashGlow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
+      ctx.fill();
+
     } else if (p.type === 'harpoon') {
       const ownerX = p.owner.x;
       const ownerY = p.owner.y - 50;

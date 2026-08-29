@@ -1000,6 +1000,8 @@
 </div>
 
 <script>
+
+// === 01-config.js ===
 // Canvas, rules, and cached DOM references
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -1140,6 +1142,22 @@ const COMBAT = {
       maxFrames: 90,
       coilStunMs: 3000,
       coilDisplayFrames: 180
+    },
+    ka9: {
+      knifeCount: 2,
+      knifeSpeed: 10,
+      knifeDamage: 8,
+      knifeKnockback: 5,
+      knifeRadius: 12,
+      zigzagAmplitude: 30,
+      zigzagFrequency: 0.15
+    },
+    doggbal: {
+      dashSpeed: 20,
+      dashFrames: 15,
+      stunMs: 3000,
+      damage: 5,
+      knockback: 3
     }
   },
   block: {
@@ -1245,6 +1263,8 @@ const ui = {
 const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]'));
 
+
+// === 02-audio.js ===
 const AudioContextClass = window.AudioContext || window.webkitAudioContext || null;
 const TITLE_SCREEN_BGM_PATH = 'assets/title-screen-bgm.mp3';
 const CHAR_SELECT_BGM_PATH = 'assets/char-select-bgm.mp3';
@@ -1618,6 +1638,8 @@ function startMusicLoop() {
 
 updateAudioUI();
 
+
+// === 03-sprites.js ===
 // Sprite cache
 const spriteCache = {};
 
@@ -1830,6 +1852,66 @@ function drawRepdogEyes(x, headY, frame) {
   x.fill();
   x.restore();
 }
+
+function drawDogbalBodyStripes(x, bodyY) {
+  x.save();
+  x.beginPath();
+  x.ellipse(58, bodyY + 14, 30, 22, 0, 0, Math.PI * 2);
+  x.clip();
+
+  // Thick vertical olive green stripe down center of body
+  x.fillStyle = '#556B2F';
+  x.fillRect(46, bodyY - 8, 24, 50);
+
+  // Thick horizontal brown stripe across body
+  x.fillStyle = '#8B4513';
+  x.fillRect(28, bodyY + 4, 60, 18);
+
+  x.restore();
+}
+
+function drawDogbalOxygenMask(x, headY) {
+  // Strap lines going around the head
+  x.strokeStyle = '#555';
+  x.lineWidth = 2.5;
+  x.beginPath();
+  x.moveTo(72, headY + 2);
+  x.quadraticCurveTo(56, headY - 10, 50, headY);
+  x.stroke();
+  x.beginPath();
+  x.moveTo(72, headY + 10);
+  x.quadraticCurveTo(56, headY + 18, 50, headY + 10);
+  x.stroke();
+
+  // Mask body - gray rounded shape over snout
+  x.fillStyle = '#666';
+  x.beginPath();
+  x.ellipse(84, headY + 6, 16, 12, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Mask edge highlight
+  x.strokeStyle = '#777';
+  x.lineWidth = 1.5;
+  x.beginPath();
+  x.ellipse(84, headY + 6, 16, 12, 0, -0.5, 1.5);
+  x.stroke();
+
+  // Small circular filter element on the side
+  x.fillStyle = '#888';
+  x.beginPath();
+  x.arc(96, headY + 8, 5, 0, Math.PI * 2);
+  x.fill();
+  x.strokeStyle = '#777';
+  x.lineWidth = 1;
+  x.stroke();
+
+  // Filter center detail
+  x.fillStyle = '#999';
+  x.beginPath();
+  x.arc(96, headY + 8, 2, 0, Math.PI * 2);
+  x.fill();
+}
+
 
 function getDoggomeleonMorphName(fighter) {
   if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
@@ -2270,6 +2352,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.ellipse(58, bodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
 
+    // DOGGABAL body stripes
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, bodyY);
+
     // Tail (no wag when frozen)
     const tailWag = frozen ? 0 : Math.sin(frame * 0.4) * 15;
     x.strokeStyle = frozenColor1;
@@ -2408,6 +2493,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
     }
   }
+
+  // DOGGABAL oxygen mask
+  if (name === 'DOGGABAL') drawDogbalOxygenMask(x, headY);
 
   // Eyes
   x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -2869,6 +2957,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.ellipse(58, vicBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
 
+    // DOGGABAL body stripes (victory)
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, vicBodyY);
+
     // Tail
     const tailWag2 = Math.sin(frame * 0.4) * 15;
     x.strokeStyle = frozenColor1;
@@ -3066,6 +3157,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
     }
 
+    // DOGGABAL oxygen mask (victory)
+    if (name === 'DOGGABAL') drawDogbalOxygenMask(x, vicHeadY);
+
     // Raised eyebrows for happy expression
     x.strokeStyle = frozenColor1;
     x.lineWidth = 3;
@@ -3111,6 +3205,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.beginPath();
     x.ellipse(58, defBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
+
+    // DOGGABAL body stripes (defeat)
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, defBodyY);
 
     // Tail (drooping)
     x.strokeStyle = frozenColor1;
@@ -3257,6 +3354,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
     }
 
+    // DOGGABAL oxygen mask (defeat)
+    if (name === 'DOGGABAL') drawDogbalOxygenMask(x, defHeadY);
+
     // Stars circling head
     for (let i = 0; i < 3; i++) {
       const a = (i / 3) * Math.PI * 2 + frame * 0.1;
@@ -3284,6 +3384,8 @@ function drawStar(x, cx, cy, r, color) {
   x.fill();
 }
 
+
+// === 04-fighter.js ===
 class Fighter {
   constructor(x, char, facing) {
     this.x = x;
@@ -3473,6 +3575,16 @@ class Fighter {
       } else if (this.specialFormSource === 'SNEK') {
         this.attackTimer = COMBAT.special.snek.maxFrames;
         this.snekSlitherActive = true;
+        this.isBlocking = false;
+        this.isCrouching = false;
+      } else if (this.specialFormSource === 'KA-9') {
+        this.attackTimer = COMBAT.special.duration;
+        if (this.onGround) this.vx = 0;
+        this.isBlocking = false;
+        this.isCrouching = false;
+      } else if (this.specialFormSource === 'DOGGABAL') {
+        this.attackTimer = COMBAT.special.duration;
+        if (this.onGround) this.vx = 0;
         this.isBlocking = false;
         this.isCrouching = false;
       } else {
@@ -3961,6 +4073,8 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
   }
 }
 
+
+// === 05-particles.js ===
 // Particles
 const particles = [];
 
@@ -4104,6 +4218,8 @@ function drawParticles() {
   ctx.textAlign = 'left';
 }
 
+
+// === 06-projectiles.js ===
 // Projectiles
 const projectiles = [];
 
@@ -4139,6 +4255,12 @@ function spawnProjectile(owner) {
     spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1, specialName);
     return;
   } else if (specialName === 'SNEK') {
+    return;
+  } else if (specialName === 'KA-9') {
+    spawnKa9Knives(owner);
+    return;
+  } else if (specialName === 'DOGGABAL') {
+    spawnDoggbalDash(owner, owner === p1 ? p2 : p1);
     return;
   } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
@@ -4257,6 +4379,37 @@ function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount, variant) {
   });
 }
 
+function spawnKa9Knives(owner) {
+  const special = COMBAT.special.ka9;
+  const target = owner === p1 ? p2 : p1;
+  const x = owner.x + owner.facing * 42;
+  const y = owner.y - 58;
+  const baseAngle = Math.atan2(target.y - target.height / 2 - y, target.x - x);
+  for (let i = 0; i < special.knifeCount; i++) {
+    const offset = (i - (special.knifeCount - 1) / 2) * 0.3;
+    const angle = baseAngle + offset;
+    projectiles.push({
+      x,
+      y,
+      owner,
+      type: 'ka9Knife',
+      life: 120,
+      radius: special.knifeRadius,
+      speed: special.knifeSpeed,
+      dmg: special.knifeDamage,
+      kb: special.knifeKnockback,
+      vx: Math.cos(angle) * special.knifeSpeed,
+      vy: Math.sin(angle) * special.knifeSpeed,
+      baseAngle: angle,
+      elapsed: 0,
+      zigzagDir: i === 0 ? 1 : -1,
+      trail: [],
+      lastOwnerFrame: owner.frame,
+      rotation: 0
+    });
+  }
+}
+
 function spawnSnekCoil(owner, target) {
   const special = COMBAT.special.snek;
   projectiles.push({
@@ -4271,6 +4424,66 @@ function spawnSnekCoil(owner, target) {
     trail: []
   });
 }
+
+function spawnDoggbalDash(owner, target) {
+  const special = COMBAT.special.doggbal;
+  projectiles.push({
+    x: owner.x + owner.facing * 30,
+    y: owner.y - 50,
+    owner,
+    target,
+    type: 'doggbalDash',
+    life: special.dashFrames * 2,
+    dashFrames: special.dashFrames,
+    elapsed: 0,
+    startX: owner.x,
+    targetX: target.x + owner.facing * 120,
+    hit: false,
+    trail: [],
+    lastOwnerFrame: owner.frame
+  });
+}
+
+function updateDoggbalDash(p, index) {
+  if (p.lastOwnerFrame === p.owner.frame) return;
+  p.lastOwnerFrame = p.owner.frame;
+  p.elapsed++;
+  p.life--;
+
+  if (p.owner.health <= 0 || p.life <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
+
+  var special = COMBAT.special.doggbal;
+  var progress = Math.min(1, p.elapsed / p.dashFrames);
+
+  p.x = p.startX + (p.targetX - p.startX) * progress;
+  p.y = p.owner.y - 50;
+
+  p.trail.push({ x: p.x, y: p.y, life: 10 });
+  if (p.trail.length > 8) p.trail.shift();
+  p.trail.forEach(function(t) { t.life--; });
+  p.trail = p.trail.filter(function(t) { return t.life > 0; });
+
+  if (!p.hit && progress > 0.3 && progress < 0.7) {
+    var target = p.target;
+    var hb = target.getHurtbox();
+    if (p.x > hb.x && p.x < hb.x + hb.w && p.y > hb.y && p.y < hb.y + hb.h) {
+      p.hit = true;
+      target.takeHit(special.damage, special.knockback, p.owner.facing);
+      target.applyStunnedStatus(special.stunMs);
+      addParticle(target.x, target.y - 50, 'stunned');
+      game.screenShake = COMBAT.effects.harpoonShake;
+      game.hitStop = COMBAT.effects.harpoonHitStop;
+      if (target.health <= 0) playImpactSound('ko');
+      else playImpactSound('hit');
+    }
+  }
+
+  if (p.life <= 0) projectiles.splice(index, 1);
+}
+
 
 function spawnRayndogLightningCloud(owner, target) {
   const special = COMBAT.special.rayndog;
@@ -4623,6 +4836,11 @@ function updateProjectiles(opponent) {
 
     if (p.type === 'snekCoil') {
       updateSnekCoil(p, i);
+      continue;
+    }
+
+    if (p.type === 'doggbalDash') {
+      updateDoggbalDash(p, i);
       continue;
     }
 
@@ -5074,6 +5292,48 @@ function drawProjectiles() {
         ctx.ellipse(coilX, coilY - 1, coilWidth - 5, Math.max(3, coilHeight - 5), 0, 0, Math.PI * 2);
         ctx.stroke();
       }
+    } else if (p.type === 'doggbalDash') {
+      // Motion blur / speed line effect
+      var dashAlpha = Math.min(1, p.life / 10);
+
+      // Speed lines trail
+      p.trail.forEach(function(t) {
+        var ta = (t.life / 10) * 0.5 * dashAlpha;
+        ctx.globalAlpha = ta;
+        ctx.strokeStyle = '#556B2F';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(t.x - 20, t.y);
+        ctx.lineTo(t.x + 20, t.y);
+        ctx.stroke();
+        ctx.strokeStyle = '#8B4513';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(t.x - 15, t.y + 5);
+        ctx.lineTo(t.x + 15, t.y + 5);
+        ctx.stroke();
+      });
+
+      // Main dash body
+      ctx.globalAlpha = dashAlpha;
+      ctx.fillStyle = '#556B2F';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, 25, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#8B4513';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y + 3, 20, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Glow
+      var dashGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 30);
+      dashGlow.addColorStop(0, 'rgba(85, 107, 47, 0.4)');
+      dashGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = dashGlow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
+      ctx.fill();
+
     } else if (p.type === 'harpoon') {
       const ownerX = p.owner.x;
       const ownerY = p.owner.y - 50;
@@ -5453,6 +5713,8 @@ function drawProjectiles() {
   });
 }
 
+
+// === 07-backgrounds.js ===
 // Background
 function drawCloud(cx, cy, scale, alpha) {
   ctx.save();
@@ -6112,6 +6374,8 @@ function drawBackground() {
   drawTempleBackground();
 }
 
+
+// === 08-characters.js ===
 // Game state and roster
 let game = {
   state: GAME_STATES.MENU,
@@ -6274,6 +6538,17 @@ const CHARACTERS = [
     desc: 'SHADOW'
   },
   {
+    id: 'ka9',
+    name: 'KA-9',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'BLADE'
+  },
+  {
     id: 'repdog',
     name: 'REPDOG',
     color1: '#ffffff',
@@ -6296,6 +6571,17 @@ const CHARACTERS = [
     health: 100,
     specialGain: 0.25,
     desc: 'CONSTRICTOR'
+  },
+  {
+    id: 'doggbal',
+    name: 'DOGGABAL',
+    color1: '#111111',
+    color2: '#222222',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'TACTICAL'
   },
   {
     id: 'subdog',
@@ -6390,6 +6676,8 @@ function shuffleCharacterIds(ids) {
   return arr;
 }
 
+
+// === 09-battle-plan.js ===
 function resetBattlePlanState() {
   game.battlePlan.route = [];
   game.battlePlan.currentIndex = 0;
@@ -6651,6 +6939,8 @@ function proceedBattlePlanStepper() {
   }
 }
 
+
+// === 10-pause.js ===
 function pauseTrackForOverlay(track, key) {
   audio.pausedTracks[key] = Boolean(track && !track.paused);
   if (audio.pausedTracks[key]) track.pause();
@@ -6754,6 +7044,8 @@ function openTitleScreen() {
   syncMusicMode();
 }
 
+
+// === 11-input.js ===
 function resetInputState(keys) {
   keys.left = false;
   keys.right = false;
@@ -7240,6 +7532,8 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 }
 
+
+// === 12-combat.js ===
 // Character select screen
 function cloneCanvas(src) {
   const c = document.createElement('canvas');
@@ -7565,7 +7859,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK' || attackerSpecialName === 'DOGGABAL') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;
@@ -7749,6 +8043,8 @@ function updateUI() {
   }
 }
 
+
+// === 13-game-loop.js ===
 function startGameLoop() {
   if (gameLoopStarted) return;
   gameLoopStarted = true;
@@ -8118,6 +8414,7 @@ window.addEventListener('keydown', e => {
 
 updateTitleModeFocus();
 startGamepadLoop();
+
 </script>
 </body>
 </html>

@@ -211,6 +211,66 @@ function drawRepdogEyes(x, headY, frame) {
   x.restore();
 }
 
+function drawDogbalBodyStripes(x, bodyY) {
+  x.save();
+  x.beginPath();
+  x.ellipse(58, bodyY + 14, 30, 22, 0, 0, Math.PI * 2);
+  x.clip();
+
+  // Thick vertical olive green stripe down center of body
+  x.fillStyle = '#556B2F';
+  x.fillRect(46, bodyY - 8, 24, 50);
+
+  // Thick horizontal brown stripe across body
+  x.fillStyle = '#8B4513';
+  x.fillRect(28, bodyY + 4, 60, 18);
+
+  x.restore();
+}
+
+function drawDogbalOxygenMask(x, headY) {
+  // Strap lines going around the head
+  x.strokeStyle = '#555';
+  x.lineWidth = 2.5;
+  x.beginPath();
+  x.moveTo(72, headY + 2);
+  x.quadraticCurveTo(56, headY - 10, 50, headY);
+  x.stroke();
+  x.beginPath();
+  x.moveTo(72, headY + 10);
+  x.quadraticCurveTo(56, headY + 18, 50, headY + 10);
+  x.stroke();
+
+  // Mask body - gray rounded shape over snout
+  x.fillStyle = '#666';
+  x.beginPath();
+  x.ellipse(84, headY + 6, 16, 12, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Mask edge highlight
+  x.strokeStyle = '#777';
+  x.lineWidth = 1.5;
+  x.beginPath();
+  x.ellipse(84, headY + 6, 16, 12, 0, -0.5, 1.5);
+  x.stroke();
+
+  // Small circular filter element on the side
+  x.fillStyle = '#888';
+  x.beginPath();
+  x.arc(96, headY + 8, 5, 0, Math.PI * 2);
+  x.fill();
+  x.strokeStyle = '#777';
+  x.lineWidth = 1;
+  x.stroke();
+
+  // Filter center detail
+  x.fillStyle = '#999';
+  x.beginPath();
+  x.arc(96, headY + 8, 2, 0, Math.PI * 2);
+  x.fill();
+}
+
+
 function getDoggomeleonMorphName(fighter) {
   if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
   return DOGGOMELEON_FORMS[fighter.doggomeleonFormIndex % DOGGOMELEON_FORMS.length];
@@ -650,6 +710,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.ellipse(58, bodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
 
+    // DOGGABAL body stripes
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, bodyY);
+
     // Tail (no wag when frozen)
     const tailWag = frozen ? 0 : Math.sin(frame * 0.4) * 15;
     x.strokeStyle = frozenColor1;
@@ -788,6 +851,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
     }
   }
+
+  // DOGGABAL oxygen mask
+  if (name === 'DOGGABAL') drawDogbalOxygenMask(x, headY);
 
   // Eyes
   x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -1249,6 +1315,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.ellipse(58, vicBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
 
+    // DOGGABAL body stripes (victory)
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, vicBodyY);
+
     // Tail
     const tailWag2 = Math.sin(frame * 0.4) * 15;
     x.strokeStyle = frozenColor1;
@@ -1446,6 +1515,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.fill();
     }
 
+    // DOGGABAL oxygen mask (victory)
+    if (name === 'DOGGABAL') drawDogbalOxygenMask(x, vicHeadY);
+
     // Raised eyebrows for happy expression
     x.strokeStyle = frozenColor1;
     x.lineWidth = 3;
@@ -1491,6 +1563,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.beginPath();
     x.ellipse(58, defBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
+
+    // DOGGABAL body stripes (defeat)
+    if (name === 'DOGGABAL') drawDogbalBodyStripes(x, defBodyY);
 
     // Tail (drooping)
     x.strokeStyle = frozenColor1;
@@ -1636,6 +1711,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.ellipse(86, defHeadY + 18, 4, 8, 0.3, 0, Math.PI * 2);
       x.fill();
     }
+
+    // DOGGABAL oxygen mask (defeat)
+    if (name === 'DOGGABAL') drawDogbalOxygenMask(x, defHeadY);
 
     // Stars circling head
     for (let i = 0; i < 3; i++) {

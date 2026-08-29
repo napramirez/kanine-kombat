@@ -195,6 +195,17 @@ const CHARACTERS = [
     desc: 'CONSTRICTOR'
   },
   {
+    id: 'doggbal',
+    name: 'DOGGABAL',
+    color1: '#111111',
+    color2: '#222222',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'TACTICAL'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',

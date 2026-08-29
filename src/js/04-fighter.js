@@ -194,6 +194,11 @@ class Fighter {
         if (this.onGround) this.vx = 0;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'DOGGABAL') {
+        this.attackTimer = COMBAT.special.duration;
+        if (this.onGround) this.vx = 0;
+        this.isBlocking = false;
+        this.isCrouching = false;
       } else {
         this.attackTimer = COMBAT.special.duration;
       }

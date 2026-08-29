@@ -3944,10 +3944,17 @@ class Fighter {
 
     // Frozen state
     if (this.freezeTimer > 0) {
-      this.freezeTimer -= PHYSICS.freezeTickMs; // ~60fps
+      this.freezeTimer -= PHYSICS.freezeTickMs;
       this.state = 'frozen';
-      this.vx = 0;
-      this.vy = 0;
+      this.vx *= 0.9;
+      this.vy += PHYSICS.gravity;
+      this.y += this.vy;
+      if (this.y >= GROUND) {
+        this.y = GROUND;
+        this.vy = 0;
+        this.onGround = true;
+      }
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
       if (this.freezeTimer <= 0) {
         this.freezeTimer = 0;
         this.attackTimer = 0;
@@ -3963,10 +3970,17 @@ class Fighter {
       this.stunnedTimer -= PHYSICS.freezeTickMs;
       if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
       this.state = 'stunned';
-      this.vx = 0;
-      this.vy = 0;
+      this.vx *= 0.9;
       this.isBlocking = false;
       this.isCrouching = false;
+      this.vy += PHYSICS.gravity;
+      this.y += this.vy;
+      if (this.y >= GROUND) {
+        this.y = GROUND;
+        this.vy = 0;
+        this.onGround = true;
+      }
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
       if (this.stunnedTimer <= 0) {
         this.stunnedTimer = 0;
         this.doggbalSpinTimer = 0;

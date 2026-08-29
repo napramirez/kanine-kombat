@@ -53,7 +53,8 @@ When a special move is blocked, do not display the special move's effects becaus
 - DOGGABAL's special move should not display STUNNED when it is blocked.
 Fix wherever else it applies.
 
-
+Allow player controls in the game mode screen.
+Fit the characters into 4 columns instead of 3 in the character select screen.
 
 ## Game System Overhaul
 

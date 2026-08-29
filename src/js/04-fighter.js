@@ -580,10 +580,11 @@ class Fighter {
 
     if (this.stunnedTimer > 0) {
       this.stunnedTimer -= PHYSICS.freezeTickMs;
+      const wasSpinning = this.doggbalSpinTimer > 0;
       if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
       this.state = 'stunned';
       if (!this.maxComboPushback) this.vx *= 0.9;
-      if (this.maxComboPushback && Math.abs(this.vx) < 2) this.maxComboPushback = false;
+      if (this.maxComboPushback && Math.abs(this.vx) < 2 && !(wasSpinning && this.doggbalSpinTimer > 0)) this.maxComboPushback = false;
       this.isBlocking = false;
       this.isCrouching = false;
       this.vy += PHYSICS.gravity;
@@ -598,6 +599,7 @@ class Fighter {
         this.stunnedTimer = 0;
         this.doggbalSpinTimer = 0;
         this.doggbalSpinDuration = 0;
+        this.maxComboPushback = false;
         this.state = 'idle';
       }
       return;

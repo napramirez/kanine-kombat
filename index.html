@@ -4759,7 +4759,7 @@ function updateNoobSnakeSequence(p, index) {
 
   if (p.captured && p.variant !== 'REPDOG' && p.barrageIndex < special.barrageCount) {
     p.barrageTimer++;
-    if (p.barrageTimer % 8 === 0) {
+    if (p.barrageTimer % 4 === 0) {
       spawnNoobSaidogFireball(p.owner, p.target, p.barrageIndex, special.barrageCount, p.variant);
       p.barrageIndex++;
     }

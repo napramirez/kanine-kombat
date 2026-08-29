@@ -8457,6 +8457,21 @@ document.addEventListener('keydown', e => {
     return;
   }
 
+  if (game.state === GAME_STATES.PAUSED) {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
+      navigatePauseSelection(-1);
+      e.preventDefault();
+    } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
+      navigatePauseSelection(1);
+      e.preventDefault();
+    } else if (e.code === 'Space' || e.code === 'Enter') {
+      ensureAudioReady();
+      pauseModeButtons[gamepadInput.pauseSelection].click();
+      e.preventDefault();
+    }
+    return;
+  }
+
   if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     ensureAudioReady();
     proceedBattlePlanStepper();

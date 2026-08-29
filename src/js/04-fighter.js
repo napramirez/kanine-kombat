@@ -56,6 +56,8 @@ class Fighter {
     this.doggbalDashStartX = x;
     this.doggbalDashTargetX = x;
     this.doggbalDashHit = false;
+    this.doggbalSpinTimer = 0;
+    this.doggbalSpinDuration = 0;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -102,6 +104,8 @@ class Fighter {
     this.doggbalDashStartX = x;
     this.doggbalDashTargetX = x;
     this.doggbalDashHit = false;
+    this.doggbalSpinTimer = 0;
+    this.doggbalSpinDuration = 0;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -409,6 +413,8 @@ class Fighter {
         opponent.takeHit(special.damage, special.knockback, this.facing);
         if (opponent.health > 0) {
           opponent.applyStunnedStatus(special.stunMs);
+          opponent.doggbalSpinTimer = special.stunMs;
+          opponent.doggbalSpinDuration = special.stunMs;
         }
         addParticle(opponent.x, opponent.y - 50, 'stunned');
         game.screenShake = COMBAT.effects.harpoonShake;
@@ -556,6 +562,7 @@ class Fighter {
 
     if (this.stunnedTimer > 0) {
       this.stunnedTimer -= PHYSICS.freezeTickMs;
+      if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
       this.state = 'stunned';
       this.vx = 0;
       this.vy = 0;
@@ -563,10 +570,15 @@ class Fighter {
       this.isCrouching = false;
       if (this.stunnedTimer <= 0) {
         this.stunnedTimer = 0;
+        this.doggbalSpinTimer = 0;
+        this.doggbalSpinDuration = 0;
         this.state = 'idle';
       }
       return;
     }
+
+    if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer = 0;
+    if (this.doggbalSpinDuration > 0) this.doggbalSpinDuration = 0;
 
     const noobSnakeCaptured = this.noobCaptureTimer > 0;
     if (noobSnakeCaptured) {
@@ -742,7 +754,18 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
           : 1);
     }
 
-    ctx.drawImage(sprite, sx, sy, spriteSize, spriteSize);
+    if (this.doggbalSpinTimer > 0 && this.doggbalSpinDuration > 0) {
+      const spinProgress = 1 - (this.doggbalSpinTimer / this.doggbalSpinDuration);
+      const easedSpin = 1 - Math.pow(1 - spinProgress, 3);
+      const spinAngle = easedSpin * Math.PI * 8;
+      ctx.save();
+      ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
+      ctx.rotate(spinAngle);
+      ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+      ctx.restore();
+    } else {
+      ctx.drawImage(sprite, sx, sy, spriteSize, spriteSize);
+    }
     ctx.globalAlpha = 1;
   }
 }

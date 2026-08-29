@@ -128,7 +128,7 @@ class Fighter {
     if (this.freezeTimer > 0) return null;
     if (this.stunnedTimer > 0) return null;
     if (this.attackTimer <= 0) return null;
-    const comboStage = Math.floor(this.comboCount / 3);
+    const comboStage = Math.floor(this.comboCount / 8);
     if (this.lastAttackType === 'punch') {
       return {
         x: this.x + this.facing * COMBAT.punch.hitbox.xOffset,

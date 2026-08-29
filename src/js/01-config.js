@@ -47,20 +47,20 @@ const PLAYER_SPAWNS = {
 const SPECIAL_METER_MAX = 100;
 
 const COMBAT = {
-  comboResetMs: 1200,
+  comboResetMs: 800,
   punch: {
-    damage: 8,
+    damage: 4,
     duration: 6,
     knockback: 4,
-    comboDamageStep: 2,
+    comboDamageStep: 1,
     comboKnockbackStep: 0.5,
     hitbox: { xOffset: 20, yOffset: 60, width: 55, height: 25, crouchOffset: 15 }
   },
   kick: {
-    damage: 12,
+    damage: 6,
     duration: 4,
     knockback: 7,
-    comboDamageStep: 3,
+    comboDamageStep: 2,
     hitbox: { xOffset: 15, yOffset: 40, width: 60, height: 30, crouchOffset: 15 }
   },
   special: {

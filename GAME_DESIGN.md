@@ -32,8 +32,8 @@ Players choose from a shared roster before each match.
 
 | Type | Damage | Knockback | Duration | Special Gain |
 |---|---:|---:|---:|---:|
-| Punch | 8 | 4 | 6 frames | 6.4 |
-| Kick | 12 | 7 | 4 frames | 9.6 |
+| Punch | 4 | 4 | 6 frames | 6.4 |
+| Kick | 6 | 7 | 4 frames | 9.6 |
 | Special | Varies | Varies | 30 frames base | Consumes full meter |
 
 ### Special Attacks
@@ -56,9 +56,9 @@ Players choose from a shared roster before each match.
 
 ### Combo System
 
-- Combos reset after 1200ms without a hit
-- Every 3 hits increases punch damage by 2
-- Every 3 hits increases kick damage by 3
+- Combos reset after 800ms without a hit
+- Every 8 hits increases punch damage by 1
+- Every 8 hits increases kick damage by 2
 - Knockback increases with combo count
 
 ### Blocking

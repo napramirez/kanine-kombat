@@ -46,6 +46,15 @@ Set a track for character selection background music that loops
 
 Implement hidden characters, these are characters that cannot be selected by players in the character select screen. These characters also do not get chosen to be part of the battle plan unless specifically set so. Hidden characters can be unlocked, and selected in the character select screen only after certain conditions are met. The hidden characters include: SHAO CATNIP and BORKO who can be unlocked only after defeating them in the Battle Plan mode.
 
+When a special move is blocked, do not display the special move's effects because they don't activate. Here are examples:
+- BORKO's special move should not display STUNNED when it is blocked
+- SKORPDOG's spear should not pull the opponent if the opponent blocked the harpoon
+- NOOB SAIDOG's and REPDOG's special move should not capture the opponent if the opponent blocks it
+- DOGGABAL's special move should not display STUNNED when it is blocked.
+Fix wherever else it applies.
+
+
+
 ## Game System Overhaul
 
 ### Query Prompt

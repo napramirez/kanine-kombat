@@ -671,9 +671,11 @@ function updateProjectiles(opponent) {
 
         if (target.health > 0 && target.onGround) {
           const blocked = target.takeHit(p.dmg, p.kb, p.owner.facing);
-          if (!blocked) target.applyStunnedStatus(COMBAT.special.tremdog.shockStunMs);
+          if (!blocked) {
+            target.applyStunnedStatus(COMBAT.special.tremdog.shockStunMs);
+            addParticle(target.x, target.y - 26, 'stunned');
+          }
           addParticle(target.x, target.y - 26, 'hit');
-          addParticle(target.x, target.y - 26, 'stunned');
           game.screenShake = COMBAT.effects.projectileShake;
           game.hitStop = COMBAT.effects.projectileHitStop;
           if (target.health <= 0) playImpactSound('ko');
@@ -727,6 +729,13 @@ function updateProjectiles(opponent) {
       if (p.x > hb.x && p.x < hb.x + hb.w &&
           p.y > hb.y && p.y < hb.y + hb.h) {
         if (p.type === 'harpoon') {
+          const blocked = opponent.takeHit(p.dmg, p.kb, p.owner.facing);
+          if (blocked) {
+            addParticle(p.x, p.y, 'block');
+            playImpactSound('block');
+            projectiles.splice(i, 1);
+            continue;
+          }
           // Harpoon: hit and pull
           p.hit = true;
           p.vx = 0;
@@ -736,10 +745,7 @@ function updateProjectiles(opponent) {
           p.ownerAnchorY = p.owner.y;
           p.owner.vx = 0;
           p.owner.vy = 0;
-          opponent.takeHit(p.dmg, p.kb, p.owner.facing);
-          if (!opponent.isBlocking) {
-            opponent.applyStunnedStatus(COMBAT.status.skorpdogStunMs);
-          }
+          opponent.applyStunnedStatus(COMBAT.status.skorpdogStunMs);
           addParticle(p.x, p.y, 'hit');
           addParticle(opponent.x, opponent.y - 65, 'stunned');
           game.screenShake = COMBAT.effects.harpoonShake;

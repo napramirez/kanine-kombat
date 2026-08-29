@@ -321,8 +321,10 @@ class Fighter {
 
     if (caught) {
       const blocked = opponent.takeHit(special.shockDamage, special.shockKnockback, this.facing);
-      if (opponent.health > 0 && !blocked) opponent.applyStunnedStatus(special.shockStunMs);
-      addParticle(opponent.x, opponent.y - 50, 'stunned');
+      if (opponent.health > 0 && !blocked) {
+        opponent.applyStunnedStatus(special.shockStunMs);
+        addParticle(opponent.x, opponent.y - 50, 'stunned');
+      }
       if (opponent.health <= 0) playImpactSound('ko');
     } else {
       playImpactSound('hit');
@@ -424,8 +426,8 @@ class Fighter {
           opponent.applyStunnedStatus(special.stunMs);
           opponent.doggbalSpinTimer = special.stunMs;
           opponent.doggbalSpinDuration = special.stunMs;
+          addParticle(opponent.x, opponent.y - 50, 'stunned');
         }
-        addParticle(opponent.x, opponent.y - 50, 'stunned');
         game.screenShake = COMBAT.effects.harpoonShake;
         game.hitStop = COMBAT.effects.harpoonHitStop;
         if (opponent.health <= 0) playImpactSound('ko');

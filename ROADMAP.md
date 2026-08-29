@@ -23,6 +23,7 @@
 - [x] Twelfth character (`NOOB SAIDOG`)
 - [x] Thirteenth character (`SNEK`)
 - [x] Fourteenth character (`REPDOG`)
+- [x] Fifteenth character (`DOGGABAL`)
 - [x] Character-specific stats and movesets
 - [ ] 3 new background stages
 - [ ] Stage selection
@@ -78,8 +79,10 @@
 - `RAYNDOG` uses a 3-second lightning-cloud special
 - `RAYDOG` uses an arc-lightning active special and a passive lightning meter
 - `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
-- `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that briefly fan out before homing
+- `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that fan out one after another before homing
 - `DOGGABAL` dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
+- `SUBDOG` passively spawns an ice clone every 5 seconds that lasts 2 seconds and freezes the opponent on contact for 2 seconds
+- MAX COMBO triggers at 30 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
 - `REPDOG` summons a green python capture and spits a single large acid glob
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
 - `SNEK` is hidden until the Battle Plan is completed as `NOOB SAIDOG`

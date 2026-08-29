@@ -48,11 +48,11 @@ Players choose from a shared roster before each match.
 - `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
 - `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
 - `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
-- `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out briefly before homing
+- `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out one after another before homing
 - `REPDOG`: summons a green python that captures the opponent, then spits a single large acid glob straight at them
 - `DOGGABAL`: dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
 - `SNEK`: slithers rapidly toward the opponent, coils around them, and applies a 3-second full stun
-- `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds
+- `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds; passive ice clone spawns every 5 seconds at SUBDOG's position, lasts 2 seconds, and freezes the opponent on contact for 2 seconds
 
 ### Combo System
 
@@ -60,6 +60,7 @@ Players choose from a shared roster before each match.
 - Every 12 hits increases punch damage by 1
 - Every 12 hits increases kick damage by 2
 - Knockback increases with combo count
+- MAX COMBO triggers at 30 hits: displays "MAX COMBO" for 60 frames and pushes the opponent to the screen edge (vx=160), resetting the combo counter
 
 ### Blocking
 

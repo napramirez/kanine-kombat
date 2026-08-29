@@ -53,7 +53,7 @@ None currently tracked.
 - [ ] Combos register and reset properly
 - [ ] Knockback direction is correct
 - [ ] NOOB SAIDOG snake applies a 3-second position lock that prevents movement but allows blocking and attacks
-- [ ] NOOB SAIDOG resumes normal movement and jumping after the 3-second snake coil; the simultaneous five-projectile barrage deals 10 total damage
+- [ ] NOOB SAIDOG resumes normal movement and jumping after the 3-second snake coil; the staggered five-projectile barrage deals 10 total damage
 - [ ] NOOB SAIDOG special and five-projectile volley work while airborne, with the fireballs fanning out extremely wide before homing and the snake coiling from behind
 - [ ] REPDOG acid glob travels straight without homing
 - [ ] DOGGABAL dashes through opponent and spins them for 3 seconds
@@ -66,6 +66,10 @@ None currently tracked.
 - [ ] REPDOG has green vest/mask, black hoodie/legs, yellow glowing eyes, and red snake tongue
 - [ ] REPDOG special summons a green python and spits a single large acid glob
 - [ ] DOGGABAL has olive green vertical stripe, brown horizontal stripe, and oxygen mask
+- [ ] SUBDOG passive ice clone spawns every 5 seconds, lasts 2 seconds, and freezes opponent on contact for 2 seconds
+- [ ] SUBDOG ice clone can be blocked by the opponent
+- [ ] MAX COMBO triggers at 30 hits, displays "MAX COMBO" text, and pushes opponent to screen edge
+- [ ] MAX COMBO pushback works during DOGGABAL spin and stun/frozen states
 
 ### Movement
 - [ ] Jump height is consistent

@@ -10,6 +10,9 @@ Use these prompts to iterate on the current game.
 - Standard gamepads now work as alternative controllers across the main game states
 - `VS CPU` already exists with a basic AI opponent
 - `BATTLE PLAN` already exists with a route stepper, a `BORKO` sub-boss, and a `SHAO CATNIP` final fight
+- `NOOB SAIDOG` fireballs now release one after another (4-frame stagger) instead of all at once
+- `SUBDOG` has a passive ice clone that spawns every 5 seconds, lasts 2 seconds, and freezes the opponent on contact
+- MAX COMBO triggers at 30 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
 - Pause functionality already exists on `Esc` during fights and Battle Plan stepper screens
 
 ## Quick Fixes

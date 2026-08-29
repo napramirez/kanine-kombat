@@ -160,17 +160,6 @@ const CHARACTERS = [
     desc: 'SHADOW'
   },
   {
-    id: 'ka9',
-    name: 'KA-9',
-    color1: '#ffffff',
-    color2: '#111111',
-    eyeColor: '#e74c3c',
-    speed: 5,
-    health: 100,
-    specialGain: 0.25,
-    desc: 'BLADE'
-  },
-  {
     id: 'repdog',
     name: 'REPDOG',
     color1: '#ffffff',

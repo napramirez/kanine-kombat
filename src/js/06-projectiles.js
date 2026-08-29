@@ -34,9 +34,6 @@ function spawnProjectile(owner) {
     return;
   } else if (specialName === 'SNEK') {
     return;
-  } else if (specialName === 'KA-9') {
-    spawnKa9Knives(owner);
-    return;
   } else if (specialName === 'DOGGABAL') {
     return;
   } else if (specialName === 'CYDOG') {
@@ -155,37 +152,6 @@ function spawnNoobSaidogFireball(owner, target, shotIndex, shotCount, variant) {
     trail: [],
     lastOwnerFrame: owner.frame
   });
-}
-
-function spawnKa9Knives(owner) {
-  const special = COMBAT.special.ka9;
-  const target = owner === p1 ? p2 : p1;
-  const x = owner.x + owner.facing * 42;
-  const y = owner.y - 58;
-  const baseAngle = Math.atan2(target.y - target.height / 2 - y, target.x - x);
-  for (let i = 0; i < special.knifeCount; i++) {
-    const offset = (i - (special.knifeCount - 1) / 2) * 0.3;
-    const angle = baseAngle + offset;
-    projectiles.push({
-      x,
-      y,
-      owner,
-      type: 'ka9Knife',
-      life: 120,
-      radius: special.knifeRadius,
-      speed: special.knifeSpeed,
-      dmg: special.knifeDamage,
-      kb: special.knifeKnockback,
-      vx: Math.cos(angle) * special.knifeSpeed,
-      vy: Math.sin(angle) * special.knifeSpeed,
-      baseAngle: angle,
-      elapsed: 0,
-      zigzagDir: i === 0 ? 1 : -1,
-      trail: [],
-      lastOwnerFrame: owner.frame,
-      rotation: 0
-    });
-  }
 }
 
 function spawnSnekCoil(owner, target) {

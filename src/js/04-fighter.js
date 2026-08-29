@@ -201,11 +201,6 @@ class Fighter {
         this.snekSlitherActive = true;
         this.isBlocking = false;
         this.isCrouching = false;
-      } else if (this.specialFormSource === 'KA-9') {
-        this.attackTimer = COMBAT.special.duration;
-        if (this.onGround) this.vx = 0;
-        this.isBlocking = false;
-        this.isCrouching = false;
       } else if (this.specialFormSource === 'DOGGABAL') {
         const opponent = this === p1 ? p2 : p1;
         const special = COMBAT.special.doggbal;

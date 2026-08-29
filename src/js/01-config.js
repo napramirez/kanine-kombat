@@ -139,15 +139,6 @@ const COMBAT = {
       coilStunMs: 3000,
       coilDisplayFrames: 180
     },
-    ka9: {
-      knifeCount: 2,
-      knifeSpeed: 10,
-      knifeDamage: 8,
-      knifeKnockback: 5,
-      knifeRadius: 12,
-      zigzagAmplitude: 30,
-      zigzagFrequency: 0.15
-    },
     doggbal: {
       dashSpeed: 20,
       dashFrames: 15,

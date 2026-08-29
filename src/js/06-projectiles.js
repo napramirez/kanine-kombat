@@ -123,6 +123,7 @@ function spawnNoobSaidogSequence(owner, target, variant) {
     riseFrames: special.snakeRiseFrames,
     elapsedFrames: 0,
     captured: false,
+    retreating: false,
     lastOwnerFrame: owner.frame,
     trail: []
   });
@@ -389,11 +390,19 @@ function updateNoobSnakeSequence(p, index) {
   p.elapsedFrames++;
   p.life--;
 
+  if (p.retreating) {
+    p.elapsedFrames -= 2;
+    if (p.elapsedFrames <= 0) {
+      projectiles.splice(index, 1);
+    }
+    return;
+  }
+
   if (!p.captured) {
     p.x = p.target.x;
     if (p.elapsedFrames >= p.riseFrames) {
-      p.captured = true;
       if (p.target.isBlocking) {
+        p.retreating = true;
         addParticle(p.target.x, p.target.y - 50, 'block');
         playImpactSound('block');
         p.target.blockTimer = COMBAT.block.stunFrames;
@@ -401,26 +410,30 @@ function updateNoobSnakeSequence(p, index) {
         p.owner.lastAttackType = '';
         p.owner.specialFormSource = '';
         p.owner.state = 'idle';
-      } else {
-        p.target.applyNoobSnakeCapture(special.captureHoldMs);
-        p.target.vx = 0;
-        p.target.vy = 0;
-        p.owner.attackTimer = 0;
-        p.owner.lastAttackType = '';
-        p.owner.specialFormSource = '';
-        p.owner.state = 'idle';
-        addParticle(p.target.x, p.target.y - 50, 'stunned');
-        if (p.variant === 'REPDOG') {
-          spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
-        } else {
-          for (let i = 0; i < special.barrageCount; i++) {
-            spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
-          }
-        }
-        playAttackSound('special');
+        game.screenShake = COMBAT.effects.harpoonShake;
+        game.hitStop = COMBAT.effects.harpoonHitStop;
+        return;
       }
+      p.captured = true;
+      p.target.applyNoobSnakeCapture(special.captureHoldMs);
+      p.target.vx = 0;
+      p.target.vy = 0;
+      p.owner.attackTimer = 0;
+      p.owner.lastAttackType = '';
+      p.owner.specialFormSource = '';
+      p.owner.state = 'idle';
+      addParticle(p.target.x, p.target.y - 50, 'stunned');
       game.screenShake = COMBAT.effects.harpoonShake;
       game.hitStop = COMBAT.effects.harpoonHitStop;
+      playImpactSound('hit');
+      if (p.variant === 'REPDOG') {
+        spawnNoobSaidogFireball(p.owner, p.target, 0, 1, p.variant);
+      } else {
+        for (let i = 0; i < special.barrageCount; i++) {
+          spawnNoobSaidogFireball(p.owner, p.target, i, special.barrageCount, p.variant);
+        }
+      }
+      playAttackSound('special');
     }
   }
 

@@ -52,6 +52,10 @@ class Fighter {
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
     this.snekSlitherActive = false;
+    this.doggbalDashActive = false;
+    this.doggbalDashStartX = x;
+    this.doggbalDashTargetX = x;
+    this.doggbalDashHit = false;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -94,6 +98,10 @@ class Fighter {
     this.borkoLeapActive = false;
     this.borkoLeapStartX = x;
     this.snekSlitherActive = false;
+    this.doggbalDashActive = false;
+    this.doggbalDashStartX = x;
+    this.doggbalDashTargetX = x;
+    this.doggbalDashHit = false;
     this.doggomeleonFormIndex = -1;
     this.specialFormSource = '';
   }
@@ -195,8 +203,17 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'DOGGABAL') {
-        this.attackTimer = COMBAT.special.duration;
-        if (this.onGround) this.vx = 0;
+        const opponent = this === p1 ? p2 : p1;
+        const special = COMBAT.special.doggbal;
+        this.attackTimer = special.dashFrames;
+        this.doggbalDashActive = true;
+        this.doggbalDashStartX = this.x;
+        this.doggbalDashTargetX = opponent.x + this.facing * 120;
+        this.doggbalDashTargetX = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.doggbalDashTargetX));
+        this.doggbalDashHit = false;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = true;
         this.isBlocking = false;
         this.isCrouching = false;
       } else {
@@ -369,6 +386,46 @@ class Fighter {
     this.attackTimer = 0;
     this.specialFormSource = '';
     this.state = 'idle';
+  }
+
+  updateDoggbalDash(opponent) {
+    const special = COMBAT.special.doggbal;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.onGround = true;
+    this.vy = 0;
+
+    const elapsedFrames = special.dashFrames - this.attackTimer + 1;
+    const progress = Math.min(1, elapsedFrames / special.dashFrames);
+    this.x = this.doggbalDashStartX + (this.doggbalDashTargetX - this.doggbalDashStartX) * progress;
+    this.attackTimer = Math.max(0, this.attackTimer - 1);
+
+    if (!this.doggbalDashHit && progress > 0.2 && progress < 0.8) {
+      const hb = opponent.getHurtbox();
+      const myCenter = this.x;
+      if (myCenter > hb.x && myCenter < hb.x + hb.w) {
+        this.doggbalDashHit = true;
+        opponent.takeHit(special.damage, special.knockback, this.facing);
+        if (opponent.health > 0) {
+          opponent.applyStunnedStatus(special.stunMs);
+        }
+        addParticle(opponent.x, opponent.y - 50, 'stunned');
+        game.screenShake = COMBAT.effects.harpoonShake;
+        game.hitStop = COMBAT.effects.harpoonHitStop;
+        if (opponent.health <= 0) playImpactSound('ko');
+        else playImpactSound('hit');
+      }
+    }
+
+    if (progress >= 1 || this.attackTimer <= 0) {
+      this.x = this.doggbalDashTargetX;
+      this.doggbalDashActive = false;
+      this.attackTimer = 0;
+      this.specialFormSource = '';
+      this.state = 'idle';
+      this.vx = 0;
+    }
   }
 
   landSekdogTeleportPunch(opponent) {
@@ -544,6 +601,11 @@ class Fighter {
 
     if (this.snekSlitherActive) {
       this.updateSnekSlither(opponent);
+      return;
+    }
+
+    if (this.doggbalDashActive) {
+      this.updateDoggbalDash(opponent);
       return;
     }
 

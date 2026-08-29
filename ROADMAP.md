@@ -138,8 +138,8 @@
 ### v0.3.0 - Balance Controls Update
 
 - Block button changed to `H` for P1 and `4` for P2
-- Punch duration reduced from 18 to 9 frames
-- Kick duration reduced from 24 to 12 frames
+- Punch duration reduced from 18 to 6 frames
+- Kick duration reduced from 24 to 4 frames
 - Nonstandard special-meter fighters no longer gain meter from punch or kick
 - Round intro changed to `Round X` then `FIGHT!`
 

@@ -32,8 +32,8 @@ Players choose from a shared roster before each match.
 
 | Type | Damage | Knockback | Duration | Special Gain |
 |---|---:|---:|---:|---:|
-| Punch | 8 | 4 | 9 frames | 6.4 |
-| Kick | 12 | 7 | 12 frames | 9.6 |
+| Punch | 8 | 4 | 6 frames | 6.4 |
+| Kick | 12 | 7 | 4 frames | 9.6 |
 | Special | Varies | Varies | 30 frames base | Consumes full meter |
 
 ### Special Attacks

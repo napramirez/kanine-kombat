@@ -21,7 +21,7 @@ function renderCharPreview(char) {
   return createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
 }
 
-const CHAR_SELECT_COLUMNS = 3;
+const CHAR_SELECT_COLUMNS = 4;
 const CHAR_SELECT_RANDOM_STEPS = 8;
 const CHAR_SELECT_RANDOM_DELAY_MS = 80;
 const CHAR_SELECT_RANDOM_DELAY_STEP_MS = 15;

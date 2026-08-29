@@ -348,6 +348,21 @@ document.addEventListener('keydown', e => {
     }
   }
 
+  if (game.state === GAME_STATES.MENU) {
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
+      navigateTitleSelection(-1);
+      e.preventDefault();
+    } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
+      navigateTitleSelection(1);
+      e.preventDefault();
+    } else if (e.code === 'Space' || e.code === 'Enter') {
+      ensureAudioReady();
+      titleModeButtons[gamepadInput.titleSelection].click();
+      e.preventDefault();
+    }
+    return;
+  }
+
   if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     ensureAudioReady();
     proceedBattlePlanStepper();

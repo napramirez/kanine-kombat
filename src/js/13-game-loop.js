@@ -110,6 +110,7 @@ function gameLoop() {
 
   // Screen shake
   ctx.save();
+  ctx.clearRect(0, 0, W, H);
   if (game.screenShake > 0) {
     ctx.translate(
       (Math.random() - 0.5) * game.screenShake,

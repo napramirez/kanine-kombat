@@ -50,7 +50,7 @@ Add another character to expand the roster beyond the current fifteen fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, KA-9 as blade, REPDOG as acid, and SNEK as constrictor/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, REPDOG as acid, DOGGABAL as tactical, and SNEK as constrictor/control.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.

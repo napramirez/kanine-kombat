@@ -82,6 +82,7 @@ Standard gamepads are supported as an alternative controller.
 
 The pause overlay also lets you switch directly to `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`.
 On a gamepad, `Start` or the right face button resumes, and the bottom face button selects the highlighted mode button.
+On a keyboard, arrow keys navigate between mode buttons, and `Enter` or `Space` confirms. `Esc` resumes.
 
 ## Mouse / UI
 
@@ -90,6 +91,21 @@ On a gamepad, `Start` or the right face button resumes, and the bottom face butt
 | Start 2-player match | Click `2 PLAYER` |
 | Start CPU match | Click `VS CPU` |
 | Start Battle Plan | Click `BATTLE PLAN` |
+
+## Title Screen
+
+| Action | Key |
+|---|---|
+| Navigate modes | `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
+| Confirm selection | `Enter` or `Space` |
+
+## Pause Screen
+
+| Action | Key |
+|---|---|
+| Navigate modes | `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
+| Confirm selection | `Enter` or `Space` |
+| Resume | `Esc` |
 
 ## Post-Match
 

@@ -56,7 +56,7 @@ None currently tracked.
 - [ ] NOOB SAIDOG resumes normal movement and jumping after the 3-second snake coil; the simultaneous five-projectile barrage deals 10 total damage
 - [ ] NOOB SAIDOG special and five-projectile volley work while airborne, with the fireballs fanning out extremely wide before homing and the snake coiling from behind
 - [ ] REPDOG acid glob travels straight without homing
-- [ ] KA-9 knives zigzag toward the opponent
+- [ ] DOGGABAL dashes through opponent and spins them for 3 seconds
 - [ ] BORKO and SHAO CATNIP are hidden from character select, Random 8, and regular CPU pools before their Battle Plan defeats
 - [ ] Defeating the BORKO sub-boss and SHAO CATNIP final boss unlocks the correct fighter and shows the unlock message
 - [ ] Hidden-character unlocks persist after returning to the title screen and reopening the game
@@ -65,8 +65,7 @@ None currently tracked.
 - [ ] SNEK body is 2x longer with pointy tail tip
 - [ ] REPDOG has green vest/mask, black hoodie/legs, yellow glowing eyes, and red snake tongue
 - [ ] REPDOG special summons a green python and spits a single large acid glob
-- [ ] KA-9 has brown body stripe, split gray/white face, and flashing infrared eye
-- [ ] KA-9 special throws 2 zigzag-pattern knives
+- [ ] DOGGABAL has olive green vertical stripe, brown horizontal stripe, and oxygen mask
 
 ### Movement
 - [ ] Jump height is consistent

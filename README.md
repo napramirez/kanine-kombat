@@ -8,7 +8,7 @@ Run `bash src/build.sh` to assemble `index.html` from the modular source files i
 
 If your browser limits gamepad support from `file://`, run the folder through a simple local HTTP server instead.
 
-From the title screen, click a mode or use controller confirm on the highlighted mode button.
+From the title screen, click a mode, use arrow keys and Enter/Space, or use controller confirm on the highlighted mode button.
 
 Optional music files:
 - `assets/title-screen-bgm.mp3`
@@ -28,7 +28,7 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - Keyboard and standard gamepad support with mixed-input play
-- 12 initially selectable fighters, plus 3 Battle Plan unlocks:
+- 11 initially selectable fighters, plus 3 Battle Plan unlocks:
   - `DOGGO CAGE`
   - `SKORPDOG`
   - `SEKDOG`
@@ -38,8 +38,8 @@ Optional music files:
   - `RAYDOG`
   - `DOGGOMELEON`
   - `NOOB SAIDOG`
-  - `KA-9`
   - `REPDOG`
+  - `DOGGABAL`
   - `SUBDOG`
   - Unlock `BORKO` by defeating the Battle Plan sub-boss
   - Unlock `SHAO CATNIP` by defeating the Battle Plan final boss
@@ -52,7 +52,7 @@ Optional music files:
 - Punch, kick, block, jump, crouch, active special attacks, and passive specials
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and fireball barrage, KA-9's zigzag knife throw, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, and freeze projectile
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Optional MP3 music hooks for title, character select, and fights

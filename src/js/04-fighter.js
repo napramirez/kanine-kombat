@@ -24,6 +24,7 @@ class Fighter {
     this.blockTimer = 0;
     this.comboCount = 0;
     this.lastHitTime = 0;
+    this.maxComboTimer = 0;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -76,6 +77,7 @@ class Fighter {
     this.hitTimer = 0;
     this.blockTimer = 0;
     this.comboCount = 0;
+    this.maxComboTimer = 0;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;

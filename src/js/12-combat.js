@@ -329,6 +329,15 @@ function checkHit(attacker, defender) {
     attacker.comboCount++;
     attacker.lastHitTime = Date.now();
 
+    if (attacker.comboCount >= 30) {
+      defender.vx = attacker.facing * 10;
+      addParticle(defender.x, defender.y - 50, 'ko');
+      game.screenShake = COMBAT.effects.koShake;
+      attacker.comboCount = 0;
+      attacker.lastHitTime = 0;
+      attacker.maxComboTimer = 60;
+    }
+
     if (defender.health <= 0) {
       game.screenShake = COMBAT.effects.koShake;
       addParticle(defender.x, defender.y - 50, 'ko');
@@ -495,12 +504,20 @@ function updateUI() {
   if (p1.comboCount >= 2 && now - p1.lastHitTime < COMBAT.comboResetMs) {
     ui.p1Combo.textContent = p1.comboCount + '-HIT COMBO';
     ui.p1Combo.classList.add('active');
+  } else if (p1.maxComboTimer > 0) {
+    p1.maxComboTimer--;
+    ui.p1Combo.textContent = 'MAX COMBO';
+    ui.p1Combo.classList.add('active');
   } else {
     ui.p1Combo.classList.remove('active');
   }
 
   if (p2.comboCount >= 2 && now - p2.lastHitTime < COMBAT.comboResetMs) {
     ui.p2Combo.textContent = p2.comboCount + '-HIT COMBO';
+    ui.p2Combo.classList.add('active');
+  } else if (p2.maxComboTimer > 0) {
+    p2.maxComboTimer--;
+    ui.p2Combo.textContent = 'MAX COMBO';
     ui.p2Combo.classList.add('active');
   } else {
     ui.p2Combo.classList.remove('active');

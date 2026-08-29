@@ -65,6 +65,7 @@ Players choose from a shared roster before each match.
 
 - Reduces damage to 15%
 - Reduces knockback to 20%
+- Blocks all special effects: stun, freeze, capture, snake coil, harpoon pull, net capture, and snowflake freeze
 - Shows a `BLOCK!` popup
 
 ### Special Meter

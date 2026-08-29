@@ -254,7 +254,7 @@ class Fighter {
     }
 
     this.health = Math.max(0, this.health - dmg);
-    this.vx = attackerFacing * kb;
+    if (!this.maxComboPushback) this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
     const blockedMeterGain = this.name === 'BORKO'

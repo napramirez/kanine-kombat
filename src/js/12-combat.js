@@ -330,7 +330,7 @@ function checkHit(attacker, defender) {
     attacker.lastHitTime = Date.now();
 
     if (attacker.comboCount >= 30) {
-      defender.vx = attacker.facing * 80;
+      defender.vx = attacker.facing * 160;
       addParticle(defender.x, defender.y - 50, 'ko');
       game.screenShake = COMBAT.effects.koShake;
       attacker.comboCount = 0;

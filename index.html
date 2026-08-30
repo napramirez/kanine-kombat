@@ -7915,7 +7915,7 @@ function updatePortrait(char, container, playerKey) {
   const info = document.createElement('div');
   info.className = 'char-portrait-info';
   const streak = playerKey ? game.winStreak[playerKey] : 0;
-  const streakHtml = streak > 0 ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
+  const streakHtml = streak > 1 ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
   info.innerHTML = `
     <div class="char-portrait-name">${char.name}</div>
     <div class="char-portrait-stats">
@@ -8306,10 +8306,10 @@ function updateUI() {
   const showStreaks = game.mode === MATCH_MODES.VERSUS;
   const p1Streak = showStreaks ? game.winStreak.p1 : 0;
   const p2Streak = showStreaks ? game.winStreak.p2 : 0;
-  ui.p1WinStreak.style.display = p1Streak > 0 ? 'block' : 'none';
-  ui.p2WinStreak.style.display = p2Streak > 0 ? 'block' : 'none';
-  if (p1Streak > 0) ui.p1WinStreak.textContent = p1Streak + '-WIN STREAK';
-  if (p2Streak > 0) ui.p2WinStreak.textContent = p2Streak + '-WIN STREAK';
+  ui.p1WinStreak.style.display = p1Streak > 1 ? 'block' : 'none';
+  ui.p2WinStreak.style.display = p2Streak > 1 ? 'block' : 'none';
+  if (p1Streak > 1) ui.p1WinStreak.textContent = p1Streak + '-WIN STREAK';
+  if (p2Streak > 1) ui.p2WinStreak.textContent = p2Streak + '-WIN STREAK';
 
   // Blinking effect when special is ready
   ui.p1Special.classList.toggle('ready', p1.special >= SPECIAL_METER_MAX);

@@ -271,6 +271,7 @@ class Fighter {
         opponent.lastAttackType = '';
         opponent.blockTimer = 0;
         opponent.isBlocking = false;
+        opponent.isCrouching = false;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;
@@ -648,16 +649,24 @@ class Fighter {
       opponent.vy = 0;
       if (this.makdogSpecialTimer <= 0) {
         opponent.y = GROUND;
-        opponent.takeHit(special.damage, special.knockback, this.facing);
-        opponent.applyStunnedStatus(special.stunMs);
-        opponent.doggbalSpinTimer = special.stunMs;
-        opponent.doggbalSpinDuration = special.stunMs;
+        const wasBlocked = opponent.isBlocking;
+        const blocked = opponent.takeHit(special.damage, special.knockback, this.facing);
         opponent.makdogImmobilized = false;
         opponent.makdogImmobilizedTimer = 0;
+        opponent.makdogGlowTimer = 0;
+        if (!blocked) {
+          opponent.doggbalSpinTimer = special.stunMs;
+          opponent.doggbalSpinDuration = special.stunMs;
+          opponent.applyStunnedStatus(special.stunMs);
+        }
+        const rollDir = -this.facing;
+        opponent.vx = rollDir * special.rollBackSpeed;
+        opponent.doggbalSpinTimer = special.rollBackFrames * 16;
+        opponent.doggbalSpinDuration = special.rollBackFrames * 16;
         game.screenShake = COMBAT.effects.koShake;
         game.hitStop = COMBAT.effects.freezeHitStop;
-        addParticle(opponent.x, opponent.y - 50, 'ko');
-        playImpactSound('ko');
+        addParticle(opponent.x, opponent.y - 50, blocked ? 'block' : 'ko');
+        playImpactSound(blocked ? 'block' : 'ko');
         this.makdogSpecialActive = false;
         this.attackTimer = 0;
         this.specialFormSource = '';
@@ -669,6 +678,7 @@ class Fighter {
       this.makdogSpecialActive = false;
       opponent.makdogImmobilized = false;
       opponent.makdogImmobilizedTimer = 0;
+      opponent.makdogGlowTimer = 0;
       this.specialFormSource = '';
       this.state = 'idle';
     }
@@ -865,14 +875,12 @@ class Fighter {
       if (this.makdogGlowTimer > 0) this.makdogGlowTimer -= PHYSICS.freezeTickMs;
       this.vx = 0;
       this.vy = 0;
-      this.isBlocking = false;
       this.isCrouching = false;
       if (this.makdogImmobilizedTimer <= 0) {
         this.makdogImmobilized = false;
         this.makdogImmobilizedTimer = 0;
         this.makdogGlowTimer = 0;
       }
-      return;
     }
 
     if (this.harpoonLockTimer > 0) {
@@ -951,6 +959,11 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       if (noobSnakeCaptured) {
         this.isBlocking = keys.block;
         this.state = this.isBlocking ? 'block' : 'idle';
+      } else if (this.makdogImmobilized) {
+        this.isBlocking = keys.block;
+        this.state = this.isBlocking ? 'block' : 'idle';
+        this.vx = 0;
+        this.vy = 0;
       } else {
         if (keys.left && !keys.right) {
           this.vx = -speed;
@@ -984,6 +997,9 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
     if (noobSnakeCaptured) {
       this.x = this.noobCaptureX;
       this.y = this.noobCaptureY;
+      this.vx = 0;
+      this.vy = 0;
+    } else if (this.makdogImmobilized) {
       this.vx = 0;
       this.vy = 0;
     } else {

@@ -166,7 +166,9 @@ const COMBAT = {
       liftHeight: 220,
       damage: 12,
       knockback: 8,
-      stunMs: 1500
+      stunMs: 1000,
+      rollBackSpeed: 10,
+      rollBackFrames: 20
     }
   },
   block: {

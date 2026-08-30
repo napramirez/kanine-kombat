@@ -617,9 +617,15 @@ class Fighter {
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;
-    this.onGround = true;
     this.vx = 0;
-    this.vy = 0;
+
+    this.vy += PHYSICS.gravity;
+    this.y += this.vy;
+    if (this.y >= GROUND) {
+      this.y = GROUND;
+      this.vy = 0;
+      this.onGround = true;
+    }
 
     this.makdogSpecialTimer--;
     this.attackTimer--;

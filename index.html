@@ -4116,9 +4116,15 @@ class Fighter {
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;
-    this.onGround = true;
     this.vx = 0;
-    this.vy = 0;
+
+    this.vy += PHYSICS.gravity;
+    this.y += this.vy;
+    if (this.y >= GROUND) {
+      this.y = GROUND;
+      this.vy = 0;
+      this.onGround = true;
+    }
 
     this.makdogSpecialTimer--;
     this.attackTimer--;
@@ -8888,8 +8894,10 @@ function gameLoop() {
     p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
     checkHit(p1, p2);
     checkHit(p2, p1);
-    updateProjectiles(p2);
-    updateProjectiles(p1);
+    if (!p1.makdogSpecialActive && !p2.makdogSpecialActive) {
+      updateProjectiles(p2);
+      updateProjectiles(p1);
+    }
 
     if (p1.health <= 0 || p2.health <= 0) {
       endRound();

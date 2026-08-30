@@ -41,6 +41,7 @@ Optional music files:
   - `REPDOG`
   - `DOGGABAL`
   - `SUBDOG`
+  - `MAKDOG`
   - Unlock `BORKO` by defeating the Battle Plan sub-boss
   - Unlock `SHAO CATNIP` by defeating the Battle Plan final boss
   - Unlock `SNEK` by completing the Battle Plan as `NOOB SAIDOG`

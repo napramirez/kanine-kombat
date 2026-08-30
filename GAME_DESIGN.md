@@ -27,6 +27,7 @@ Players choose from a shared roster before each match.
 | `DOGGABAL` | Tactical | 5 | 100 | Black dog, olive green vertical stripe, brown horizontal stripe, oxygen mask |
 | `SNEK` | Constrictor | 7 | 100 | Hidden black python with red eyes; unlock by completing the Battle Plan as NOOB SAIDOG |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
+| `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask |
 
 ### Combat System
 

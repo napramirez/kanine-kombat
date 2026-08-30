@@ -3762,8 +3762,8 @@ class Fighter {
         this.makdogSpecialTimer = special.eyeGlowFrames;
         this.makdogLiftY = 0;
         opponent.makdogImmobilized = true;
-        opponent.makdogImmobilizedTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
-        opponent.makdogGlowTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
+        opponent.makdogImmobilizedTimer = (special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames) * 16.67;
+        opponent.makdogGlowTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames;
         opponent.vx = 0;
         opponent.vy = 0;
         opponent.attackTimer = 0;

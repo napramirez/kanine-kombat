@@ -4472,7 +4472,11 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
 }
 
     const speed = this.speed;
-    if (this.attackTimer <= 0 && this.hitTimer <= 0) {
+    if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
+      this.state = 'hit';
+      this.isBlocking = false;
+      this.isCrouching = false;
+    } else if (this.attackTimer <= 0 && this.hitTimer <= 0) {
       if (noobSnakeCaptured) {
         this.isBlocking = keys.block;
         this.state = this.isBlocking ? 'block' : 'idle';

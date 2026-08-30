@@ -4488,7 +4488,7 @@ class Fighter {
     if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
 
     // Spawn daggers when meter is full
-    if (this.kanoineDaggers.length === 0) {
+    if (this.passiveSpecial >= SPECIAL_METER_MAX && this.kanoineDaggers.length === 0) {
       this.passiveSpecial = 0;
       this.kanoineDaggers = [
         { angle: 0, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false },
@@ -4496,7 +4496,9 @@ class Fighter {
       ];
     }
 
-    // Update daggers
+    // Update daggers only if they exist
+    if (this.kanoineDaggers.length === 0) return;
+
     for (let i = this.kanoineDaggers.length - 1; i >= 0; i--) {
       const dagger = this.kanoineDaggers[i];
       dagger.timer--;

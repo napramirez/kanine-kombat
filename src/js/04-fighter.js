@@ -256,11 +256,13 @@ class Fighter {
         this.isCrouching = false;
       } else if (this.specialFormSource === 'MAKDOG') {
         const special = COMBAT.special.makdog;
+        const opponent = this === p1 ? p2 : p1;
         this.attackTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         this.makdogSpecialActive = true;
         this.makdogSpecialPhase = 'eyeGlow';
         this.makdogSpecialTimer = special.eyeGlowFrames;
         this.makdogLiftY = 0;
+        opponent.makdogGlowTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;

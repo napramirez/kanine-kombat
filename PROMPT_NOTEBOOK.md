@@ -56,6 +56,18 @@ Fix wherever else it applies.
 Allow player controls in the game mode screen.
 Fit the characters into 4 columns instead of 3 in the character select screen.
 
+Change RAYDOG's active special move. RAYDOG will now fly like Superman with front limbs towards the opponent and back limbs pointing the opposite direction.
+
+If unblocked:
+
+- The opponent will be briefly immobile and RAYDOG will continue to fly while pushing the opponent along the end of the screen
+- Deal 10 damage to the opponent and stun for 1 second
+- Shake the screen on impact to the edge of the screen, then spin and hurl RAYDOG backwards
+
+If blocked:
+
+- spin and hurl RAYDOG backwards
+
 ## Game System Feature
 
 ### Battle Plan Credits

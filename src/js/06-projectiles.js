@@ -27,7 +27,6 @@ function spawnProjectile(owner) {
     spawnRayndogLightningCloud(owner, owner === p1 ? p2 : p1);
     return;
   } else if (specialName === 'RAYDOG') {
-    spawnRaydogArcLightning(owner, owner === p1 ? p2 : p1);
     return;
   } else if (specialName === 'NOOB SAIDOG' || specialName === 'REPDOG') {
     spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1, specialName);

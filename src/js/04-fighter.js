@@ -61,6 +61,10 @@ class Fighter {
     this.doggbalSpinTimer = 0;
     this.doggbalSpinDuration = 0;
     this.doggomeleonFormIndex = -1;
+    this.raydogDashActive = false;
+    this.raydogDashPhase = '';
+    this.raydogDashTimer = 0;
+    this.raydogDashHit = false;
     this.specialFormSource = '';
   }
 
@@ -111,6 +115,10 @@ class Fighter {
     this.doggbalSpinTimer = 0;
     this.doggbalSpinDuration = 0;
     this.doggomeleonFormIndex = -1;
+    this.raydogDashActive = false;
+    this.raydogDashPhase = '';
+    this.raydogDashTimer = 0;
+    this.raydogDashHit = false;
     this.specialFormSource = '';
   }
 
@@ -214,6 +222,18 @@ class Fighter {
         this.doggbalDashTargetX = opponent.x + this.facing * 120;
         this.doggbalDashTargetX = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.doggbalDashTargetX));
         this.doggbalDashHit = false;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = true;
+        this.isBlocking = false;
+        this.isCrouching = false;
+      } else if (this.specialFormSource === 'RAYDOG') {
+        const special = COMBAT.special.raydog;
+        this.attackTimer = special.dashFrames;
+        this.raydogDashActive = true;
+        this.raydogDashPhase = 'fly';
+        this.raydogDashTimer = special.dashFrames;
+        this.raydogDashHit = false;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;
@@ -444,6 +464,85 @@ class Fighter {
     }
   }
 
+  updateRaydogSupermanDash(opponent) {
+    const special = COMBAT.special.raydog;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.onGround = true;
+    this.vy = 0;
+
+    if (this.raydogDashPhase === 'fly') {
+      this.vx = this.facing * special.dashSpeed;
+      this.x += this.vx;
+      this.raydogDashTimer--;
+
+      if (!this.raydogDashHit) {
+        const hb = opponent.getHurtbox();
+        const myFront = this.x + this.facing * (FIGHTER_LAYOUT.width / 2 + 10);
+        if (myFront > hb.x && myFront < hb.x + hb.w) {
+          this.raydogDashHit = true;
+          const blocked = opponent.takeHit(special.damage, special.knockback, this.facing);
+          if (blocked) {
+            this.raydogDashPhase = 'hurl';
+            this.raydogDashTimer = special.hurlBackFrames;
+            this.facing = -this.facing;
+            this.vx = this.facing * special.hurlBackSpeed;
+            game.screenShake = COMBAT.effects.hitShake;
+            game.hitStop = COMBAT.effects.meleeHitStop;
+            playImpactSound('block');
+          } else {
+            opponent.applyStunnedStatus(special.stunMs);
+            opponent.vx = 0;
+            addParticle(opponent.x, opponent.y - 50, 'stunned');
+            this.raydogDashPhase = 'push';
+            this.raydogDashTimer = special.pushFrames;
+            game.hitStop = COMBAT.effects.freezeHitStop;
+            playImpactSound('hit');
+          }
+        }
+      }
+
+      if (this.raydogDashTimer <= 0 && this.raydogDashPhase === 'fly') {
+        this.raydogDashActive = false;
+        this.attackTimer = 0;
+        this.specialFormSource = '';
+        this.state = 'idle';
+        this.vx = 0;
+      }
+    } else if (this.raydogDashPhase === 'push') {
+      this.vx = this.facing * special.dashSpeed;
+      opponent.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, opponent.x + this.vx));
+      opponent.vx = 0;
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x + this.vx));
+
+      const atEdge = (this.facing === 1 && this.x >= W - FIGHTER_LAYOUT.boundaryPadding - 10) ||
+                     (this.facing === -1 && this.x <= FIGHTER_LAYOUT.boundaryPadding + 10);
+      this.raydogDashTimer--;
+
+      if (atEdge || this.raydogDashTimer <= 0) {
+        game.screenShake = COMBAT.effects.koShake;
+        addParticle(opponent.x, opponent.y - 50, 'hit');
+        this.raydogDashPhase = 'hurl';
+        this.raydogDashTimer = special.hurlBackFrames;
+        this.facing = -this.facing;
+        this.vx = this.facing * special.hurlBackSpeed;
+      }
+    } else if (this.raydogDashPhase === 'hurl') {
+      this.x += this.vx;
+      this.raydogDashTimer--;
+      this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
+
+      if (this.raydogDashTimer <= 0) {
+        this.raydogDashActive = false;
+        this.attackTimer = 0;
+        this.specialFormSource = '';
+        this.state = 'idle';
+        this.vx = 0;
+      }
+    }
+  }
+
   landSekdogTeleportPunch(opponent) {
     if (opponent.health <= 0) return;
 
@@ -655,6 +754,11 @@ class Fighter {
       return;
     }
 
+    if (this.raydogDashActive) {
+      this.updateRaydogSupermanDash(opponent);
+      return;
+    }
+
     if (this.doggbalDashActive) {
       this.updateDoggbalDash(opponent);
       return;
@@ -797,6 +901,21 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       const spinProgress = 1 - (this.doggbalSpinTimer / this.doggbalSpinDuration);
       const easedSpin = 1 - Math.pow(1 - spinProgress, 3);
       const spinAngle = easedSpin * Math.PI * 8;
+      ctx.save();
+      ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
+      ctx.rotate(spinAngle);
+      ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+      ctx.restore();
+    } else if (this.raydogDashActive && this.raydogDashPhase === 'fly') {
+      const tiltAngle = this.facing * -Math.PI / 4;
+      ctx.save();
+      ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
+      ctx.rotate(tiltAngle);
+      ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+      ctx.restore();
+    } else if (this.raydogDashActive && this.raydogDashPhase === 'hurl') {
+      const hurlProgress = 1 - (this.raydogDashTimer / COMBAT.special.raydog.hurlBackFrames);
+      const spinAngle = hurlProgress * Math.PI * 6;
       ctx.save();
       ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
       ctx.rotate(spinAngle);

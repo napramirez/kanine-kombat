@@ -81,8 +81,14 @@ const COMBAT = {
       zapKnockback: 3
     },
     raydog: {
-      damage: 5,
+      damage: 10,
       knockback: 4,
+      stunMs: 1000,
+      dashSpeed: 18,
+      dashFrames: 30,
+      pushFrames: 20,
+      hurlBackSpeed: 14,
+      hurlBackFrames: 20,
       displayFrames: 12,
       passiveIntervalFrames: 180,
       passiveRadius: 340

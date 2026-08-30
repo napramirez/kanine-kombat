@@ -290,6 +290,64 @@ function drawDogbalOxygenMask(x, headY) {
   x.fill();
 }
 
+function drawKanoineBodyStripes(x, bodyY) {
+  x.save();
+  x.beginPath();
+  x.ellipse(58, bodyY + 14, 30, 22, 0, 0, Math.PI * 2);
+  x.clip();
+
+  // Thick horizontal brown stripe across body (no olive green stripe)
+  x.fillStyle = '#8B4513';
+  x.fillRect(28, bodyY + 4, 60, 18);
+
+  x.restore();
+}
+
+function drawKanoineHalfFace(x, headY, frame) {
+  // Save context for clipping
+  x.save();
+
+  // Draw gray half (left side)
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.rect(48, headY - 22, 22, 44);
+  x.clip();
+
+  // Redraw head in gray
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.ellipse(70, headY, 22, 20, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Redraw ears in gray
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.ellipse(56, headY - 18, 8, 14, -0.3, 0, Math.PI * 2);
+  x.fill();
+
+  // Inner ear (gray side)
+  x.fillStyle = '#ffb3b3';
+  x.beginPath();
+  x.ellipse(57, headY - 16, 4, 8, -0.3, 0, Math.PI * 2);
+  x.fill();
+
+  x.restore();
+
+  // Glowing red eye on gray side (left eye)
+  const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
+  const secondary = Math.floor(6 + flash * 28);
+  x.save();
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 7 + flash * 7;
+  x.fillStyle = `rgb(255, ${secondary}, ${secondary})`;
+  x.beginPath();
+  x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.restore();
+
+  // Normal eye on white side (right eye) - already drawn by default
+}
+
 
 function getDoggomeleonMorphName(fighter) {
   if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
@@ -732,6 +790,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, bodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, bodyY);
 
     // Tail (no wag when frozen)
     const tailWag = frozen ? 0 : Math.sin(frame * 0.4) * 15;
@@ -874,6 +933,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   // DOGGABAL oxygen mask
   if (name === 'DOGGABAL') drawDogbalOxygenMask(x, headY);
+
+  // KANOINE half-face (gray side with glowing red eye)
+  if (name === 'KANOINE') drawKanoineHalfFace(x, headY, frame);
 
   // Eyes
   x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -1337,6 +1399,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes (victory)
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, vicBodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, vicBodyY);
 
     // Tail
     const tailWag2 = Math.sin(frame * 0.4) * 15;
@@ -1537,6 +1600,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL oxygen mask (victory)
     if (name === 'DOGGABAL') drawDogbalOxygenMask(x, vicHeadY);
+    if (name === 'KANOINE') drawKanoineHalfFace(x, vicHeadY, frame);
 
     // Raised eyebrows for happy expression
     x.strokeStyle = frozenColor1;
@@ -1586,6 +1650,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes (defeat)
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, defBodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, defBodyY);
 
     // Tail (drooping)
     x.strokeStyle = frozenColor1;
@@ -1734,6 +1799,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL oxygen mask (defeat)
     if (name === 'DOGGABAL') drawDogbalOxygenMask(x, defHeadY);
+    if (name === 'KANOINE') drawKanoineHalfFace(x, defHeadY, frame);
 
     // Stars circling head
     for (let i = 0; i < 3; i++) {

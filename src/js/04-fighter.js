@@ -246,6 +246,20 @@ class Fighter {
         this.onGround = true;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'KANOINE') {
+        const opponent = this === p1 ? p2 : p1;
+        const special = COMBAT.special.kanoine;
+        this.attackTimer = special.dashFrames;
+        this.doggbalDashActive = true;
+        this.doggbalDashStartX = this.x;
+        this.doggbalDashTargetX = opponent.x + this.facing * 120;
+        this.doggbalDashTargetX = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.doggbalDashTargetX));
+        this.doggbalDashHit = false;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = true;
+        this.isBlocking = false;
+        this.isCrouching = false;
       } else if (this.specialFormSource === 'RAYDOG') {
         const special = COMBAT.special.raydog;
         this.attackTimer = special.dashFrames;
@@ -466,7 +480,7 @@ class Fighter {
   }
 
   updateDoggbalDash(opponent) {
-    const special = COMBAT.special.doggbal;
+    const special = this.specialFormSource === 'KANOINE' ? COMBAT.special.kanoine : COMBAT.special.doggbal;
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;

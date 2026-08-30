@@ -1228,6 +1228,13 @@ const COMBAT = {
       damage: 5,
       knockback: 3
     },
+    kanoine: {
+      dashSpeed: 20,
+      dashFrames: 15,
+      stunMs: 3000,
+      damage: 5,
+      knockback: 3
+    },
     subdog: {
       passiveIntervalFrames: 300,
       cloneDurationFrames: 120,
@@ -2023,6 +2030,64 @@ function drawDogbalOxygenMask(x, headY) {
   x.fill();
 }
 
+function drawKanoineBodyStripes(x, bodyY) {
+  x.save();
+  x.beginPath();
+  x.ellipse(58, bodyY + 14, 30, 22, 0, 0, Math.PI * 2);
+  x.clip();
+
+  // Thick horizontal brown stripe across body (no olive green stripe)
+  x.fillStyle = '#8B4513';
+  x.fillRect(28, bodyY + 4, 60, 18);
+
+  x.restore();
+}
+
+function drawKanoineHalfFace(x, headY, frame) {
+  // Save context for clipping
+  x.save();
+
+  // Draw gray half (left side)
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.rect(48, headY - 22, 22, 44);
+  x.clip();
+
+  // Redraw head in gray
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.ellipse(70, headY, 22, 20, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Redraw ears in gray
+  x.fillStyle = '#888888';
+  x.beginPath();
+  x.ellipse(56, headY - 18, 8, 14, -0.3, 0, Math.PI * 2);
+  x.fill();
+
+  // Inner ear (gray side)
+  x.fillStyle = '#ffb3b3';
+  x.beginPath();
+  x.ellipse(57, headY - 16, 4, 8, -0.3, 0, Math.PI * 2);
+  x.fill();
+
+  x.restore();
+
+  // Glowing red eye on gray side (left eye)
+  const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
+  const secondary = Math.floor(6 + flash * 28);
+  x.save();
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 7 + flash * 7;
+  x.fillStyle = `rgb(255, ${secondary}, ${secondary})`;
+  x.beginPath();
+  x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+  x.restore();
+
+  // Normal eye on white side (right eye) - already drawn by default
+}
+
 
 function getDoggomeleonMorphName(fighter) {
   if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
@@ -2465,6 +2530,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, bodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, bodyY);
 
     // Tail (no wag when frozen)
     const tailWag = frozen ? 0 : Math.sin(frame * 0.4) * 15;
@@ -2607,6 +2673,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   // DOGGABAL oxygen mask
   if (name === 'DOGGABAL') drawDogbalOxygenMask(x, headY);
+
+  // KANOINE half-face (gray side with glowing red eye)
+  if (name === 'KANOINE') drawKanoineHalfFace(x, headY, frame);
 
   // Eyes
   x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -3070,6 +3139,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes (victory)
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, vicBodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, vicBodyY);
 
     // Tail
     const tailWag2 = Math.sin(frame * 0.4) * 15;
@@ -3270,6 +3340,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL oxygen mask (victory)
     if (name === 'DOGGABAL') drawDogbalOxygenMask(x, vicHeadY);
+    if (name === 'KANOINE') drawKanoineHalfFace(x, vicHeadY, frame);
 
     // Raised eyebrows for happy expression
     x.strokeStyle = frozenColor1;
@@ -3319,6 +3390,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL body stripes (defeat)
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, defBodyY);
+    if (name === 'KANOINE') drawKanoineBodyStripes(x, defBodyY);
 
     // Tail (drooping)
     x.strokeStyle = frozenColor1;
@@ -3467,6 +3539,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // DOGGABAL oxygen mask (defeat)
     if (name === 'DOGGABAL') drawDogbalOxygenMask(x, defHeadY);
+    if (name === 'KANOINE') drawKanoineHalfFace(x, defHeadY, frame);
 
     // Stars circling head
     for (let i = 0; i < 3; i++) {
@@ -3745,6 +3818,20 @@ class Fighter {
         this.onGround = true;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'KANOINE') {
+        const opponent = this === p1 ? p2 : p1;
+        const special = COMBAT.special.kanoine;
+        this.attackTimer = special.dashFrames;
+        this.doggbalDashActive = true;
+        this.doggbalDashStartX = this.x;
+        this.doggbalDashTargetX = opponent.x + this.facing * 120;
+        this.doggbalDashTargetX = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.doggbalDashTargetX));
+        this.doggbalDashHit = false;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = true;
+        this.isBlocking = false;
+        this.isCrouching = false;
       } else if (this.specialFormSource === 'RAYDOG') {
         const special = COMBAT.special.raydog;
         this.attackTimer = special.dashFrames;
@@ -3965,7 +4052,7 @@ class Fighter {
   }
 
   updateDoggbalDash(opponent) {
-    const special = COMBAT.special.doggbal;
+    const special = this.specialFormSource === 'KANOINE' ? COMBAT.special.kanoine : COMBAT.special.doggbal;
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;
@@ -7176,6 +7263,17 @@ const CHARACTERS = [
     desc: 'TACTICAL'
   },
   {
+    id: 'kanoine',
+    name: 'KANOINE',
+    color1: '#ffffff',
+    color2: '#888888',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'DUALITY'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',
@@ -8477,7 +8575,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK' || attackerSpecialName === 'DOGGABAL' || attackerSpecialName === 'MAKDOG') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK' || attackerSpecialName === 'DOGGABAL' || attackerSpecialName === 'KANOINE' || attackerSpecialName === 'MAKDOG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

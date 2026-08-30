@@ -153,6 +153,13 @@ const COMBAT = {
       damage: 5,
       knockback: 3
     },
+    kanoine: {
+      dashSpeed: 20,
+      dashFrames: 15,
+      stunMs: 3000,
+      damage: 5,
+      knockback: 3
+    },
     subdog: {
       passiveIntervalFrames: 300,
       cloneDurationFrames: 120,

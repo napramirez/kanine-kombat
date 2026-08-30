@@ -199,6 +199,17 @@ const CHARACTERS = [
     desc: 'TACTICAL'
   },
   {
+    id: 'kanoine',
+    name: 'KANOINE',
+    color1: '#ffffff',
+    color2: '#888888',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'DUALITY'
+  },
+  {
     id: 'subdog',
     name: 'SUBDOG',
     color1: '#ffffff',

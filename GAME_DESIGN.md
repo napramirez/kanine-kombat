@@ -28,6 +28,7 @@ Players choose from a shared roster before each match.
 | `SNEK` | Constrictor | 7 | 100 | Hidden black python with red eyes; unlock by completing the Battle Plan as NOOB SAIDOG |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 | `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask |
+| `KANOINE` | Duality | 5 | 100 | White dog, half-gray face, glowing red eye on gray side, brown stripe |
 
 ### Combat System
 

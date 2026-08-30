@@ -35,6 +35,8 @@ function spawnProjectile(owner) {
     return;
   } else if (specialName === 'DOGGABAL') {
     return;
+  } else if (specialName === 'MAKDOG') {
+    return;
   } else if (specialName === 'CYDOG') {
     color1 = '#2ecc71';
     color2 = '#27ae60';

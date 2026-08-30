@@ -209,6 +209,17 @@ const CHARACTERS = [
     specialGain: 0.25,
     passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.subdog.passiveIntervalFrames,
     desc: 'TRAPPER'
+  },
+  {
+    id: 'makdog',
+    name: 'MAKDOG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'GRAPPLER'
   }
 ];
 

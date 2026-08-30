@@ -157,6 +157,15 @@ const COMBAT = {
       passiveIntervalFrames: 300,
       cloneDurationFrames: 120,
       cloneFreezeMs: 2000
+    },
+    makdog: {
+      eyeGlowFrames: 45,
+      liftFrames: 30,
+      holdFrames: 30,
+      slamFrames: 15,
+      damage: 12,
+      knockback: 8,
+      stunMs: 1500
     }
   },
   block: {

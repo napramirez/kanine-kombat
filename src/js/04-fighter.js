@@ -65,6 +65,13 @@ class Fighter {
     this.raydogDashPhase = '';
     this.raydogDashTimer = 0;
     this.raydogDashHit = false;
+    this.makdogSpecialActive = false;
+    this.makdogSpecialPhase = '';
+    this.makdogSpecialTimer = 0;
+    this.makdogLiftY = 0;
+    this.makdogImmobilized = false;
+    this.makdogImmobilizedTimer = 0;
+    this.makdogGlowTimer = 0;
     this.specialFormSource = '';
   }
 
@@ -119,6 +126,13 @@ class Fighter {
     this.raydogDashPhase = '';
     this.raydogDashTimer = 0;
     this.raydogDashHit = false;
+    this.makdogSpecialActive = false;
+    this.makdogSpecialPhase = '';
+    this.makdogSpecialTimer = 0;
+    this.makdogLiftY = 0;
+    this.makdogImmobilized = false;
+    this.makdogImmobilizedTimer = 0;
+    this.makdogGlowTimer = 0;
     this.specialFormSource = '';
   }
 
@@ -234,6 +248,18 @@ class Fighter {
         this.raydogDashPhase = 'fly';
         this.raydogDashTimer = special.dashFrames;
         this.raydogDashHit = false;
+        this.vx = 0;
+        this.vy = 0;
+        this.onGround = true;
+        this.isBlocking = false;
+        this.isCrouching = false;
+      } else if (this.specialFormSource === 'MAKDOG') {
+        const special = COMBAT.special.makdog;
+        this.attackTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
+        this.makdogSpecialActive = true;
+        this.makdogSpecialPhase = 'eyeGlow';
+        this.makdogSpecialTimer = special.eyeGlowFrames;
+        this.makdogLiftY = 0;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;
@@ -570,6 +596,77 @@ class Fighter {
     }
   }
 
+  updateMakdogSpecial(opponent) {
+    const special = COMBAT.special.makdog;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.onGround = true;
+    this.vx = 0;
+    this.vy = 0;
+
+    this.makdogSpecialTimer--;
+    this.attackTimer--;
+
+    if (this.makdogSpecialPhase === 'eyeGlow') {
+      if (this.makdogSpecialTimer <= 0) {
+        this.makdogSpecialPhase = 'lift';
+        this.makdogSpecialTimer = special.liftFrames;
+        opponent.makdogImmobilized = true;
+        opponent.makdogImmobilizedTimer = special.liftFrames + special.holdFrames + special.slamFrames;
+        opponent.makdogGlowTimer = special.liftFrames + special.holdFrames + special.slamFrames;
+        opponent.vx = 0;
+        opponent.vy = 0;
+        opponent.state = 'stunned';
+      }
+    } else if (this.makdogSpecialPhase === 'lift') {
+      const liftProgress = 1 - (this.makdogSpecialTimer / special.liftFrames);
+      opponent.y = GROUND - liftProgress * 150;
+      opponent.vx = 0;
+      opponent.vy = 0;
+      if (this.makdogSpecialTimer <= 0) {
+        this.makdogSpecialPhase = 'hold';
+        this.makdogSpecialTimer = special.holdFrames;
+      }
+    } else if (this.makdogSpecialPhase === 'hold') {
+      opponent.y = GROUND - 150;
+      opponent.vx = 0;
+      opponent.vy = 0;
+      if (this.makdogSpecialTimer <= 0) {
+        this.makdogSpecialPhase = 'slam';
+        this.makdogSpecialTimer = special.slamFrames;
+      }
+    } else if (this.makdogSpecialPhase === 'slam') {
+      const slamProgress = 1 - (this.makdogSpecialTimer / special.slamFrames);
+      opponent.y = (GROUND - 150) + slamProgress * 150;
+      opponent.vx = 0;
+      opponent.vy = 0;
+      if (this.makdogSpecialTimer <= 0) {
+        opponent.y = GROUND;
+        opponent.takeHit(special.damage, special.knockback, this.facing);
+        opponent.applyStunnedStatus(special.stunMs);
+        opponent.makdogImmobilized = false;
+        opponent.makdogImmobilizedTimer = 0;
+        game.screenShake = COMBAT.effects.koShake;
+        game.hitStop = COMBAT.effects.freezeHitStop;
+        addParticle(opponent.x, opponent.y - 50, 'ko');
+        playImpactSound('ko');
+        this.makdogSpecialActive = false;
+        this.attackTimer = 0;
+        this.specialFormSource = '';
+        this.state = 'idle';
+      }
+    }
+
+    if (this.attackTimer <= 0 && this.makdogSpecialActive) {
+      this.makdogSpecialActive = false;
+      opponent.makdogImmobilized = false;
+      opponent.makdogImmobilizedTimer = 0;
+      this.specialFormSource = '';
+      this.state = 'idle';
+    }
+  }
+
   landSekdogTeleportPunch(opponent) {
     if (opponent.health <= 0) return;
 
@@ -756,6 +853,21 @@ class Fighter {
       this.isCrouching = false;
     }
 
+    if (this.makdogImmobilized) {
+      this.makdogImmobilizedTimer -= PHYSICS.freezeTickMs;
+      if (this.makdogGlowTimer > 0) this.makdogGlowTimer -= PHYSICS.freezeTickMs;
+      this.vx = 0;
+      this.vy = 0;
+      this.isBlocking = false;
+      this.isCrouching = false;
+      if (this.makdogImmobilizedTimer <= 0) {
+        this.makdogImmobilized = false;
+        this.makdogImmobilizedTimer = 0;
+        this.makdogGlowTimer = 0;
+      }
+      return;
+    }
+
     if (this.harpoonLockTimer > 0) {
       this.harpoonLockTimer--;
       this.state = 'special';
@@ -778,6 +890,11 @@ class Fighter {
 
     if (this.snekSlitherActive) {
       this.updateSnekSlither(opponent);
+      return;
+    }
+
+    if (this.makdogSpecialActive) {
+      this.updateMakdogSpecial(opponent);
       return;
     }
 
@@ -902,8 +1019,12 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
 
     const isFrozen = this.freezeTimer > 0;
     const displayChar = getDisplayedCharacterData(this);
+    let eyeColor = displayChar.eyeColor;
+    if (this.makdogSpecialActive && this.makdogSpecialPhase === 'eyeGlow') {
+      eyeColor = Math.floor(this.frame / 4) % 2 === 0 ? '#00ff00' : '#88ff88';
+    }
     let sprite = createDogSprite(
-      displayChar.color1, displayChar.color2, displayChar.eyeColor,
+      displayChar.color1, displayChar.color2, eyeColor,
       displayChar.name, this.facing, this.frame, state, 1, isFrozen
     );
 
@@ -951,6 +1072,19 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
     } else {
       ctx.drawImage(sprite, sx, sy, spriteSize, spriteSize);
     }
+
+    if (this.makdogGlowTimer > 0 && Math.floor(this.frame / 4) % 2 === 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.shadowColor = '#00ff00';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY, spriteSize / 2.5, spriteSize / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     ctx.globalAlpha = 1;
   }
 }

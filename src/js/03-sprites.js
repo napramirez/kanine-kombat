@@ -5,7 +5,7 @@ const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
 const DOGGOMELEON_MORPH_FRAMES = 480;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -68,6 +68,17 @@ function getMaskedTrimColors(name, frozen) {
       hoodieEdge: '#222',
       centerStripe: '#111',
       innerEar: '#5a3a3a'
+    };
+  }
+
+  if (name === 'MAKDOG') {
+    return {
+      limbColor: '#111',
+      pawColor: '#222',
+      hoodieColor: '#111',
+      hoodieEdge: '#222',
+      centerStripe: '#111',
+      innerEar: '#333'
     };
   }
 
@@ -154,12 +165,21 @@ function getMaskedGearColors(name, frozen, frame = 0) {
     };
   }
 
-if (name === 'TREMODOG') {
+  if (name === 'TREMODOG') {
     return {
       vestColor: '#8b5a2b',
       vestHighlight: '#b07d45',
       maskColor: '#8b5a2b',
       maskEdge: '#5c3b1e'
+    };
+  }
+
+  if (name === 'MAKDOG') {
+    return {
+      vestColor: '#e74c3c',
+      vestHighlight: '#ff6b6b',
+      maskColor: '#e74c3c',
+      maskEdge: '#c0392b'
     };
   }
 

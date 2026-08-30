@@ -7915,7 +7915,8 @@ function updatePortrait(char, container, playerKey) {
   const info = document.createElement('div');
   info.className = 'char-portrait-info';
   const streak = playerKey ? game.winStreak[playerKey] : 0;
-  const streakHtml = streak > 1 ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
+  const showStreak = (playerKey === 'p1' && (game.mode === MATCH_MODES.VERSUS || game.mode === MATCH_MODES.CPU)) || (playerKey === 'p2' && game.mode === MATCH_MODES.VERSUS);
+  const streakHtml = (showStreak && streak > 1) ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
   info.innerHTML = `
     <div class="char-portrait-name">${char.name}</div>
     <div class="char-portrait-stats">
@@ -8206,12 +8207,12 @@ function endRound() {
         return;
       }
 
-      if (game.mode === MATCH_MODES.VERSUS) {
+      if (game.mode === MATCH_MODES.VERSUS || game.mode === MATCH_MODES.CPU) {
         if (winner === p1) {
           game.winStreak.p1++;
           game.winStreak.p2 = 0;
         } else {
-          game.winStreak.p2++;
+          if (game.mode === MATCH_MODES.VERSUS) game.winStreak.p2++;
           game.winStreak.p1 = 0;
         }
       }
@@ -8302,10 +8303,11 @@ function updateUI() {
   ui.p1PassiveLabel.style.visibility = p1HasPassive ? 'visible' : 'hidden';
   ui.p2PassiveLabel.style.visibility = p2HasPassive ? 'visible' : 'hidden';
 
-  // Win streak display (2 Player mode only)
-  const showStreaks = game.mode === MATCH_MODES.VERSUS;
-  const p1Streak = showStreaks ? game.winStreak.p1 : 0;
-  const p2Streak = showStreaks ? game.winStreak.p2 : 0;
+  // Win streak display (2 Player and VS CPU modes)
+  const showP1Streak = game.mode === MATCH_MODES.VERSUS || game.mode === MATCH_MODES.CPU;
+  const showP2Streak = game.mode === MATCH_MODES.VERSUS;
+  const p1Streak = showP1Streak ? game.winStreak.p1 : 0;
+  const p2Streak = showP2Streak ? game.winStreak.p2 : 0;
   ui.p1WinStreak.style.display = p1Streak > 1 ? 'block' : 'none';
   ui.p2WinStreak.style.display = p2Streak > 1 ? 'block' : 'none';
   if (p1Streak > 1) ui.p1WinStreak.textContent = p1Streak + '-WIN STREAK';

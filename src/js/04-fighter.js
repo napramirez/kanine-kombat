@@ -250,14 +250,12 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'KANOINE') {
-        const opponent = this === p1 ? p2 : p1;
         const special = COMBAT.special.kanoine;
         this.attackTimer = special.dashFrames;
-        this.doggbalDashActive = true;
-        this.doggbalDashStartX = this.x;
-        this.doggbalDashTargetX = opponent.x + this.facing * 120;
-        this.doggbalDashTargetX = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.doggbalDashTargetX));
-        this.doggbalDashHit = false;
+        this.raydogDashActive = true;
+        this.raydogDashPhase = 'fly';
+        this.raydogDashTimer = special.dashFrames;
+        this.raydogDashHit = false;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;
@@ -525,7 +523,7 @@ class Fighter {
   }
 
   updateRaydogSupermanDash(opponent) {
-    const special = COMBAT.special.raydog;
+    const special = this.specialFormSource === 'KANOINE' ? COMBAT.special.kanoine : COMBAT.special.raydog;
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;
@@ -1139,14 +1137,25 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
       ctx.restore();
     } else if (this.raydogDashActive && this.raydogDashPhase === 'fly') {
-      const tiltAngle = this.facing * -Math.PI / 4;
-      ctx.save();
-      ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
-      ctx.rotate(tiltAngle);
-      ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
-      ctx.restore();
+      if (this.specialFormSource === 'KANOINE') {
+        // KANOINE spins while flying
+        const spinAngle = (this.frame * 0.3) % (Math.PI * 2);
+        ctx.save();
+        ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
+        ctx.rotate(spinAngle);
+        ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+        ctx.restore();
+      } else {
+        const tiltAngle = this.facing * -Math.PI / 4;
+        ctx.save();
+        ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
+        ctx.rotate(tiltAngle);
+        ctx.drawImage(sprite, -spriteSize / 2, -spriteSize / 2, spriteSize, spriteSize);
+        ctx.restore();
+      }
     } else if (this.raydogDashActive && this.raydogDashPhase === 'hurl') {
-      const hurlProgress = 1 - (this.raydogDashTimer / COMBAT.special.raydog.hurlBackFrames);
+      const hurlFrames = this.specialFormSource === 'KANOINE' ? COMBAT.special.kanoine.hurlBackFrames : COMBAT.special.raydog.hurlBackFrames;
+      const hurlProgress = 1 - (this.raydogDashTimer / hurlFrames);
       const spinAngle = hurlProgress * Math.PI * 6;
       ctx.save();
       ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);

@@ -154,11 +154,14 @@ const COMBAT = {
       knockback: 3
     },
     kanoine: {
-      dashSpeed: 20,
-      dashFrames: 15,
-      stunMs: 3000,
-      damage: 5,
-      knockback: 3
+      damage: 10,
+      knockback: 4,
+      stunMs: 1000,
+      dashSpeed: 18,
+      dashFrames: 30,
+      pushFrames: 20,
+      hurlBackSpeed: 14,
+      hurlBackFrames: 20
     },
     subdog: {
       passiveIntervalFrames: 300,

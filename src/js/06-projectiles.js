@@ -850,6 +850,7 @@ function updateProjectiles(opponent) {
 
 function drawProjectiles() {
   projectiles.forEach(p => {
+    if (p.owner && p.owner.makdogSpecialActive) return;
     const alpha = Math.min(1, p.life / 20);
 
     if (p.type === 'noobSnake') {

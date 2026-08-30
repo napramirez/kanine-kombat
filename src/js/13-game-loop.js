@@ -194,7 +194,7 @@ function gameLoop() {
 
   p1.draw();
   p2.draw();
-  if (!p1.makdogSpecialActive && !p2.makdogSpecialActive) drawProjectiles();
+  drawProjectiles();
   drawParticles();
 
   // Draw countdown

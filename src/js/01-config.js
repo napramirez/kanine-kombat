@@ -161,7 +161,12 @@ const COMBAT = {
       dashFrames: 30,
       pushFrames: 20,
       hurlBackSpeed: 14,
-      hurlBackFrames: 20
+      hurlBackFrames: 20,
+      passiveIntervalFrames: 300,
+      daggerDurationFrames: 120,
+      daggerDamage: 5,
+      daggerSpeed: 8,
+      daggerRange: 150
     },
     subdog: {
       passiveIntervalFrames: 300,

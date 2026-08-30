@@ -76,6 +76,8 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.specialFormSource = '';
+    this.kanoinePassiveTimer = 0;
+    this.kanoineDaggers = [];
   }
 
   reset(x) {
@@ -140,6 +142,8 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.specialFormSource = '';
+    this.kanoinePassiveTimer = 0;
+    this.kanoineDaggers = [];
   }
 
   getHurtbox() {
@@ -837,11 +841,82 @@ class Fighter {
     spawnSubdogIceClone(this);
   }
 
+  updateKanoinePassive(opponent) {
+    if (this.name !== 'KANOINE' || this.health <= 0) return;
+
+    const special = COMBAT.special.kanoine;
+
+    // Spawn daggers on interval
+    this.kanoinePassiveTimer++;
+    if (this.kanoinePassiveTimer >= special.passiveIntervalFrames && this.kanoineDaggers.length === 0) {
+      this.kanoinePassiveTimer = 0;
+      this.kanoineDaggers = [
+        { angle: 0, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false },
+        { angle: Math.PI, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false }
+      ];
+    }
+
+    // Update daggers
+    for (let i = this.kanoineDaggers.length - 1; i >= 0; i--) {
+      const dagger = this.kanoineDaggers[i];
+      dagger.timer--;
+
+      if (dagger.phase === 'orbit') {
+        // Spin around KANOINE
+        dagger.angle += 0.15;
+        const orbitRadius = 50;
+        dagger.x = this.x + Math.cos(dagger.angle) * orbitRadius;
+        dagger.y = this.y - 50 + Math.sin(dagger.angle) * orbitRadius;
+
+        // Check if opponent is close
+        const dx = opponent.x - this.x;
+        const dy = (opponent.y - 50) - (this.y - 50);
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < special.daggerRange) {
+          dagger.phase = 'home';
+          dagger.targetX = opponent.x;
+          dagger.targetY = opponent.y - 50;
+        }
+
+        // Return if time runs out
+        if (dagger.timer <= 0) {
+          this.kanoineDaggers.splice(i, 1);
+          continue;
+        }
+      } else if (dagger.phase === 'home') {
+        // Home towards opponent
+        const dx = opponent.x - dagger.x;
+        const dy = (opponent.y - 50) - dagger.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 5) {
+          dagger.x += (dx / dist) * special.daggerSpeed;
+          dagger.y += (dy / dist) * special.daggerSpeed;
+        }
+
+        // Check hit
+        if (!dagger.hit && dist < 30) {
+          dagger.hit = true;
+          opponent.takeHit(special.daggerDamage, 0, this.facing);
+          addParticle(opponent.x, opponent.y - 50, 'hit');
+          playImpactSound('hit');
+        }
+
+        // Remove after hit or time
+        if (dagger.hit || dagger.timer <= 0) {
+          this.kanoineDaggers.splice(i, 1);
+        }
+      }
+    }
+  }
+
   update(keys, opponent) {
     this.frame++;
     this.updateDoggomeleonMorph();
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
+    this.updateKanoinePassive(opponent);
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;
@@ -1190,6 +1265,27 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       ctx.ellipse(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY, spriteSize / 2.5, spriteSize / 2, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
+    }
+
+    // Draw KANOINE daggers
+    if (this.kanoineDaggers.length > 0) {
+      const spinAngle = this.frame * 0.2;
+      for (const dagger of this.kanoineDaggers) {
+        ctx.save();
+        ctx.translate(dagger.x + this.shakeX, dagger.y + this.shakeY);
+        ctx.rotate(spinAngle);
+        ctx.fillStyle = '#silver';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(4, 0);
+        ctx.lineTo(0, 12);
+        ctx.lineTo(-4, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
     }
 
     ctx.globalAlpha = 1;

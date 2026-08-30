@@ -72,7 +72,8 @@ class Fighter {
     this.makdogImmobilized = false;
     this.makdogImmobilizedTimer = 0;
     this.makdogGlowTimer = 0;
-    this.makdogSpinDir = 1;
+    this.makdogSpinDir = 0;
+    this.makdogPendingStun = 0;
     this.specialFormSource = '';
   }
 
@@ -134,7 +135,8 @@ class Fighter {
     this.makdogImmobilized = false;
     this.makdogImmobilizedTimer = 0;
     this.makdogGlowTimer = 0;
-    this.makdogSpinDir = 1;
+    this.makdogSpinDir = 0;
+    this.makdogPendingStun = 0;
     this.specialFormSource = '';
   }
 
@@ -666,8 +668,7 @@ class Fighter {
         opponent.makdogSpinDir = spinDir;
 
         if (!blocked) {
-          opponent.stunnedTimer = special.stunMs;
-          opponent.state = 'stunned';
+          opponent.makdogPendingStun = special.stunMs;
         }
 
         game.screenShake = COMBAT.effects.koShake;
@@ -876,11 +877,17 @@ class Fighter {
       this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
       const dir = -this.makdogSpinDir;
       this.vx = dir * COMBAT.special.makdog.rollBackSpeed;
+      this.isBlocking = false;
+      this.isCrouching = false;
       if (this.doggbalSpinTimer <= 0) {
         this.doggbalSpinTimer = 0;
         this.doggbalSpinDuration = 0;
         this.makdogSpinDir = 0;
         this.vx = 0;
+        if (this.makdogPendingStun > 0) {
+          this.applyStunnedStatus(this.makdogPendingStun);
+          this.makdogPendingStun = 0;
+        }
       }
     }
 

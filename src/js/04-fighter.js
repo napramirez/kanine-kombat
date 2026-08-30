@@ -72,6 +72,7 @@ class Fighter {
     this.makdogImmobilized = false;
     this.makdogImmobilizedTimer = 0;
     this.makdogGlowTimer = 0;
+    this.makdogSpinDir = 1;
     this.specialFormSource = '';
   }
 
@@ -133,6 +134,7 @@ class Fighter {
     this.makdogImmobilized = false;
     this.makdogImmobilizedTimer = 0;
     this.makdogGlowTimer = 0;
+    this.makdogSpinDir = 1;
     this.specialFormSource = '';
   }
 
@@ -649,20 +651,24 @@ class Fighter {
       opponent.vy = 0;
       if (this.makdogSpecialTimer <= 0) {
         opponent.y = GROUND;
-        const wasBlocked = opponent.isBlocking;
         const blocked = opponent.takeHit(special.damage, special.knockback, this.facing);
         opponent.makdogImmobilized = false;
         opponent.makdogImmobilizedTimer = 0;
         opponent.makdogGlowTimer = 0;
-        if (!blocked) {
-          opponent.doggbalSpinTimer = special.stunMs;
-          opponent.doggbalSpinDuration = special.stunMs;
-          opponent.applyStunnedStatus(special.stunMs);
-        }
-        const rollDir = -this.facing;
+
+        const makdogOnLeft = this.x < opponent.x;
+        const rollDir = makdogOnLeft ? -1 : 1;
+        const spinDir = makdogOnLeft ? 1 : -1;
+
         opponent.vx = rollDir * special.rollBackSpeed;
         opponent.doggbalSpinTimer = special.rollBackFrames * 16;
         opponent.doggbalSpinDuration = special.rollBackFrames * 16;
+        opponent.makdogSpinDir = spinDir;
+
+        if (!blocked) {
+          opponent.applyStunnedStatus(special.stunMs);
+        }
+
         game.screenShake = COMBAT.effects.koShake;
         game.hitStop = COMBAT.effects.freezeHitStop;
         addParticle(opponent.x, opponent.y - 50, blocked ? 'block' : 'ko');
@@ -1071,7 +1077,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
     if (this.doggbalSpinTimer > 0 && this.doggbalSpinDuration > 0) {
       const spinProgress = 1 - (this.doggbalSpinTimer / this.doggbalSpinDuration);
       const easedSpin = 1 - Math.pow(1 - spinProgress, 3);
-      const spinAngle = easedSpin * Math.PI * 8;
+      const spinAngle = easedSpin * Math.PI * 8 * (this.makdogSpinDir || 1);
       ctx.save();
       ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
       ctx.rotate(spinAngle);

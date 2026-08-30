@@ -92,6 +92,8 @@
 - Character select supports random-8 selection on the special button with an animated shuffle
 - Standard gamepads now work as alternative controllers across menu, select, fight, pause, Battle Plan, and game over
 - `Esc` pause flow exists for fights and Battle Plan stepper screens
+- Battle Plan continue system:3 credits,10-second countdown, punch to continue, credits reset on timeout or depletion
+- Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in HUD and character select (hidden until2+ wins)
 
 ## Version History
 

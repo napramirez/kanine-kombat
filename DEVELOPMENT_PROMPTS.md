@@ -13,6 +13,8 @@ Use these prompts to iterate on the current game.
 - `NOOB SAIDOG` fireballs now release one after another (4-frame stagger) instead of all at once
 - `SUBDOG` has a passive ice clone that spawns every 5 seconds, lasts 2 seconds, and freezes the opponent on contact
 - MAX COMBO triggers at 30 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
+- Battle Plan continue system:3 credits,10-second countdown on loss, punch to continue, credits reset on timeout or depletion
+- Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - Pause functionality already exists on `Esc` during fights and Battle Plan stepper screens
 
 ## Quick Fixes
@@ -223,11 +225,11 @@ Improve the existing pause flow:
 ### Score Tracking
 
 ```text
-Add persistent stats:
-1. Track wins per player with localStorage.
-2. Display win streaks.
-3. Store recent match history.
-4. Add a reset-stats option.
+Expand on the existing win streak system:
+1. Persist win streaks in localStorage across sessions.
+2. Store recent match history.
+3. Add a reset-stats option.
+4. Display all-time highest streak.
 ```
 
 ## Technical

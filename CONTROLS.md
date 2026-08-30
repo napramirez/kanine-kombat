@@ -113,3 +113,10 @@ On a keyboard, arrow keys navigate between mode buttons, and `Enter` or `Space` 
 |---|---|
 | Return to character select after Game Over | `Space` |
 | Return to character select after Game Over (Pad) | Bottom face button (`A` / `Cross`) |
+
+## Continue Screen (Battle Plan)
+
+| Action | Key |
+|---|---|
+| Continue (use1 credit) | `J` or `1` or `Numpad 1` |
+| Continue (Pad) | Bottom face button (`A` / `Cross`) |

@@ -97,3 +97,12 @@ None currently tracked.
 - [ ] Mixed keyboard and gamepad input do not cancel each other incorrectly
 - [ ] NOOB SAIDOG mirror matches keep snake and barrage ownership separate
 - [ ] NOOB SAIDOG special state clears between rounds and after KO
+- [ ] Battle Plan continue screen shows on loss with 10-second countdown
+- [ ] Pressing punch on continue screen uses 1 credit and resumes match
+- [ ] Continue countdown expires and returns to title screen
+- [ ] Credits reset to 3 when depleted or starting new Battle Plan
+- [ ] Win streak tracks consecutive wins in 2 Player mode
+- [ ] Win streak tracks P1 wins in VS CPU mode (no CPU streak)
+- [ ] Win streak resets when player loses
+- [ ] Win streak displays in fight HUD and character select when2+
+- [ ] Win streak hidden when0 or1

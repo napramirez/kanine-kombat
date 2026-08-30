@@ -117,12 +117,24 @@ Players choose from a shared roster before each match.
 - The `SHAO CATNIP` match always uses `CATNIP's Domain`
 - A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
 - `Space` or controller confirm advances from the route stepper into the next fight
+- Player starts with 3 credits; on loss, a 10-second continue screen appears
+- Press punch to continue (uses1 credit and resumes from current match)
+- If countdown expires or no credits remain, credits reset to3 and player returns to title screen
+
+### Win Streak
+
+- `2 PLAYER` and `VS CPU` modes track consecutive wins per player
+- Streak resets to zero when a player loses
+- Streak displays in the fight HUD below the passive meters and in character select below the portrait
+- Streak is hidden when zero or one
 
 ## Game States
 
 ```text
 menu -> charSelect -> countdown -> fight -> roundEnd -> ... -> gameOver -> charSelect
 menu -> charSelect -> battlePlanStepper -> countdown -> fight -> battlePlanStepper -> ...
+fight -> continue (Battle Plan loss with credits remaining)
+continue -> countdown (resume) or menu (timeout/no credits)
 fight or battlePlanStepper -> paused
 ```
 
@@ -150,6 +162,7 @@ fight or battlePlanStepper -> paused
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
 - Character select also supports a random-8 cursor action on the special button
 - First active gamepad claims Player 1; the next active gamepad claims Player 2
+- Win streak displayed below player portraits when2+ (2 Player and VS CPU)
 - Hidden fighters are absent from character select, Random 8, and unscripted CPU pools until unlocked
 - Defeating the Battle Plan `BORKO` sub-boss unlocks `BORKO`; defeating the `SHAO CATNIP` final boss unlocks `SHAO CATNIP`
 - Completing the Battle Plan as `NOOB SAIDOG` unlocks `SNEK`
@@ -158,6 +171,7 @@ fight or battlePlanStepper -> paused
 ### HUD and Effects
 
 - Health bars, active/passive special meters, timer, player names, and round dots
+- Win streak counter below passive meters (2 Player and VS CPU, hidden until2+ wins)
 - On gamepad, bottom face button confirms/proceeds, right face button acts as back, left face button blocks, top face button triggers special/random, and `Start` pauses or resumes
 - Hit sparks, block sparks, KO explosions, and text popups
 - Screen shake and hit stop on impactful hits

@@ -166,7 +166,7 @@ const COMBAT = {
       daggerDurationFrames: 120,
       daggerDamage: 5,
       daggerSpeed: 8,
-      daggerRange: 150
+      daggerRange: 300
     },
     subdog: {
       passiveIntervalFrames: 300,

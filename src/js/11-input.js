@@ -309,6 +309,13 @@ function handleGamepadGameOverInput(slot, state) {
   }
 }
 
+function handleGamepadContinueInput(slot, state) {
+  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+    ensureAudioReady();
+    acceptContinue();
+  }
+}
+
 function handleGamepadFightInput(slotName, slot, state) {
   const targetHeld = slot.held;
   targetHeld.left = state.left && !state.right;
@@ -344,6 +351,7 @@ function processGamepadSlot(slotName, slot, state, now) {
   else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) handleGamepadBattlePlanInput(slot, state);
   else if (game.state === GAME_STATES.PAUSED) handleGamepadPauseInput(slot, state, now);
   else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slot, state);
+  else if (game.state === GAME_STATES.CONTINUE) handleGamepadContinueInput(slot, state);
 
   if (game.state === GAME_STATES.FIGHT || game.state === GAME_STATES.COUNTDOWN) handleGamepadFightInput(slotName, slot, state);
   else clearGamepadSlotHeld(slot);

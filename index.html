@@ -799,6 +799,50 @@
     text-shadow: 2px 2px #000;
   }
 
+  #continue-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    text-align: center;
+  }
+
+  #continue-screen h1 {
+    color: #e74c3c;
+    font-size: 48px;
+    text-shadow: 4px 4px #000, 0 0 30px #c0392b;
+    margin-bottom: 30px;
+    animation: pulse 1s infinite;
+  }
+
+  #continue-countdown {
+    color: #f1c40f;
+    font-size: 96px;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 20px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #continue-credits {
+    color: #fff;
+    font-size: 14px;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 30px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #continue-prompt {
+    color: #74b9ff;
+    font-size: 12px;
+    text-shadow: 2px 2px #000;
+    animation: pulse 1.2s infinite;
+    font-family: 'Press Start 2P', monospace;
+  }
+
   #special-bars {
     display: flex;
     justify-content: space-between;
@@ -997,6 +1041,12 @@
     </div>
     <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
   </div>
+  <div id="continue-screen">
+    <h1>CONTINUE?</h1>
+    <div id="continue-countdown">10</div>
+    <div id="continue-credits">CREDITS: <span id="credits-count">3</span></div>
+    <div id="continue-prompt">Press PUNCH to continue</div>
+  </div>
 </div>
 
 <script>
@@ -1014,7 +1064,8 @@ const GAME_STATES = {
   COUNTDOWN: 'countdown',
   FIGHT: 'fight',
   ROUND_END: 'roundEnd',
-  GAME_OVER: 'gameOver'
+  GAME_OVER: 'gameOver',
+  CONTINUE: 'continue'
 };
 
 const MATCH_MODES = {
@@ -1248,6 +1299,9 @@ const ui = {
   p1Portrait: document.getElementById('p1-portrait'),
   p2Portrait: document.getElementById('p2-portrait'),
   charPool: document.getElementById('char-pool'),
+  continueScreen: document.getElementById('continue-screen'),
+  continueCountdown: document.getElementById('continue-countdown'),
+  creditsCount: document.getElementById('credits-count'),
   roundDots: {
     p1r1: document.getElementById('p1-r1'),
     p1r2: document.getElementById('p1-r2'),
@@ -6526,6 +6580,9 @@ let game = {
     stepperFromIndex: -1,
     stepperReady: false
   },
+  credits: 3,
+  continueCountdown: 0,
+  continueTimerInterval: null,
   pause: {
     active: false,
     returnState: '',
@@ -7141,6 +7198,7 @@ function leavePausedSessionForMode(mode) {
   hidePauseOverlay();
   resumeAudioFromOverlay();
   game.mode = mode;
+  if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
   ensureAudioReady();
   playUiSound('start');
   openCharacterSelect(true);
@@ -7157,6 +7215,7 @@ function openTitleScreen() {
 
   hidePauseOverlay();
   hideBattlePlanStepper();
+  hideContinueScreen();
   resetInputState(keys1);
   resetInputState(keys2);
   clearAllGamepadHeld();
@@ -7483,6 +7542,13 @@ function handleGamepadGameOverInput(slot, state) {
   }
 }
 
+function handleGamepadContinueInput(slot, state) {
+  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+    ensureAudioReady();
+    acceptContinue();
+  }
+}
+
 function handleGamepadFightInput(slotName, slot, state) {
   const targetHeld = slot.held;
   targetHeld.left = state.left && !state.right;
@@ -7518,6 +7584,7 @@ function processGamepadSlot(slotName, slot, state, now) {
   else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) handleGamepadBattlePlanInput(slot, state);
   else if (game.state === GAME_STATES.PAUSED) handleGamepadPauseInput(slot, state, now);
   else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slot, state);
+  else if (game.state === GAME_STATES.CONTINUE) handleGamepadContinueInput(slot, state);
 
   if (game.state === GAME_STATES.FIGHT || game.state === GAME_STATES.COUNTDOWN) handleGamepadFightInput(slotName, slot, state);
   else clearGamepadSlotHeld(slot);
@@ -8107,9 +8174,15 @@ function endRound() {
         return;
       }
 
+      if (isBattlePlanMode() && winner === p2 && game.credits > 0) {
+        showContinueScreen();
+        return;
+      }
+
       game.state = GAME_STATES.GAME_OVER;
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
+      if (isBattlePlanMode() && winner === p2) game.credits = 3;
       return;
     }
   } else {
@@ -8118,6 +8191,55 @@ function endRound() {
   }
 
   game.round++;
+}
+
+const CONTINUE_COUNTDOWN_SECONDS = 10;
+
+function showContinueScreen() {
+  game.state = GAME_STATES.CONTINUE;
+  game.continueCountdown = CONTINUE_COUNTDOWN_SECONDS;
+  if (game.timerInterval) clearInterval(game.timerInterval);
+  syncMusicMode();
+
+  ui.continueScreen.style.display = 'flex';
+  ui.continueCountdown.textContent = game.continueCountdown;
+  ui.creditsCount.textContent = game.credits;
+
+  if (game.continueTimerInterval) clearInterval(game.continueTimerInterval);
+  game.continueTimerInterval = setInterval(() => {
+    game.continueCountdown--;
+    ui.continueCountdown.textContent = game.continueCountdown;
+    if (game.continueCountdown <= 0) {
+      declineContinue();
+    }
+  }, 1000);
+}
+
+function hideContinueScreen() {
+  ui.continueScreen.style.display = 'none';
+  if (game.continueTimerInterval) {
+    clearInterval(game.continueTimerInterval);
+    game.continueTimerInterval = null;
+  }
+}
+
+function acceptContinue() {
+  game.credits--;
+  hideContinueScreen();
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  updateRoundDots();
+  loadBattlePlanMatch();
+  startRound();
+  startGameLoop();
+}
+
+function declineContinue() {
+  hideContinueScreen();
+  game.credits = 3;
+  resetBattlePlanState();
+  openTitleScreen();
 }
 
 function updateRoundDots() {
@@ -8240,6 +8362,16 @@ ui.startScreen.addEventListener('pointerdown', () => {
 document.addEventListener('keydown', e => {
   if (game.state === GAME_STATES.PAUSED) return;
   if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
+
+  if (game.state === GAME_STATES.CONTINUE) {
+    const k = e.key.toLowerCase();
+    if (k === 'j' || k === '1' || e.key === 'Numpad1') {
+      ensureAudioReady();
+      acceptContinue();
+      e.preventDefault();
+    }
+    return;
+  }
 
   const k = e.key.toLowerCase();
   if (k === 'a') keys1.left = true;
@@ -8460,6 +8592,7 @@ ui.cpuButton.addEventListener('click', () => {
 ui.battlePlanButton.addEventListener('click', () => {
   ensureAudioReady();
   game.mode = MATCH_MODES.BATTLE_PLAN;
+  game.credits = 3;
   playUiSound('start');
   openCharacterSelect();
 });

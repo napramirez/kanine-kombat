@@ -10,7 +10,8 @@ const GAME_STATES = {
   COUNTDOWN: 'countdown',
   FIGHT: 'fight',
   ROUND_END: 'roundEnd',
-  GAME_OVER: 'gameOver'
+  GAME_OVER: 'gameOver',
+  CONTINUE: 'continue'
 };
 
 const MATCH_MODES = {
@@ -244,6 +245,9 @@ const ui = {
   p1Portrait: document.getElementById('p1-portrait'),
   p2Portrait: document.getElementById('p2-portrait'),
   charPool: document.getElementById('char-pool'),
+  continueScreen: document.getElementById('continue-screen'),
+  continueCountdown: document.getElementById('continue-countdown'),
+  creditsCount: document.getElementById('credits-count'),
   roundDots: {
     p1r1: document.getElementById('p1-r1'),
     p1r2: document.getElementById('p1-r2'),

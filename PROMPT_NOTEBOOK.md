@@ -56,6 +56,12 @@ Fix wherever else it applies.
 Allow player controls in the game mode screen.
 Fit the characters into 4 columns instead of 3 in the character select screen.
 
+## Game System Feature
+
+### Battle Plan Credits
+
+Implement a new feature in Battle Plan mode. The player starts with 3 credits. Every time a player loses a match, display a countdown of 10 seconds and ask the player whether the player wants to continue. The player can choose to continue by pressing the punch button. If the countdown hits zero, that means the player did not want to continue. If the player chose to continue, use up 1 credit to resume the Battle Plan from where the player lost. If the player did choose to continue, the amount of credits reset and is brought back to the main screen.
+
 ## Game System Overhaul
 
 ### Query Prompt

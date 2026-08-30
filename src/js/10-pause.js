@@ -72,6 +72,7 @@ function leavePausedSessionForMode(mode) {
   hidePauseOverlay();
   resumeAudioFromOverlay();
   game.mode = mode;
+  if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
   ensureAudioReady();
   playUiSound('start');
   openCharacterSelect(true);
@@ -88,6 +89,7 @@ function openTitleScreen() {
 
   hidePauseOverlay();
   hideBattlePlanStepper();
+  hideContinueScreen();
   resetInputState(keys1);
   resetInputState(keys2);
   clearAllGamepadHeld();

@@ -445,9 +445,15 @@ function endRound() {
         return;
       }
 
+      if (isBattlePlanMode() && winner === p2 && game.credits > 0) {
+        showContinueScreen();
+        return;
+      }
+
       game.state = GAME_STATES.GAME_OVER;
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
+      if (isBattlePlanMode() && winner === p2) game.credits = 3;
       return;
     }
   } else {
@@ -456,6 +462,55 @@ function endRound() {
   }
 
   game.round++;
+}
+
+const CONTINUE_COUNTDOWN_SECONDS = 10;
+
+function showContinueScreen() {
+  game.state = GAME_STATES.CONTINUE;
+  game.continueCountdown = CONTINUE_COUNTDOWN_SECONDS;
+  if (game.timerInterval) clearInterval(game.timerInterval);
+  syncMusicMode();
+
+  ui.continueScreen.style.display = 'flex';
+  ui.continueCountdown.textContent = game.continueCountdown;
+  ui.creditsCount.textContent = game.credits;
+
+  if (game.continueTimerInterval) clearInterval(game.continueTimerInterval);
+  game.continueTimerInterval = setInterval(() => {
+    game.continueCountdown--;
+    ui.continueCountdown.textContent = game.continueCountdown;
+    if (game.continueCountdown <= 0) {
+      declineContinue();
+    }
+  }, 1000);
+}
+
+function hideContinueScreen() {
+  ui.continueScreen.style.display = 'none';
+  if (game.continueTimerInterval) {
+    clearInterval(game.continueTimerInterval);
+    game.continueTimerInterval = null;
+  }
+}
+
+function acceptContinue() {
+  game.credits--;
+  hideContinueScreen();
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  updateRoundDots();
+  loadBattlePlanMatch();
+  startRound();
+  startGameLoop();
+}
+
+function declineContinue() {
+  hideContinueScreen();
+  game.credits = 3;
+  resetBattlePlanState();
+  openTitleScreen();
 }
 
 function updateRoundDots() {

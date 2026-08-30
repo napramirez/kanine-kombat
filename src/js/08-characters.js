@@ -12,6 +12,9 @@ let game = {
     stepperFromIndex: -1,
     stepperReady: false
   },
+  credits: 3,
+  continueCountdown: 0,
+  continueTimerInterval: null,
   pause: {
     active: false,
     returnState: '',

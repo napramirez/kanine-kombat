@@ -50,6 +50,16 @@ document.addEventListener('keydown', e => {
   if (game.state === GAME_STATES.PAUSED) return;
   if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
 
+  if (game.state === GAME_STATES.CONTINUE) {
+    const k = e.key.toLowerCase();
+    if (k === 'j' || k === '1' || e.key === 'Numpad1') {
+      ensureAudioReady();
+      acceptContinue();
+      e.preventDefault();
+    }
+    return;
+  }
+
   const k = e.key.toLowerCase();
   if (k === 'a') keys1.left = true;
   if (k === 'd') keys1.right = true;
@@ -269,6 +279,7 @@ ui.cpuButton.addEventListener('click', () => {
 ui.battlePlanButton.addEventListener('click', () => {
   ensureAudioReady();
   game.mode = MATCH_MODES.BATTLE_PLAN;
+  game.credits = 3;
   playUiSound('start');
   openCharacterSelect();
 });

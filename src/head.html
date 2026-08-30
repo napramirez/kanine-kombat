@@ -799,6 +799,50 @@
     text-shadow: 2px 2px #000;
   }
 
+  #continue-screen {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    text-align: center;
+  }
+
+  #continue-screen h1 {
+    color: #e74c3c;
+    font-size: 48px;
+    text-shadow: 4px 4px #000, 0 0 30px #c0392b;
+    margin-bottom: 30px;
+    animation: pulse 1s infinite;
+  }
+
+  #continue-countdown {
+    color: #f1c40f;
+    font-size: 96px;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 20px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #continue-credits {
+    color: #fff;
+    font-size: 14px;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 30px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  #continue-prompt {
+    color: #74b9ff;
+    font-size: 12px;
+    text-shadow: 2px 2px #000;
+    animation: pulse 1.2s infinite;
+    font-family: 'Press Start 2P', monospace;
+  }
+
   #special-bars {
     display: flex;
     justify-content: space-between;

@@ -904,6 +904,25 @@
   #p1-passive-label { left: 22px; }
   #p2-passive-label { right: 22px; }
 
+  .win-streak {
+    position: absolute;
+    top: 126px;
+    font-size: 10px;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+    display: none;
+  }
+
+  #p1-win-streak { left: 22px; color: #ff6b6b; }
+  #p2-win-streak { right: 22px; color: #74b9ff; text-align: right; }
+
+  .char-win-streak {
+    font-size: 10px;
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+    margin-top: 8px;
+  }
+
   .round-indicator {
     position: absolute;
     top: 8px;
@@ -983,6 +1002,8 @@
     <span class="special-label" id="p2-special-label">ACTIVE</span>
     <span class="passive-label" id="p1-passive-label">PASSIVE</span>
     <span class="passive-label" id="p2-passive-label">PASSIVE</span>
+    <div class="win-streak" id="p1-win-streak"></div>
+    <div class="win-streak" id="p2-win-streak"></div>
     <div class="round-indicator" id="p1-rounds"><span class="round-dot" id="p1-r1"></span><span class="round-dot" id="p1-r2"></span></div>
     <div class="round-indicator" id="p2-rounds"><span class="round-dot" id="p2-r1"></span><span class="round-dot" id="p2-r2"></span></div>
     <div class="combo-counter" id="p1-combo"></div>
@@ -1296,6 +1317,8 @@ const ui = {
   p2PassiveLabel: document.getElementById('p2-passive-label'),
   p1Combo: document.getElementById('p1-combo'),
   p2Combo: document.getElementById('p2-combo'),
+  p1WinStreak: document.getElementById('p1-win-streak'),
+  p2WinStreak: document.getElementById('p2-win-streak'),
   p1Portrait: document.getElementById('p1-portrait'),
   p2Portrait: document.getElementById('p2-portrait'),
   charPool: document.getElementById('char-pool'),
@@ -6583,6 +6606,7 @@ let game = {
   credits: 3,
   continueCountdown: 0,
   continueTimerInterval: null,
+  winStreak: { p1: 0, p2: 0 },
   pause: {
     active: false,
     returnState: '',
@@ -7882,7 +7906,7 @@ function buildTitleLogo() {
 
 buildTitleLogo();
 
-function updatePortrait(char, container) {
+function updatePortrait(char, container, playerKey) {
   container.innerHTML = '';
   
   const sprite = createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
@@ -7890,12 +7914,15 @@ function updatePortrait(char, container) {
   
   const info = document.createElement('div');
   info.className = 'char-portrait-info';
+  const streak = playerKey ? game.winStreak[playerKey] : 0;
+  const streakHtml = streak > 0 ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
   info.innerHTML = `
     <div class="char-portrait-name">${char.name}</div>
     <div class="char-portrait-stats">
       <span>HP:</span> ${char.health} &bull; <span>SPD:</span> ${char.speed}<br>
       <span>${char.desc}</span>
     </div>
+    ${streakHtml}
   `;
   container.appendChild(info);
 }
@@ -7951,8 +7978,8 @@ function updateCharSelect() {
     opt.className = cls;
   });
 
-  updatePortrait(CHARACTERS[p1Selection], ui.p1Portrait);
-  updatePortrait(CHARACTERS[p2Selection], ui.p2Portrait);
+  updatePortrait(CHARACTERS[p1Selection], ui.p1Portrait, 'p1');
+  updatePortrait(CHARACTERS[p2Selection], ui.p2Portrait, 'p2');
 }
 
 function confirmSelection() {
@@ -8179,6 +8206,16 @@ function endRound() {
         return;
       }
 
+      if (game.mode === MATCH_MODES.VERSUS) {
+        if (winner === p1) {
+          game.winStreak.p1++;
+          game.winStreak.p2 = 0;
+        } else {
+          game.winStreak.p2++;
+          game.winStreak.p1 = 0;
+        }
+      }
+
       game.state = GAME_STATES.GAME_OVER;
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
@@ -8264,6 +8301,15 @@ function updateUI() {
   ui.p2PassiveContainer.style.visibility = p2HasPassive ? 'visible' : 'hidden';
   ui.p1PassiveLabel.style.visibility = p1HasPassive ? 'visible' : 'hidden';
   ui.p2PassiveLabel.style.visibility = p2HasPassive ? 'visible' : 'hidden';
+
+  // Win streak display (2 Player mode only)
+  const showStreaks = game.mode === MATCH_MODES.VERSUS;
+  const p1Streak = showStreaks ? game.winStreak.p1 : 0;
+  const p2Streak = showStreaks ? game.winStreak.p2 : 0;
+  ui.p1WinStreak.style.display = p1Streak > 0 ? 'block' : 'none';
+  ui.p2WinStreak.style.display = p2Streak > 0 ? 'block' : 'none';
+  if (p1Streak > 0) ui.p1WinStreak.textContent = p1Streak + '-WIN STREAK';
+  if (p2Streak > 0) ui.p2WinStreak.textContent = p2Streak + '-WIN STREAK';
 
   // Blinking effect when special is ready
   ui.p1Special.classList.toggle('ready', p1.special >= SPECIAL_METER_MAX);

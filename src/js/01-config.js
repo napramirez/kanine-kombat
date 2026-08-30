@@ -242,6 +242,8 @@ const ui = {
   p2PassiveLabel: document.getElementById('p2-passive-label'),
   p1Combo: document.getElementById('p1-combo'),
   p2Combo: document.getElementById('p2-combo'),
+  p1WinStreak: document.getElementById('p1-win-streak'),
+  p2WinStreak: document.getElementById('p2-win-streak'),
   p1Portrait: document.getElementById('p1-portrait'),
   p2Portrait: document.getElementById('p2-portrait'),
   charPool: document.getElementById('char-pool'),

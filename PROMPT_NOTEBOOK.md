@@ -62,6 +62,10 @@ Fit the characters into 4 columns instead of 3 in the character select screen.
 
 Implement a new feature in Battle Plan mode. The player starts with 3 credits. Every time a player loses a match, display a countdown of 10 seconds and ask the player whether the player wants to continue. The player can choose to continue by pressing the punch button. If the countdown hits zero, that means the player did not want to continue. If the player chose to continue, use up 1 credit to resume the Battle Plan from where the player lost. If the player did choose to continue, the amount of credits reset and is brought back to the main screen.
 
+### Winning Streaks
+
+Implement a new feature in 2 Player mode. Count the number of consecutive wins a player has won in 2 Player matches. If the player loses a match, reset the streak to zero. Display the win streak during the match right below the health, active special and passive special meters. Do not display if the streak is zero. Also display the streak in the character select screen, right below the player portrait if it is not zero.
+
 ## Game System Overhaul
 
 ### Query Prompt

@@ -15,6 +15,7 @@ let game = {
   credits: 3,
   continueCountdown: 0,
   continueTimerInterval: null,
+  winStreak: { p1: 0, p2: 0 },
   pause: {
     active: false,
     returnState: '',

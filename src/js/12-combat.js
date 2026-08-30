@@ -153,7 +153,7 @@ function buildTitleLogo() {
 
 buildTitleLogo();
 
-function updatePortrait(char, container) {
+function updatePortrait(char, container, playerKey) {
   container.innerHTML = '';
   
   const sprite = createDogSprite(char.color1, char.color2, char.eyeColor, char.name, 1, 0, 'idle');
@@ -161,12 +161,15 @@ function updatePortrait(char, container) {
   
   const info = document.createElement('div');
   info.className = 'char-portrait-info';
+  const streak = playerKey ? game.winStreak[playerKey] : 0;
+  const streakHtml = streak > 0 ? `<div class="char-win-streak" style="color: ${playerKey === 'p1' ? '#ff6b6b' : '#74b9ff'}">${streak}-WIN STREAK</div>` : '';
   info.innerHTML = `
     <div class="char-portrait-name">${char.name}</div>
     <div class="char-portrait-stats">
       <span>HP:</span> ${char.health} &bull; <span>SPD:</span> ${char.speed}<br>
       <span>${char.desc}</span>
     </div>
+    ${streakHtml}
   `;
   container.appendChild(info);
 }
@@ -222,8 +225,8 @@ function updateCharSelect() {
     opt.className = cls;
   });
 
-  updatePortrait(CHARACTERS[p1Selection], ui.p1Portrait);
-  updatePortrait(CHARACTERS[p2Selection], ui.p2Portrait);
+  updatePortrait(CHARACTERS[p1Selection], ui.p1Portrait, 'p1');
+  updatePortrait(CHARACTERS[p2Selection], ui.p2Portrait, 'p2');
 }
 
 function confirmSelection() {
@@ -450,6 +453,16 @@ function endRound() {
         return;
       }
 
+      if (game.mode === MATCH_MODES.VERSUS) {
+        if (winner === p1) {
+          game.winStreak.p1++;
+          game.winStreak.p2 = 0;
+        } else {
+          game.winStreak.p2++;
+          game.winStreak.p1 = 0;
+        }
+      }
+
       game.state = GAME_STATES.GAME_OVER;
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
@@ -535,6 +548,15 @@ function updateUI() {
   ui.p2PassiveContainer.style.visibility = p2HasPassive ? 'visible' : 'hidden';
   ui.p1PassiveLabel.style.visibility = p1HasPassive ? 'visible' : 'hidden';
   ui.p2PassiveLabel.style.visibility = p2HasPassive ? 'visible' : 'hidden';
+
+  // Win streak display (2 Player mode only)
+  const showStreaks = game.mode === MATCH_MODES.VERSUS;
+  const p1Streak = showStreaks ? game.winStreak.p1 : 0;
+  const p2Streak = showStreaks ? game.winStreak.p2 : 0;
+  ui.p1WinStreak.style.display = p1Streak > 0 ? 'block' : 'none';
+  ui.p2WinStreak.style.display = p2Streak > 0 ? 'block' : 'none';
+  if (p1Streak > 0) ui.p1WinStreak.textContent = p1Streak + '-WIN STREAK';
+  if (p2Streak > 0) ui.p2WinStreak.textContent = p2Streak + '-WIN STREAK';
 
   // Blinking effect when special is ready
   ui.p1Special.classList.toggle('ready', p1.special >= SPECIAL_METER_MAX);

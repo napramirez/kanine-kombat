@@ -74,6 +74,7 @@ class Fighter {
     this.makdogGlowTimer = 0;
     this.makdogSpinDir = 0;
     this.makdogPendingStun = 0;
+    this.sekdogChestOpen = false;
     this.specialFormSource = '';
   }
 
@@ -137,6 +138,7 @@ class Fighter {
     this.makdogGlowTimer = 0;
     this.makdogSpinDir = 0;
     this.makdogPendingStun = 0;
+    this.sekdogChestOpen = false;
     this.specialFormSource = '';
   }
 
@@ -205,6 +207,7 @@ class Fighter {
         this.teleportPhaseTimer = COMBAT.special.sekdog.descendFrames;
         this.teleportOffset = 0;
         this.teleportPunchDone = false;
+        this.sekdogChestOpen = true;
       } else if (this.name === 'BORKO') {
         const opponent = this === p1 ? p2 : p1;
         const special = COMBAT.special.borko;
@@ -788,6 +791,7 @@ class Fighter {
         this.teleportPhase = '';
         this.teleportOffset = 0;
         this.teleportPunchDone = false;
+        this.sekdogChestOpen = false;
         this.attackTimer = 0;
         this.state = 'idle';
       }
@@ -1105,7 +1109,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
     }
     let sprite = createDogSprite(
       displayChar.color1, displayChar.color2, eyeColor,
-      displayChar.name, this.facing, this.frame, state, 1, isFrozen
+      displayChar.name, this.facing, this.frame, state, 1, isFrozen, this
     );
 
     if (this.health <= 0 && this.defeatTimer > 0) {

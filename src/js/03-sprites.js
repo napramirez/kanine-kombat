@@ -315,6 +315,37 @@ function drawKanoineBodyStripes(x, bodyY) {
   x.restore();
 }
 
+function drawSekdogChestOpen(x, bodyY, frame) {
+  const openProgress = Math.min(1, Math.sin(frame * 0.15) * 0.5 + 0.5);
+  const openWidth = 8 + openProgress * 12;
+
+  x.save();
+
+  // Chest opening (dark interior)
+  x.fillStyle = '#1a1a1a';
+  x.beginPath();
+  x.ellipse(58, bodyY + 10, openWidth, 15, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Inner glow (orange/red like missile exhaust)
+  x.fillStyle = `rgba(255, ${100 + Math.floor(openProgress * 100)}, 0, ${0.3 + openProgress * 0.4})`;
+  x.beginPath();
+  x.ellipse(58, bodyY + 10, openWidth * 0.7, 10, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Chest flap edges
+  x.strokeStyle = '#333';
+  x.lineWidth = 2;
+  x.beginPath();
+  x.arc(58, bodyY + 10, openWidth, -0.5, 0.5);
+  x.stroke();
+  x.beginPath();
+  x.arc(58, bodyY + 10, openWidth, Math.PI - 0.5, Math.PI + 0.5);
+  x.stroke();
+
+  x.restore();
+}
+
 function drawKanoineHalfFace(x, headY, frame) {
   // Save context for clipping
   x.save();
@@ -720,7 +751,7 @@ function drawSnekSprite(x, frame, state, frozen) {
   x.restore();
 }
 
-function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false) {
+function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false, fighter = null) {
   const frozenSuffix = frozen ? '-frozen' : '';
   const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}`;
   if (spriteCache[key]) return spriteCache[key];
@@ -803,6 +834,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     // DOGGABAL body stripes
     if (name === 'DOGGABAL') drawDogbalBodyStripes(x, bodyY);
     if (name === 'KANOINE') drawKanoineBodyStripes(x, bodyY);
+
+    // SEKDOG chest opening
+    if (name === 'SEKDOG' && fighter && fighter.sekdogChestOpen) {
+      drawSekdogChestOpen(x, bodyY, frame);
+    }
 
     // Tail (no wag when frozen)
     const tailWag = frozen ? 0 : Math.sin(frame * 0.4) * 15;

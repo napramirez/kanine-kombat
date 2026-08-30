@@ -286,8 +286,7 @@ class Fighter {
         this.attackTimer = COMBAT.special.duration;
       }
       this.special = 0;
-      const opponent = this === game.p1 ? game.p2 : game.p1;
-      if (!this.makdogSpecialActive && !opponent.makdogSpecialActive) spawnProjectile(this);
+      spawnProjectile(this);
       if (this.name === 'CYDOG') {
         this.attackTimer = 0;
         this.state = 'idle';

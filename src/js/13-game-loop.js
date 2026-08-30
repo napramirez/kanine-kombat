@@ -138,10 +138,8 @@ function gameLoop() {
     p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
     checkHit(p1, p2);
     checkHit(p2, p1);
-    if (!p1.makdogSpecialActive && !p2.makdogSpecialActive) {
-      updateProjectiles(p2);
-      updateProjectiles(p1);
-    }
+    updateProjectiles(p2);
+    updateProjectiles(p1);
 
     if (p1.health <= 0 || p2.health <= 0) {
       endRound();

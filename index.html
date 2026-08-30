@@ -3785,8 +3785,7 @@ class Fighter {
         this.attackTimer = COMBAT.special.duration;
       }
       this.special = 0;
-      const opponent = this === game.p1 ? game.p2 : game.p1;
-      if (!this.makdogSpecialActive && !opponent.makdogSpecialActive) spawnProjectile(this);
+      spawnProjectile(this);
       if (this.name === 'CYDOG') {
         this.attackTimer = 0;
         this.state = 'idle';
@@ -8897,10 +8896,8 @@ function gameLoop() {
     p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
     checkHit(p1, p2);
     checkHit(p2, p1);
-    if (!p1.makdogSpecialActive && !p2.makdogSpecialActive) {
-      updateProjectiles(p2);
-      updateProjectiles(p1);
-    }
+    updateProjectiles(p2);
+    updateProjectiles(p1);
 
     if (p1.health <= 0 || p2.health <= 0) {
       endRound();

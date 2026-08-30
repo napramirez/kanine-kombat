@@ -4361,8 +4361,19 @@ class Fighter {
       return;
     }
 
-    if (this.doggbalSpinTimer > 0) this.doggbalSpinTimer = 0;
-    if (this.doggbalSpinDuration > 0) this.doggbalSpinDuration = 0;
+    if (this.doggbalSpinTimer > 0 && !this.makdogSpinDir) this.doggbalSpinTimer = 0;
+    if (this.doggbalSpinDuration > 0 && !this.makdogSpinDir) this.doggbalSpinDuration = 0;
+
+    if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
+      this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
+      this.vx *= 0.95;
+      if (this.doggbalSpinTimer <= 0) {
+        this.doggbalSpinTimer = 0;
+        this.doggbalSpinDuration = 0;
+        this.makdogSpinDir = 0;
+        this.vx = 0;
+      }
+    }
 
     const noobSnakeCaptured = this.noobCaptureTimer > 0;
     if (noobSnakeCaptured) {

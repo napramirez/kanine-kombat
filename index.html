@@ -4577,24 +4577,6 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       ctx.drawImage(sprite, sx, sy, spriteSize, spriteSize);
     }
 
-    if (this.makdogSpecialActive && this.makdogSpecialPhase === 'eyeGlow' && Math.floor(this.frame / 4) % 2 === 0) {
-      ctx.save();
-      ctx.globalAlpha = 0.5;
-      ctx.shadowColor = '#00ff00';
-      ctx.shadowBlur = 30;
-      const gradient = ctx.createRadialGradient(
-        this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY, 0,
-        this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY, spriteSize * 0.8
-      );
-      gradient.addColorStop(0, 'rgba(0, 255, 0, 0.6)');
-      gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.ellipse(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY, spriteSize * 0.8, spriteSize * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-
     if (this.makdogGlowTimer > 0 && Math.floor(this.frame / 4) % 2 === 0) {
       ctx.save();
       ctx.globalAlpha = 0.4;

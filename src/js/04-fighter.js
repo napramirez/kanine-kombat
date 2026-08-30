@@ -872,7 +872,7 @@ class Fighter {
 
     if (this.makdogImmobilized) {
       this.makdogImmobilizedTimer -= PHYSICS.freezeTickMs;
-      if (this.makdogGlowTimer > 0) this.makdogGlowTimer -= PHYSICS.freezeTickMs;
+      if (this.makdogGlowTimer > 0) this.makdogGlowTimer--;
       this.vx = 0;
       this.vy = 0;
       this.isCrouching = false;

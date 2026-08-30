@@ -219,15 +219,27 @@ function drawRepdogEyes(x, headY, frame) {
   const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
   const green = Math.floor(180 + flash * 75);
   x.save();
-  x.shadowColor = '#ffeb3b';
+  x.shadowColor = '#4caf50';
   x.shadowBlur = 7 + flash * 7;
-  x.fillStyle = `rgb(255, ${green}, 20)`;
+  x.fillStyle = `rgb(50, ${green}, 50)`;
   x.beginPath();
   x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
   x.fill();
   x.beginPath();
   x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
   x.fill();
+  x.restore();
+}
+
+function drawCydogVisor(x, headY, frame) {
+  const flash = (Math.sin(frame * 0.25) + 1) * 0.5;
+  const blue = Math.floor(200 + flash * 55);
+  x.save();
+  x.shadowColor = '#00bfff';
+  x.shadowBlur = 8 + flash * 8;
+  x.fillStyle = `rgb(0, 191, ${blue})`;
+  // Thin rectangular visor spanning both eyes
+  x.fillRect(58, headY - 12, 34, 6);
   x.restore();
 }
 
@@ -967,6 +979,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
+  if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, headY, frame);
 
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
@@ -1570,6 +1583,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
+    if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
 
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
@@ -1788,6 +1802,9 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.moveTo(85, defHeadY - 9);
     x.lineTo(75, defHeadY - 1);
     x.stroke();
+
+    // CYDOG/SEKDOG visor (defeat)
+    if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);
 
     // Tongue sticking out
     if (!isMaskedFighter(name)) {

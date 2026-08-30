@@ -545,7 +545,7 @@ class Fighter {
       if (!this.raydogDashHit) {
         const hb = opponent.getHurtbox();
         const myFront = this.x + this.facing * (FIGHTER_LAYOUT.width / 2 + 10);
-        if (myFront > hb.x && myFront < hb.x + hb.w && this.y > hb.y && this.y < hb.y + hb.h) {
+        if (myFront > hb.x && myFront < hb.x + hb.w && this.y >= hb.y && this.y <= hb.y + hb.h) {
           this.raydogDashHit = true;
           const blocked = opponent.isBlocking;
 

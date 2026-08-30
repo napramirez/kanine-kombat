@@ -3936,8 +3936,11 @@ class Fighter {
     this.state = 'special';
     this.isBlocking = false;
     this.isCrouching = false;
-    this.onGround = true;
-    this.vy = 0;
+
+    if (this.raydogDashPhase === 'fly' || this.raydogDashPhase === 'push') {
+      this.onGround = true;
+      this.vy = 0;
+    }
 
     if (this.raydogDashPhase === 'fly') {
       this.vx = this.facing * special.dashSpeed;
@@ -3955,6 +3958,8 @@ class Fighter {
             this.raydogDashTimer = special.hurlBackFrames;
             this.facing = -this.facing;
             this.vx = this.facing * special.hurlBackSpeed;
+            this.vy = -18;
+            this.onGround = false;
             game.screenShake = COMBAT.effects.hitShake;
             game.hitStop = COMBAT.effects.meleeHitStop;
             playImpactSound('block');
@@ -3994,11 +3999,33 @@ class Fighter {
         this.raydogDashTimer = special.hurlBackFrames;
         this.facing = -this.facing;
         this.vx = this.facing * special.hurlBackSpeed;
+        this.vy = -18;
+        this.onGround = false;
       }
     } else if (this.raydogDashPhase === 'hurl') {
       this.x += this.vx;
+      this.vy += PHYSICS.gravity;
+      this.y += this.vy;
       this.raydogDashTimer--;
       this.x = Math.max(FIGHTER_LAYOUT.boundaryPadding, Math.min(W - FIGHTER_LAYOUT.boundaryPadding, this.x));
+
+      if (this.y >= GROUND) {
+        this.y = GROUND;
+        this.vy = 0;
+        this.onGround = true;
+        this.raydogDashActive = false;
+        this.attackTimer = 0;
+        this.specialFormSource = '';
+        this.state = 'idle';
+        this.vx = 0;
+      } else if (this.raydogDashTimer <= 0) {
+        this.raydogDashActive = false;
+        this.attackTimer = 0;
+        this.specialFormSource = '';
+        this.state = 'idle';
+        this.vx = 0;
+        this.vy = 0;
+      }
 
       if (this.raydogDashTimer <= 0) {
         this.raydogDashActive = false;

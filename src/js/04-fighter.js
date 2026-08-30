@@ -1157,7 +1157,8 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
     } else if (this.raydogDashActive && this.raydogDashPhase === 'hurl') {
       const hurlFrames = this.specialFormSource === 'KANOINE' ? COMBAT.special.kanoine.hurlBackFrames : COMBAT.special.raydog.hurlBackFrames;
       const hurlProgress = 1 - (this.raydogDashTimer / hurlFrames);
-      const spinAngle = hurlProgress * Math.PI * 6;
+      const spinDir = this.specialFormSource === 'KANOINE' ? (this.facing === -1 ? -1 : 1) : 1;
+      const spinAngle = hurlProgress * Math.PI * 6 * spinDir;
       ctx.save();
       ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
       ctx.rotate(spinAngle);

@@ -4177,21 +4177,32 @@ class Fighter {
         const myFront = this.x + this.facing * (FIGHTER_LAYOUT.width / 2 + 10);
         if (myFront > hb.x && myFront < hb.x + hb.w) {
           this.raydogDashHit = true;
-          const blocked = opponent.takeHit(special.damage, special.knockback, this.facing);
+          const blocked = opponent.isBlocking;
+
           if (blocked) {
+            if (this.specialFormSource === 'KANOINE') {
+              // KANOINE: no damage, no knockback, no stun when blocked
+              addParticle(opponent.x + this.facing * 30, opponent.y - 50, 'block');
+              playImpactSound('block');
+            } else {
+              opponent.takeHit(special.damage, special.knockback, this.facing);
+              game.screenShake = COMBAT.effects.hitShake;
+              game.hitStop = COMBAT.effects.meleeHitStop;
+              playImpactSound('block');
+            }
             this.raydogDashPhase = 'hurl';
             this.raydogDashTimer = special.hurlBackFrames;
             this.facing = -this.facing;
             this.vx = this.facing * special.hurlBackSpeed;
             this.vy = -18;
             this.onGround = false;
-            game.screenShake = COMBAT.effects.hitShake;
-            game.hitStop = COMBAT.effects.meleeHitStop;
-            playImpactSound('block');
           } else {
-            opponent.applyStunnedStatus(special.stunMs);
-            opponent.vx = 0;
-            addParticle(opponent.x, opponent.y - 50, 'stunned');
+            opponent.takeHit(special.damage, special.knockback, this.facing);
+            if (this.specialFormSource !== 'KANOINE') {
+              opponent.applyStunnedStatus(special.stunMs);
+              opponent.vx = 0;
+              addParticle(opponent.x, opponent.y - 50, 'stunned');
+            }
             this.raydogDashPhase = 'push';
             this.raydogDashTimer = special.pushFrames;
             game.hitStop = COMBAT.effects.freezeHitStop;

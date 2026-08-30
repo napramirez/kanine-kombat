@@ -4165,7 +4165,8 @@ class Fighter {
         opponent.makdogSpinDir = spinDir;
 
         if (!blocked) {
-          opponent.applyStunnedStatus(special.stunMs);
+          opponent.stunnedTimer = special.stunMs;
+          opponent.state = 'stunned';
         }
 
         game.screenShake = COMBAT.effects.koShake;

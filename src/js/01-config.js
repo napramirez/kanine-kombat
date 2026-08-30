@@ -159,10 +159,11 @@ const COMBAT = {
       cloneFreezeMs: 2000
     },
     makdog: {
-      eyeGlowFrames: 45,
+      eyeGlowFrames: 90,
       liftFrames: 30,
       holdFrames: 30,
       slamFrames: 15,
+      liftHeight: 220,
       damage: 12,
       knockback: 8,
       stunMs: 1500

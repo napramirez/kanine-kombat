@@ -3759,7 +3759,15 @@ class Fighter {
         this.makdogSpecialPhase = 'eyeGlow';
         this.makdogSpecialTimer = special.eyeGlowFrames;
         this.makdogLiftY = 0;
+        opponent.makdogImmobilized = true;
+        opponent.makdogImmobilizedTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         opponent.makdogGlowTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
+        opponent.vx = 0;
+        opponent.vy = 0;
+        opponent.attackTimer = 0;
+        opponent.lastAttackType = '';
+        opponent.blockTimer = 0;
+        opponent.isBlocking = false;
         this.vx = 0;
         this.vy = 0;
         this.onGround = true;
@@ -4112,16 +4120,6 @@ class Fighter {
       if (this.makdogSpecialTimer <= 0) {
         this.makdogSpecialPhase = 'lift';
         this.makdogSpecialTimer = special.liftFrames;
-        opponent.makdogImmobilized = true;
-        opponent.makdogImmobilizedTimer = special.liftFrames + special.holdFrames + special.slamFrames;
-        opponent.makdogGlowTimer = special.liftFrames + special.holdFrames + special.slamFrames;
-        opponent.vx = 0;
-        opponent.vy = 0;
-        opponent.attackTimer = 0;
-        opponent.lastAttackType = '';
-        opponent.blockTimer = 0;
-        opponent.isBlocking = false;
-        opponent.state = 'stunned';
       }
     } else if (this.makdogSpecialPhase === 'lift') {
       const liftProgress = 1 - (this.makdogSpecialTimer / special.liftFrames);

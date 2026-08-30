@@ -949,33 +949,35 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   // KANOINE half-face (gray side with glowing red eye)
   if (name === 'KANOINE') drawKanoineHalfFace(x, headY, frame);
 
-  // Eyes
-  x.fillStyle = frozen ? '#e0ffff' : '#fff';
-  x.beginPath();
-  x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
-  x.fill();
+  // Eyes (skip for CYDOG/SEKDOG - they have visor only)
+  if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    x.fillStyle = frozen ? '#e0ffff' : '#fff';
+    x.beginPath();
+    x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+    x.fill();
+    x.beginPath();
+    x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
+    x.fill();
 
-  // Pupils
-  const pupilOffset = (state === 'hit' || frozen) ? -2 : 2;
-  x.fillStyle = frozenEyeColor;
-  x.beginPath();
-  x.ellipse(70 + pupilOffset, headY - 5, 4, 5, 0, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.ellipse(82 + pupilOffset, headY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
-  x.fill();
+    // Pupils
+    const pupilOffset = (state === 'hit' || frozen) ? -2 : 2;
+    x.fillStyle = frozenEyeColor;
+    x.beginPath();
+    x.ellipse(70 + pupilOffset, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+    x.fill();
+    x.beginPath();
+    x.ellipse(82 + pupilOffset, headY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
+    x.fill();
 
-  // Pupil highlights
-  x.fillStyle = '#fff';
-  x.beginPath();
-  x.arc(71 + pupilOffset, headY - 7, 1.5, 0, Math.PI * 2);
-  x.fill();
-  x.beginPath();
-  x.arc(83 + pupilOffset, headY - 7, 1.2, 0, Math.PI * 2);
-  x.fill();
+    // Pupil highlights
+    x.fillStyle = '#fff';
+    x.beginPath();
+    x.arc(71 + pupilOffset, headY - 7, 1.5, 0, Math.PI * 2);
+    x.fill();
+    x.beginPath();
+    x.arc(83 + pupilOffset, headY - 7, 1.2, 0, Math.PI * 2);
+    x.fill();
+  }
 
   if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
@@ -1555,32 +1557,34 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(40 - jumpOffset * 0.3, 104, 14, 6);
     x.fillRect(60 + jumpOffset * 0.3, 104, 14, 6);
 
-    // Eyes
-    x.fillStyle = '#fff';
-    x.beginPath();
-    x.ellipse(68, vicHeadY - 6, 7, 8, 0, 0, Math.PI * 2);
-    x.fill();
-    x.beginPath();
-    x.ellipse(80, vicHeadY - 6, 6, 7, 0, 0, Math.PI * 2);
-    x.fill();
+    // Eyes (skip for CYDOG/SEKDOG - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+      x.fillStyle = '#fff';
+      x.beginPath();
+      x.ellipse(68, vicHeadY - 6, 7, 8, 0, 0, Math.PI * 2);
+      x.fill();
+      x.beginPath();
+      x.ellipse(80, vicHeadY - 6, 6, 7, 0, 0, Math.PI * 2);
+      x.fill();
 
-    // Pupils
-    x.fillStyle = eyeColor;
-    x.beginPath();
-    x.ellipse(70, vicHeadY - 5, 4, 5, 0, 0, Math.PI * 2);
-    x.fill();
-    x.beginPath();
-    x.ellipse(82, vicHeadY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
-    x.fill();
+      // Pupils
+      x.fillStyle = eyeColor;
+      x.beginPath();
+      x.ellipse(70, vicHeadY - 5, 4, 5, 0, 0, Math.PI * 2);
+      x.fill();
+      x.beginPath();
+      x.ellipse(82, vicHeadY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
+      x.fill();
 
-    // Pupil highlights
-    x.fillStyle = '#fff';
-    x.beginPath();
-    x.arc(71, vicHeadY - 7, 1.5, 0, Math.PI * 2);
-    x.fill();
-    x.beginPath();
-    x.arc(83, vicHeadY - 7, 1.2, 0, Math.PI * 2);
-    x.fill();
+      // Pupil highlights
+      x.fillStyle = '#fff';
+      x.beginPath();
+      x.arc(71, vicHeadY - 7, 1.5, 0, Math.PI * 2);
+      x.fill();
+      x.beginPath();
+      x.arc(83, vicHeadY - 7, 1.2, 0, Math.PI * 2);
+      x.fill();
+    }
 
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
@@ -1781,27 +1785,29 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(23, defBodyY + 23, 14, 6);
     x.fillRect(83, defBodyY + 23, 14, 6);
 
-    // X eyes (dead)
-    x.strokeStyle = '#333';
-    x.lineWidth = 3;
-    // Left X
-    x.beginPath();
-    x.moveTo(63, defHeadY - 9);
-    x.lineTo(73, defHeadY - 1);
-    x.stroke();
-    x.beginPath();
-    x.moveTo(73, defHeadY - 9);
-    x.lineTo(63, defHeadY - 1);
-    x.stroke();
-    // Right X
-    x.beginPath();
-    x.moveTo(75, defHeadY - 9);
-    x.lineTo(85, defHeadY - 1);
-    x.stroke();
-    x.beginPath();
-    x.moveTo(85, defHeadY - 9);
-    x.lineTo(75, defHeadY - 1);
-    x.stroke();
+    // X eyes (dead) - skip for CYDOG/SEKDOG - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+      x.strokeStyle = '#333';
+      x.lineWidth = 3;
+      // Left X
+      x.beginPath();
+      x.moveTo(63, defHeadY - 9);
+      x.lineTo(73, defHeadY - 1);
+      x.stroke();
+      x.beginPath();
+      x.moveTo(73, defHeadY - 9);
+      x.lineTo(63, defHeadY - 1);
+      x.stroke();
+      // Right X
+      x.beginPath();
+      x.moveTo(75, defHeadY - 9);
+      x.lineTo(85, defHeadY - 1);
+      x.stroke();
+      x.beginPath();
+      x.moveTo(85, defHeadY - 9);
+      x.lineTo(75, defHeadY - 1);
+      x.stroke();
+    }
 
     // CYDOG/SEKDOG visor (defeat)
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);

@@ -867,7 +867,8 @@ class Fighter {
 
     if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
       this.doggbalSpinTimer -= PHYSICS.freezeTickMs;
-      this.vx *= 0.95;
+      const dir = -this.makdogSpinDir;
+      this.vx = dir * COMBAT.special.makdog.rollBackSpeed;
       if (this.doggbalSpinTimer <= 0) {
         this.doggbalSpinTimer = 0;
         this.doggbalSpinDuration = 0;

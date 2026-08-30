@@ -301,7 +301,7 @@ class Fighter {
         this.attackTimer = COMBAT.special.duration;
       }
       this.special = 0;
-      spawnProjectile(this);
+      if (this.specialFormSource !== 'KANOINE') spawnProjectile(this);
       if (this.name === 'CYDOG') {
         this.attackTimer = 0;
         this.state = 'idle';

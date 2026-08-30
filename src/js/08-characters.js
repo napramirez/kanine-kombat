@@ -207,6 +207,7 @@ const CHARACTERS = [
     speed: 5,
     health: 100,
     specialGain: 0.25,
+    passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.kanoine.passiveIntervalFrames,
     desc: 'DUALITY'
   },
   {

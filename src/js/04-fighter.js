@@ -76,7 +76,6 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.specialFormSource = '';
-    this.kanoinePassiveTimer = 0;
     this.kanoineDaggers = [];
   }
 
@@ -142,7 +141,6 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.specialFormSource = '';
-    this.kanoinePassiveTimer = 0;
     this.kanoineDaggers = [];
   }
 
@@ -846,10 +844,13 @@ class Fighter {
 
     const special = COMBAT.special.kanoine;
 
-    // Spawn daggers on interval
-    this.kanoinePassiveTimer++;
-    if (this.kanoinePassiveTimer >= special.passiveIntervalFrames && this.kanoineDaggers.length === 0) {
-      this.kanoinePassiveTimer = 0;
+    // Fill passive meter
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    // Spawn daggers when meter is full
+    if (this.kanoineDaggers.length === 0) {
+      this.passiveSpecial = 0;
       this.kanoineDaggers = [
         { angle: 0, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false },
         { angle: Math.PI, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false }

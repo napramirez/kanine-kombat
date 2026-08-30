@@ -217,11 +217,11 @@ function drawNoobSaidogEyes(x, headY, frame) {
 
 function drawRepdogEyes(x, headY, frame) {
   const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
-  const green = Math.floor(180 + flash * 75);
+  const yellow = Math.floor(200 + flash * 55);
   x.save();
-  x.shadowColor = '#4caf50';
+  x.shadowColor = '#ffeb3b';
   x.shadowBlur = 7 + flash * 7;
-  x.fillStyle = `rgb(50, ${green}, 50)`;
+  x.fillStyle = `rgb(255, ${yellow}, 50)`;
   x.beginPath();
   x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
   x.fill();

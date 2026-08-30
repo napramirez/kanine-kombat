@@ -4772,8 +4772,9 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       ctx.restore();
     } else if (this.raydogDashActive && this.raydogDashPhase === 'fly') {
       if (this.specialFormSource === 'KANOINE') {
-        // KANOINE spins while flying
-        const spinAngle = (this.frame * 0.3) % (Math.PI * 2);
+        // KANOINE spins while flying (counter-clockwise when facing left)
+        const spinDir = this.facing === -1 ? -1 : 1;
+        const spinAngle = (this.frame * 0.3 * spinDir) % (Math.PI * 2);
         ctx.save();
         ctx.translate(this.x + this.shakeX, this.y - spriteSize / 2 + this.shakeY);
         ctx.rotate(spinAngle);

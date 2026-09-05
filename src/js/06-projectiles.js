@@ -635,10 +635,10 @@ function updateProjectiles(opponent) {
         projectiles.splice(i, 1);
         continue;
       }
-      if (target.health > 0 && target.onGround) {
+      if (target.health > 0) {
         const dx = target.x - p.x;
         if (Math.abs(dx) < p.radius) {
-          target.vx *= COMBAT.special.smowkdawg.slowMultiplier;
+          target.slowMultiplier = Math.min(target.slowMultiplier, COMBAT.special.smowkdawg.slowMultiplier);
         }
       }
       continue;

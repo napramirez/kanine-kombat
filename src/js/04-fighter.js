@@ -76,6 +76,7 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
+    this.slowMultiplier = 1;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -142,6 +143,7 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
+    this.slowMultiplier = 1;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -926,6 +928,7 @@ class Fighter {
 
   update(keys, opponent) {
     this.frame++;
+    this.slowMultiplier = 1;
     this.updateDoggomeleonMorph();
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
@@ -1170,7 +1173,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       this.vy = 0;
     } else {
       this.vy += PHYSICS.gravity;
-      this.x += this.vx;
+      this.x += this.vx * this.slowMultiplier;
       this.y += this.vy;
 
       if (this.y >= GROUND) {

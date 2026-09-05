@@ -5,7 +5,7 @@ const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
 const DOGGOMELEON_MORPH_FRAMES = 480;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -108,6 +108,15 @@ function getMaskedGearColors(name, frozen, frame = 0) {
       vestHighlight: '#ffd700',
       maskColor: '#f1c40f',
       maskEdge: '#c8a800'
+    };
+  }
+
+  if (name === 'SMOWKDAWG') {
+    return {
+      vestColor: '#808080',
+      vestHighlight: '#a0a0a0',
+      maskColor: '#808080',
+      maskEdge: '#606060'
     };
   }
 
@@ -1218,6 +1227,35 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.stroke();
 
       x.fillStyle = '#fff';
+      x.beginPath();
+      x.arc(harpoonX + 1, harpoonY, 2, 0, Math.PI * 2);
+      x.fill();
+    } else if (name === 'SMOWKDAWG') {
+      const harpoonX = 102;
+      const harpoonY = bodyY + 1;
+      x.strokeStyle = '#aaa';
+      x.lineWidth = 3;
+      x.setLineDash([4, 3]);
+      x.beginPath();
+      x.moveTo(82, bodyY + 3);
+      x.lineTo(harpoonX, harpoonY);
+      x.stroke();
+      x.setLineDash([]);
+
+      x.fillStyle = '#d0d0d0';
+      x.beginPath();
+      x.moveTo(harpoonX + 10, harpoonY);
+      x.lineTo(harpoonX, harpoonY - 6);
+      x.lineTo(harpoonX - 6, harpoonY);
+      x.lineTo(harpoonX, harpoonY + 6);
+      x.closePath();
+      x.fill();
+
+      x.strokeStyle = '#999';
+      x.lineWidth = 2;
+      x.stroke();
+
+      x.fillStyle = '#e8e8e8';
       x.beginPath();
       x.arc(harpoonX + 1, harpoonY, 2, 0, Math.PI * 2);
       x.fill();

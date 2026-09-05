@@ -13,6 +13,14 @@ function spawnProjectile(owner) {
     radius = 8;
     dmg = 15;
     kb = 5;
+  } else if (specialName === 'SMOWKDAWG') {
+    color1 = '#808080';
+    color2 = '#606060';
+    type = 'harpoon';
+    speed = 14;
+    radius = 8;
+    dmg = 15;
+    kb = 5;
   } else if (specialName === 'SEKDOG') {
     color1 = '#ff6b6b';
     color2 = '#c0392b';

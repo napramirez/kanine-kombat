@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 15 fighters are present: 12 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`
+- 16 fighters are present: 13 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states

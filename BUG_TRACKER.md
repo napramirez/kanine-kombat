@@ -65,6 +65,8 @@ None currently tracked.
 - [ ] SNEK body is 2x longer with pointy tail tip
 - [ ] REPDOG has green vest/mask, black hoodie/legs, yellow glowing eyes, and red snake tongue
 - [ ] REPDOG special summons a green python and spits a single large acid glob
+- [ ] SMOWKDAWG has gray gear (vest, mask) instead of SKORPDOG's yellow
+- [ ] SMOWKDAWG harpoon is gray-colored and pulls opponent like SKORPDOG
 - [ ] DOGGABAL has olive green vertical stripe, brown horizontal stripe, and oxygen mask
 - [ ] SUBDOG passive ice clone spawns every 5 seconds, lasts 2 seconds, and freezes opponent on contact for 2 seconds
 - [ ] SUBDOG ice clone can be blocked by the opponent

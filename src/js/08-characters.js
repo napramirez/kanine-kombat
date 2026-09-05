@@ -232,6 +232,17 @@ const CHARACTERS = [
     health: 100,
     specialGain: 0.25,
     desc: 'GRAPPLER'
+  },
+  {
+    id: 'smowkdawg',
+    name: 'SMOWKDAWG',
+    color1: '#ffffff',
+    color2: '#111111',
+    eyeColor: '#e74c3c',
+    speed: 5,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'STRIKER'
   }
 ];
 

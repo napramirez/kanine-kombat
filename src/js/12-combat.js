@@ -327,7 +327,7 @@ function checkHit(attacker, defender) {
       actualAtkBox.y + actualAtkBox.h > defBox.y) {
     defender.takeHit(atkBox.dmg, atkBox.kb, attacker.facing);
     const attackerSpecialName = getActiveSpecialName(attacker);
-    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK' || attackerSpecialName === 'DOGGABAL' || attackerSpecialName === 'KANOINE' || attackerSpecialName === 'MAKDOG') || attacker.lastAttackType === 'special') {
+    if (!(attackerSpecialName === 'SKORPDOG' || attackerSpecialName === 'SUBDOG' || attackerSpecialName === 'SEKDOG' || attackerSpecialName === 'CYDOG' || attackerSpecialName === 'TREMODOG' || attackerSpecialName === 'RAYNDOG' || attackerSpecialName === 'RAYDOG' || attackerSpecialName === 'NOOB SAIDOG' || attackerSpecialName === 'REPDOG' || attackerSpecialName === 'SNEK' || attackerSpecialName === 'DOGGABAL' || attackerSpecialName === 'KANOINE' || attackerSpecialName === 'MAKDOG' || attackerSpecialName === 'SMOWKDAWG') || attacker.lastAttackType === 'special') {
       attacker.special = Math.min(SPECIAL_METER_MAX, attacker.special + atkBox.dmg * COMBAT.meter.onHitMultiplier);
     }
     attacker.comboCount++;

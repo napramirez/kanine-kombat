@@ -73,7 +73,7 @@
 
 ## Current Build Notes
 
-- Roster is now 15 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, and `SUBDOG`
+- Roster is now 16 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, and `SUBDOG`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special

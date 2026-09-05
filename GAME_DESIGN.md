@@ -16,6 +16,7 @@ Players choose from a shared roster before each match.
 | `BORKO` | Power | 4 | 125 | Hidden gray boss; unlock by defeating the Battle Plan sub-boss |
 | `SHAO CATNIP` | Speed | 8 | 150 | Hidden purple boss; unlock by defeating the Battle Plan final boss |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
+| `SMOWKDAWG` | Striker | 5 | 100 | SKORPDOG variant with gray gear |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
 | `TREMODOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
@@ -44,6 +45,7 @@ Players choose from a shared roster before each match.
 - `BORKO`: remembers the opponent's position, leaps high toward it, and creates a landing shockwave that deals 10 damage and 1 second of stun if the opponent is caught in the radius
 - `SHAO CATNIP`: blue/purple energy ball
 - `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun
+- `SMOWKDAWG`: gray harpoon that pulls the opponent in and applies a 1-second stun (same as SKORPDOG)
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
@@ -75,7 +77,7 @@ Players choose from a shared roster before each match.
 
 - `ACTIVE` special meter is the normal player-triggered special meter
 - Base active-meter passive gain is `0.08` per frame
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
+- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
 - On blocked hits, defenders gain `damage * 0.3`; `SHAO CATNIP` gains `damage * 0.5`; `BORKO` gains `damage * 0.75`
@@ -84,7 +86,7 @@ Players choose from a shared roster before each match.
 - `PASSIVE` special meter is shown only for fighters with passive abilities
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
 - `DOGGOMELEON`'s passive meter fills over 8 seconds and advances to the next borrowed form in the morph cycle
-- `SKORPDOG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` do not gain active special meter from punch or kick hits
+- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` do not gain active special meter from punch or kick hits
 
 ### Physics
 

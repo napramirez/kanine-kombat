@@ -28,9 +28,10 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - Keyboard and standard gamepad support with mixed-input play
-- 11 initially selectable fighters, plus 3 Battle Plan unlocks:
+- 12 initially selectable fighters, plus 3 Battle Plan unlocks:
   - `DOGGO CAGE`
   - `SKORPDOG`
+  - `SMOWKDAWG`
   - `SEKDOG`
   - `CYDOG`
   - `TREMODOG`

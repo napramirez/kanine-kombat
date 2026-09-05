@@ -176,7 +176,7 @@ const COMBAT = {
     smowkdawg: {
       passiveIntervalFrames: 480,
       cloudDurationFrames: 180,
-      slowMultiplier: 0.5
+      slowMultiplier: 0.25
     },
     makdog: {
       eyeGlowFrames: 90,

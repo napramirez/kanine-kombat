@@ -75,6 +75,7 @@ class Fighter {
     this.makdogSpinDir = 0;
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
+    this.smowkdawgPuffTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -140,6 +141,7 @@ class Fighter {
     this.makdogSpinDir = 0;
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
+    this.smowkdawgPuffTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -918,6 +920,13 @@ class Fighter {
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
     this.updateKanoinePassive(opponent);
+    if (this.name === 'SMOWKDAWG' && this.health > 0) {
+      this.smowkdawgPuffTimer--;
+      if (this.smowkdawgPuffTimer <= 0) {
+        this.smowkdawgPuffTimer = 12 + Math.floor(Math.random() * 8);
+        spawnSmokePuff(this.x, this.y);
+      }
+    }
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;

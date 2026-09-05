@@ -88,6 +88,20 @@ function addParticle(x, y, type) {
   }
 }
 
+function spawnSmokePuff(x, y) {
+  particles.push({
+    x: x + (Math.random() - 0.5) * 20,
+    y: y - Math.random() * 10,
+    vx: (Math.random() - 0.5) * 0.8,
+    vy: -0.5 - Math.random() * 1,
+    life: 30 + Math.floor(Math.random() * 10),
+    maxLife: 40,
+    color: ['#888', '#777', '#999', '#aaa'][Math.floor(Math.random() * 4)],
+    size: 5 + Math.random() * 5,
+    type: 'smokePuff'
+  });
+}
+
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
@@ -98,7 +112,11 @@ function updateParticles() {
     }
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.2;
+    if (p.type === 'smokePuff') {
+      p.vx *= 0.98;
+    } else {
+      p.vy += 0.2;
+    }
     if (p.life <= 0) particles.splice(i, 1);
   }
 }
@@ -132,6 +150,11 @@ function drawParticles() {
       ctx.font = `bold ${16 + (1 - alpha) * 10}px 'Press Start 2P', monospace`;
       ctx.textAlign = 'center';
       ctx.fillText(p.text, p.x, p.y - (1 - alpha) * 20);
+    } else if (p.type === 'smokePuff') {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * alpha * 0.6, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size * alpha, p.size * alpha);

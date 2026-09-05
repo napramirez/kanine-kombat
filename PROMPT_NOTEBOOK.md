@@ -30,6 +30,15 @@ Implement a new character called "KA-9", who does not have any related visual ap
 
 Implement a new character named "DOGGABAL" who has no similar visual appearance to anyone. he is a black dog with a thick, vertical olive green stripe running down his body. he also has a thick, horizontal brown stripe running across his body. he has an oxygen mask on his face.
 
+Then re-do implementing SMOWKDAWG starting with just the character creation with cosmetic variation and the special move with identical mechanism. No passive special. This is a complete identical SKORPDOG character, except for the cosmetics
+
+Passive Special — Smoke Cloud + Invisibility
+- Fills every ~5 seconds (300 frames)
+- Spawns floor-wide smoke cloud (4s duration) at stage center
+- Opponent inside cloud moves at 50% speed (vx *= 0.5)
+- SMOWKDAWG turns invisible for 3 seconds (alpha ~0.15 with shimmer)
+- Body smoke puffs emit at all times (every15 frames), even when visible
+
 ### Battle Stage Creation
 
 Implement a new background stage named "Borko's Lair". The setting is indoor, in the sewers so the time of day does not matter. At the background is a canal with flowing sewer water. There is a dark area with glowing yellow eyes in the darkness.

@@ -841,6 +841,16 @@ class Fighter {
     spawnSubdogIceClone(this);
   }
 
+  updateSmowkdawgPassive(opponent) {
+    if (this.name !== 'SMOWKDAWG' || this.health <= 0) return;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    this.passiveSpecial = 0;
+    spawnSmowkdawgSmokeCloud(this);
+  }
+
   updateKanoinePassive(opponent) {
     if (this.name !== 'KANOINE' || this.health <= 0) return;
 
@@ -920,6 +930,7 @@ class Fighter {
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
     this.updateKanoinePassive(opponent);
+    this.updateSmowkdawgPassive(opponent);
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
       if (this.smowkdawgPuffTimer <= 0) {

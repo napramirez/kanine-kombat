@@ -173,6 +173,11 @@ const COMBAT = {
       cloneDurationFrames: 120,
       cloneFreezeMs: 2000
     },
+    smowkdawg: {
+      passiveIntervalFrames: 480,
+      cloudDurationFrames: 180,
+      slowMultiplier: 0.5
+    },
     makdog: {
       eyeGlowFrames: 90,
       liftFrames: 30,

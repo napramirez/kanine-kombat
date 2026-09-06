@@ -246,7 +246,7 @@ function handleGamepadCharacterSelectInput(slotName, slot, state, now) {
         startRandomCharacterSelect('p1');
       }
     }
-  } else if (!isCpuControlledMode() && !p2Confirmed && !p2Randomizing) {
+  } else if (!isBattlePlanMode() && !p2Confirmed && !p2Randomizing) {
     const left = state.left && !state.right;
     const right = state.right && !state.left;
     const up = state.up && !state.down;
@@ -410,8 +410,8 @@ function updateCharSelectModeUI() {
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';
   } else if (isCpuMode()) {
-    ui.p2SelectLabel.textContent = 'CPU';
-    ui.p2SelectControls.textContent = 'CPU: auto-selects and auto-confirms';
+    ui.p2SelectLabel.textContent = 'CHOOSE FOR CPU';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
     ui.fightButton.textContent = 'FIGHT CPU';
   } else {
     ui.p2SelectLabel.textContent = 'PLAYER 2';

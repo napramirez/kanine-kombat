@@ -196,7 +196,7 @@ function buildCharSelect() {
         p1Selection = i;
         updateCharSelect();
         playUiSound('navigate');
-      } else if (!p2Confirmed && !p2Randomizing && !isCpuControlledMode()) {
+      } else if (!p2Confirmed && !p2Randomizing && !isBattlePlanMode()) {
         p2Selection = i;
         updateCharSelect();
         playUiSound('navigate');
@@ -283,7 +283,7 @@ document.addEventListener('keydown', e => {
   }
 
   // P2 navigation
-  if (!p2Confirmed && !p2Randomizing && !isCpuControlledMode()) {
+  if (!p2Confirmed && !p2Randomizing && !isBattlePlanMode()) {
     if (e.key === 'ArrowLeft') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, -1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (e.key === 'ArrowRight') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 1, 0); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }
     if (e.key === 'ArrowUp') { ensureAudioReady(); p2Selection = moveCharSelection(p2Selection, 0, -1); updateCharSelect(); playUiSound('navigate'); e.preventDefault(); }

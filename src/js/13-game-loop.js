@@ -28,7 +28,7 @@ function openCharacterSelect(resetRounds = false) {
   clearAllGamepadHeld();
   syncMusicMode();
   p1Confirmed = false;
-  p2Confirmed = isCpuControlledMode();
+  p2Confirmed = isBattlePlanMode();
   resetInputState(keys2);
   p1Selection = getSelectableCharacterIndex(p1Selection);
   p2Selection = getSelectableCharacterIndex(p2Selection, p1Selection);

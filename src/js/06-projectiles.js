@@ -1182,7 +1182,7 @@ function drawProjectiles() {
       for (let j = 0; j < 10; j++) {
         const baseX = (j / 10) * W + W / 20;
         const cx = baseX + Math.cos(t * 1.3 + j * 2.1) * 15;
-        const cy = GROUND - 200 + Math.sin(t * 0.6 + j * 1.8) * 14;
+        const cy = GROUND - 150 + Math.sin(t * 0.6 + j * 1.8) * 14;
         const r = 7 + Math.sin(t * 0.8 + j * 1.2) * 3;
         ctx.globalAlpha = smokeAlpha * (0.25 + Math.sin(t * 1.1 + j) * 0.15);
         ctx.fillStyle = '#999';

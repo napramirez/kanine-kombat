@@ -174,7 +174,7 @@ function handleGamepadTitleInput(slot, state, now) {
   if (shouldRepeatMenuDirection(slot, 'left', left, now)) navigateTitleSelection(-1);
   else if (shouldRepeatMenuDirection(slot, 'right', right, now)) navigateTitleSelection(1);
 
-  if (isGamepadEdgePressed(slot, state, 'confirm') || isGamepadEdgePressed(slot, state, 'start')) {
+  if (isGamepadEdgePressed(slot, state, 'special') || isGamepadEdgePressed(slot, state, 'start')) {
     ensureAudioReady();
     titleModeButtons[gamepadInput.titleSelection].click();
   }
@@ -189,7 +189,7 @@ function handleGamepadPauseInput(slot, state, now) {
   if (shouldRepeatMenuDirection(slot, 'left', left || up, now)) navigatePauseSelection(-1);
   else if (shouldRepeatMenuDirection(slot, 'right', right || down, now)) navigatePauseSelection(1);
 
-  if (isGamepadEdgePressed(slot, state, 'confirm')) {
+  if (isGamepadEdgePressed(slot, state, 'special')) {
     ensureAudioReady();
     pauseModeButtons[gamepadInput.pauseSelection].click();
   }

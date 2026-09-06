@@ -412,32 +412,26 @@ document.addEventListener('visibilitychange', () => {
 // Menu and state navigation
 document.addEventListener('keydown', e => {
   if (game.state === GAME_STATES.MENU) {
-    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
-      navigateTitleSelection(-1);
-      e.preventDefault();
-    } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
-      navigateTitleSelection(1);
-      e.preventDefault();
-    } else if (e.code === 'Space' || e.code === 'Enter') {
-      ensureAudioReady();
-      titleModeButtons[gamepadInput.titleSelection].click();
-      e.preventDefault();
-    }
+    if (e.key === 'a' || e.key === 'A') { navigateTitleSelection(-1); e.preventDefault(); }
+    else if (e.key === 'd' || e.key === 'D') { navigateTitleSelection(1); e.preventDefault(); }
+    else if (e.key === 'w' || e.key === 'W') { navigateTitleSelection(-1); e.preventDefault(); }
+    else if (e.key === 's' || e.key === 'S') { navigateTitleSelection(1); e.preventDefault(); }
+    else if (e.key === 'l' || e.key === 'L') { ensureAudioReady(); titleModeButtons[gamepadInput.titleSelection].click(); e.preventDefault(); }
+    else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') { navigateTitleSelection(-1); e.preventDefault(); }
+    else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { navigateTitleSelection(1); e.preventDefault(); }
+    else if (e.key === '3' || e.key === 'Numpad3') { ensureAudioReady(); titleModeButtons[gamepadInput.titleSelection].click(); e.preventDefault(); }
     return;
   }
 
   if (game.state === GAME_STATES.PAUSED) {
-    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
-      navigatePauseSelection(-1);
-      e.preventDefault();
-    } else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
-      navigatePauseSelection(1);
-      e.preventDefault();
-    } else if (e.code === 'Space' || e.code === 'Enter') {
-      ensureAudioReady();
-      pauseModeButtons[gamepadInput.pauseSelection].click();
-      e.preventDefault();
-    }
+    if (e.key === 'a' || e.key === 'A') { navigatePauseSelection(-1); e.preventDefault(); }
+    else if (e.key === 'd' || e.key === 'D') { navigatePauseSelection(1); e.preventDefault(); }
+    else if (e.key === 'w' || e.key === 'W') { navigatePauseSelection(-1); e.preventDefault(); }
+    else if (e.key === 's' || e.key === 'S') { navigatePauseSelection(1); e.preventDefault(); }
+    else if (e.key === 'l' || e.key === 'L') { ensureAudioReady(); pauseModeButtons[gamepadInput.pauseSelection].click(); e.preventDefault(); }
+    else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') { navigatePauseSelection(-1); e.preventDefault(); }
+    else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { navigatePauseSelection(1); e.preventDefault(); }
+    else if (e.key === '3' || e.key === 'Numpad3') { ensureAudioReady(); pauseModeButtons[gamepadInput.pauseSelection].click(); e.preventDefault(); }
     return;
   }
 

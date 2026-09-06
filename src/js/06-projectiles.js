@@ -366,6 +366,19 @@ function spawnSubdogIceClone(owner) {
   });
 }
 
+function spawnSmowkdawgSmokeCloud(owner) {
+  const special = COMBAT.special.smowkdawg;
+  projectiles.push({
+    x: W / 2,
+    y: GROUND,
+    owner,
+    type: 'smokeCloud',
+    life: special.cloudDurationFrames,
+    radius: W / 2,
+    lastOwnerFrame: owner.frame
+  });
+}
+
 function updateNoobSnakeSequence(p, index) {
   if (p.lastOwnerFrame === p.owner.frame) return;
   p.lastOwnerFrame = p.owner.frame;
@@ -609,6 +622,23 @@ function updateProjectiles(opponent) {
           p.hit = true;
           projectiles.splice(i, 1);
           continue;
+        }
+      }
+      continue;
+    }
+
+    if (p.type === 'smokeCloud') {
+      if (p.lastOwnerFrame === p.owner.frame) continue;
+      p.lastOwnerFrame = p.owner.frame;
+      p.life--;
+      if (p.life <= 0) {
+        projectiles.splice(i, 1);
+        continue;
+      }
+      if (target.health > 0) {
+        const dx = target.x - p.x;
+        if (Math.abs(dx) < p.radius) {
+          target.slowMultiplier = Math.min(target.slowMultiplier, COMBAT.special.smowkdawg.slowMultiplier);
         }
       }
       continue;
@@ -1135,6 +1165,35 @@ function drawProjectiles() {
         ctx.lineTo(cx - 3, cy);
         ctx.closePath();
         ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+    } else if (p.type === 'smokeCloud') {
+      const smokeAlpha = Math.min(1, p.life / 30) * 0.5;
+      const t = Date.now() * 0.002;
+
+      for (let j = 0; j < 14; j++) {
+        const baseX = (j / 14) * W + W / 28;
+        const cx = baseX + Math.sin(t + j * 1.7) * 12;
+        const cy = GROUND - 5 + Math.sin(t * 0.8 + j * 2.3) * 5;
+        const r = 12 + Math.sin(t * 0.5 + j) * 4;
+        ctx.globalAlpha = smokeAlpha * (0.4 + Math.sin(t + j * 0.9) * 0.2);
+        ctx.fillStyle = '#888';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let j = 0; j < 10; j++) {
+        const baseX = (j / 10) * W + W / 20;
+        const cx = baseX + Math.cos(t * 1.3 + j * 2.1) * 15;
+        const cy = GROUND - 14 + Math.sin(t * 0.6 + j * 1.8) * 6;
+        const r = 7 + Math.sin(t * 0.8 + j * 1.2) * 3;
+        ctx.globalAlpha = smokeAlpha * (0.25 + Math.sin(t * 1.1 + j) * 0.15);
+        ctx.fillStyle = '#999';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       ctx.globalAlpha = 1;

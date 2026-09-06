@@ -4617,7 +4617,7 @@ class Fighter {
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
       if (this.smowkdawgPuffTimer <= 0) {
-        this.smowkdawgPuffTimer = 12 + Math.floor(Math.random() * 8);
+        this.smowkdawgPuffTimer = 6 + Math.floor(Math.random() * 4);
         spawnSmokePuff(this.x, this.y);
       }
     }

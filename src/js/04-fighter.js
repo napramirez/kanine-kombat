@@ -76,6 +76,7 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
+    this.smokeCloudTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -142,6 +143,7 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
+    this.smokeCloudTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -938,6 +940,7 @@ class Fighter {
         spawnSmokePuff(this.x, this.y);
       }
     }
+    if (this.smokeCloudTimer > 0) this.smokeCloudTimer--;
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;
@@ -1233,6 +1236,8 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
           ? Math.min(1, 1 - this.teleportOffset / H)
           : 1);
     }
+
+    if (this.smokeCloudTimer > 0) ctx.globalAlpha *= 0.5;
 
     if (this.doggbalSpinTimer > 0 && this.doggbalSpinDuration > 0) {
       const spinProgress = 1 - (this.doggbalSpinTimer / this.doggbalSpinDuration);

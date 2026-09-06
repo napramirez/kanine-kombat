@@ -368,6 +368,7 @@ function spawnSubdogIceClone(owner) {
 
 function spawnSmowkdawgSmokeCloud(owner) {
   const special = COMBAT.special.smowkdawg;
+  owner.smokeCloudTimer = special.cloudDurationFrames;
   projectiles.push({
     x: W / 2,
     y: GROUND,

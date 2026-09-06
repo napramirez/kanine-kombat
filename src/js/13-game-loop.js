@@ -66,12 +66,20 @@ function isFullscreen() {
 function updateFullscreenScale() {
   const el = document.getElementById('gameContainer');
   if (!isFullscreen()) {
+    canvas.width = 1024;
+    canvas.height = 600;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    canvas.style.border = '';
     el.style.transform = '';
     el.classList.remove('fs-active');
     return;
   }
-  const scale = Math.min(window.screen.width / 1024, window.screen.height / 600);
-  el.style.transform = `scale(${scale})`;
+  const sw = window.screen.width;
+  const sh = window.screen.height;
+  canvas.width = sw;
+  canvas.height = sh;
+  ctx.setTransform(sw / 1024, 0, 0, sh / 600, 0, 0);
+  canvas.style.border = 'none';
   el.classList.add('fs-active');
 }
 

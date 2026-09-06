@@ -4800,7 +4800,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
   return;
 }
 
-    const speed = this.speed;
+    const speed = this.smokeCloudTimer > 0 ? this.speed * 2 : this.speed;
     if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
       this.state = 'hit';
       this.isBlocking = false;

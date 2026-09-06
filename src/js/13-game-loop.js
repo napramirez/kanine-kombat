@@ -58,6 +58,45 @@ function openCharacterSelect(resetRounds = false) {
   ui.charSelectTimer.textContent = charSelectCountdown;
 }
 
+// Fullscreen
+function isFullscreen() {
+  return !!document.fullscreenElement;
+}
+
+function updateFullscreenScale() {
+  const el = document.getElementById('gameContainer');
+  if (!isFullscreen()) {
+    el.style.transform = '';
+    el.classList.remove('fs-active');
+    return;
+  }
+  const scale = Math.min(window.screen.width / 1024, window.screen.height / 600);
+  el.style.transform = `scale(${scale})`;
+  el.classList.add('fs-active');
+}
+
+function updateFullscreenButtons() {
+  const label = isFullscreen() ? 'WINDOWED' : 'FULLSCREEN';
+  ui.fullscreenBtn.textContent = label;
+  ui.fullscreenBtnPause.textContent = label;
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    document.exitFullscreen();
+  } else {
+    document.getElementById('gameContainer').requestFullscreen().then(updateFullscreenScale);
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenScale();
+  updateFullscreenButtons();
+});
+
+ui.fullscreenBtn.addEventListener('click', toggleFullscreen);
+ui.fullscreenBtnPause.addEventListener('click', toggleFullscreen);
+
 ui.startScreen.addEventListener('pointerdown', () => {
   if (game.state === GAME_STATES.MENU) ensureAudioReady();
 });

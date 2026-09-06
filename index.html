@@ -27,6 +27,36 @@
     height: 600px;
   }
 
+  #gameContainer.fs-active {
+    transform-origin: 0 0;
+  }
+
+  #fullscreen-btn,
+  #fullscreen-btn-pause {
+    background: none;
+    border: 1px solid #666;
+    color: #aaa;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 6px 12px;
+    cursor: pointer;
+    pointer-events: all;
+  }
+
+  #fullscreen-btn:hover,
+  #fullscreen-btn-pause:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  #fullscreen-btn {
+    margin-top: 14px;
+  }
+
+  #fullscreen-btn-pause {
+    margin-top: 16px;
+  }
+
   canvas {
     display: block;
     border: 3px solid #444;
@@ -1030,6 +1060,7 @@
       <button class="mode-btn" id="cpu-btn">VS CPU</button>
       <button class="mode-btn" id="battle-plan-btn">BATTLE PLAN</button>
     </div>
+    <button id="fullscreen-btn">FULLSCREEN</button>
   </div>
   <div id="char-select">
     <h1>SELECT YOUR FIGHTER</h1>
@@ -1071,6 +1102,7 @@
       <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
       <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
     </div>
+    <button id="fullscreen-btn-pause">FULLSCREEN</button>
     <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
   </div>
   <div id="continue-screen">
@@ -1332,6 +1364,8 @@ const ui = {
   titleLogo: document.getElementById('title-logo'),
   charSelect: document.getElementById('char-select'),
   charSelectTimer: document.getElementById('char-select-timer'),
+  fullscreenBtn: document.getElementById('fullscreen-btn'),
+  fullscreenBtnPause: document.getElementById('fullscreen-btn-pause'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
   battlePlanRouteViewport: document.getElementById('battle-plan-route-viewport'),
@@ -9294,6 +9328,45 @@ function openCharacterSelect(resetRounds = false) {
   }, 1000);
   ui.charSelectTimer.textContent = charSelectCountdown;
 }
+
+// Fullscreen
+function isFullscreen() {
+  return !!document.fullscreenElement;
+}
+
+function updateFullscreenScale() {
+  const el = document.getElementById('gameContainer');
+  if (!isFullscreen()) {
+    el.style.transform = '';
+    el.classList.remove('fs-active');
+    return;
+  }
+  const scale = Math.min(window.screen.width / 1024, window.screen.height / 600);
+  el.style.transform = `scale(${scale})`;
+  el.classList.add('fs-active');
+}
+
+function updateFullscreenButtons() {
+  const label = isFullscreen() ? 'WINDOWED' : 'FULLSCREEN';
+  ui.fullscreenBtn.textContent = label;
+  ui.fullscreenBtnPause.textContent = label;
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    document.exitFullscreen();
+  } else {
+    document.getElementById('gameContainer').requestFullscreen().then(updateFullscreenScale);
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenScale();
+  updateFullscreenButtons();
+});
+
+ui.fullscreenBtn.addEventListener('click', toggleFullscreen);
+ui.fullscreenBtnPause.addEventListener('click', toggleFullscreen);
 
 ui.startScreen.addEventListener('pointerdown', () => {
   if (game.state === GAME_STATES.MENU) ensureAudioReady();

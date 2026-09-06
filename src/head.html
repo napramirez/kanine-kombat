@@ -27,6 +27,36 @@
     height: 600px;
   }
 
+  #gameContainer.fs-active {
+    transform-origin: 0 0;
+  }
+
+  #fullscreen-btn,
+  #fullscreen-btn-pause {
+    background: none;
+    border: 1px solid #666;
+    color: #aaa;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 6px 12px;
+    cursor: pointer;
+    pointer-events: all;
+  }
+
+  #fullscreen-btn:hover,
+  #fullscreen-btn-pause:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  #fullscreen-btn {
+    margin-top: 14px;
+  }
+
+  #fullscreen-btn-pause {
+    margin-top: 16px;
+  }
+
   canvas {
     display: block;
     border: 3px solid #444;

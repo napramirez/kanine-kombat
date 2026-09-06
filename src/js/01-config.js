@@ -246,6 +246,8 @@ const ui = {
   titleLogo: document.getElementById('title-logo'),
   charSelect: document.getElementById('char-select'),
   charSelectTimer: document.getElementById('char-select-timer'),
+  fullscreenBtn: document.getElementById('fullscreen-btn'),
+  fullscreenBtnPause: document.getElementById('fullscreen-btn-pause'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
   battlePlanRouteViewport: document.getElementById('battle-plan-route-viewport'),

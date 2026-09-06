@@ -1237,7 +1237,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
           : 1);
     }
 
-    if (this.smokeCloudTimer > 0) ctx.globalAlpha *= 0.25;
+    if (this.smokeCloudTimer > 0) ctx.globalAlpha *= 0.15;
 
     if (this.doggbalSpinTimer > 0 && this.doggbalSpinDuration > 0) {
       const spinProgress = 1 - (this.doggbalSpinTimer / this.doggbalSpinDuration);

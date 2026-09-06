@@ -111,8 +111,18 @@ ui.startScreen.addEventListener('pointerdown', () => {
 
 // Input handling
 document.addEventListener('keydown', e => {
-  if (game.state === GAME_STATES.PAUSED) return;
   if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
+
+  if (e.key === 'p' || e.key === 'NumpadAdd') {
+    e.preventDefault();
+    if (game.state === GAME_STATES.FIGHT) showPauseOverlay(GAME_STATES.FIGHT);
+    else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
+    else if (game.state === GAME_STATES.PAUSED) resumePausedSession();
+    else if (game.state === GAME_STATES.CHAR_SELECT) openTitleScreen();
+    return;
+  }
+
+  if (game.state === GAME_STATES.PAUSED) return;
 
   if (game.state === GAME_STATES.CONTINUE) {
     const k = e.key.toLowerCase();
@@ -139,7 +149,7 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') { keys2.right = true; e.preventDefault(); }
     if (e.key === 'ArrowUp') { keys2.up = true; e.preventDefault(); }
     if (e.key === 'ArrowDown') { keys2.down = true; e.preventDefault(); }
-    if (k === '4') keys2.block = true;
+    if (e.key === 'Numpad4') keys2.block = true;
     if (k === '1' || e.key === 'Numpad1') { ensureAudioReady(); p2.attack('punch'); e.preventDefault(); }
     if (k === '2' || e.key === 'Numpad2') { ensureAudioReady(); p2.attack('kick'); e.preventDefault(); }
     if (k === '3' || e.key === 'Numpad3') { ensureAudioReady(); p2.attack('special'); e.preventDefault(); }
@@ -162,7 +172,7 @@ document.addEventListener('keyup', e => {
     if (e.key === 'ArrowRight') keys2.right = false;
     if (e.key === 'ArrowUp') keys2.up = false;
     if (e.key === 'ArrowDown') keys2.down = false;
-    if (k === '4') keys2.block = false;
+    if (e.key === 'Numpad4') keys2.block = false;
   }
 });
 
@@ -399,30 +409,8 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Restart - go back to character select
+// Menu and state navigation
 document.addEventListener('keydown', e => {
-  if (e.code === 'Escape') {
-    if (game.state === GAME_STATES.CHAR_SELECT) {
-      openTitleScreen();
-      return;
-    }
-
-    if (game.state === GAME_STATES.FIGHT) {
-      showPauseOverlay(GAME_STATES.FIGHT);
-      return;
-    }
-
-    if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
-      showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
-      return;
-    }
-
-    if (game.state === GAME_STATES.PAUSED) {
-      resumePausedSession();
-      return;
-    }
-  }
-
   if (game.state === GAME_STATES.MENU) {
     if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
       navigateTitleSelection(-1);

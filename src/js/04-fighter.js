@@ -1148,7 +1148,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
 
         // Jump
         if (keys.up && this.onGround) {
-          this.vy = this.smokeCloudTimer > 0 ? PHYSICS.jumpVelocity * 1.5 : PHYSICS.jumpVelocity;
+          this.vy = this.smokeCloudTimer > 0 ? PHYSICS.jumpVelocity * 1.25 : PHYSICS.jumpVelocity;
           this.onGround = false;
         }
 

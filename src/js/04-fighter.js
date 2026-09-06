@@ -76,7 +76,6 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
-    this.slowMultiplier = 1;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -143,7 +142,6 @@ class Fighter {
     this.makdogPendingStun = 0;
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
-    this.slowMultiplier = 1;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -843,16 +841,6 @@ class Fighter {
     spawnSubdogIceClone(this);
   }
 
-  updateSmowkdawgPassive(opponent) {
-    if (this.name !== 'SMOWKDAWG' || this.health <= 0) return;
-
-    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
-    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
-
-    this.passiveSpecial = 0;
-    spawnSmowkdawgSmokeCloud(this);
-  }
-
   updateKanoinePassive(opponent) {
     if (this.name !== 'KANOINE' || this.health <= 0) return;
 
@@ -928,12 +916,10 @@ class Fighter {
 
   update(keys, opponent) {
     this.frame++;
-    this.slowMultiplier = 1;
     this.updateDoggomeleonMorph();
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
     this.updateKanoinePassive(opponent);
-    this.updateSmowkdawgPassive(opponent);
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
       if (this.smowkdawgPuffTimer <= 0) {
@@ -1173,7 +1159,7 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       this.vy = 0;
     } else {
       this.vy += PHYSICS.gravity;
-      this.x += this.vx * this.slowMultiplier;
+      this.x += this.vx;
       this.y += this.vy;
 
       if (this.y >= GROUND) {

@@ -84,6 +84,11 @@ function openTitleScreen() {
     selectionConfirmTimer = null;
   }
 
+  if (charSelectCountdownInterval) {
+    clearInterval(charSelectCountdownInterval);
+    charSelectCountdownInterval = null;
+  }
+
   clearCharSelectRandomizers();
   if (game.timerInterval) clearInterval(game.timerInterval);
 

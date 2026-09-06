@@ -235,6 +235,10 @@ function confirmSelection() {
     clearTimeout(selectionConfirmTimer);
     selectionConfirmTimer = null;
   }
+  if (charSelectCountdownInterval) {
+    clearInterval(charSelectCountdownInterval);
+    charSelectCountdownInterval = null;
+  }
   clearCharSelectRandomizers();
 
   if (isBattlePlanMode()) {

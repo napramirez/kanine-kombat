@@ -20,6 +20,8 @@ const MATCH_MODES = {
   BATTLE_PLAN: 'battlePlan'
 };
 
+const CHAR_SELECT_TIMER_SECONDS = 30;
+
 const COUNTDOWN_PHASES = {
   ROUND: 'round',
   FIGHT: 'fight'
@@ -243,6 +245,7 @@ const ui = {
   startScreen: document.getElementById('start-screen'),
   titleLogo: document.getElementById('title-logo'),
   charSelect: document.getElementById('char-select'),
+  charSelectTimer: document.getElementById('char-select-timer'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
   battlePlanRouteViewport: document.getElementById('battle-plan-route-viewport'),

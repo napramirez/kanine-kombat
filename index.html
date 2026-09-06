@@ -266,8 +266,18 @@
   #char-select h1 {
     color: #f1c40f;
     font-size: 28px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     text-shadow: 3px 3px #000;
+  }
+
+  #char-select-timer {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 20px;
+    color: #ff6b6b;
+    text-shadow: 2px 2px #000;
+    text-align: center;
+    margin-bottom: 15px;
+    height: 28px;
   }
 
   #char-select-container {
@@ -1023,6 +1033,7 @@
   </div>
   <div id="char-select">
     <h1>SELECT YOUR FIGHTER</h1>
+    <div id="char-select-timer"></div>
     <div id="char-select-container">
       <div class="char-select-panel p1">
         <h2 id="p1-select-label">PLAYER 1</h2>
@@ -1094,6 +1105,8 @@ const MATCH_MODES = {
   CPU: 'cpu',
   BATTLE_PLAN: 'battlePlan'
 };
+
+const CHAR_SELECT_TIMER_SECONDS = 30;
 
 const COUNTDOWN_PHASES = {
   ROUND: 'round',
@@ -1318,6 +1331,7 @@ const ui = {
   startScreen: document.getElementById('start-screen'),
   titleLogo: document.getElementById('title-logo'),
   charSelect: document.getElementById('char-select'),
+  charSelectTimer: document.getElementById('char-select-timer'),
   battlePlanStepper: document.getElementById('battle-plan-stepper'),
   battlePlanSummary: document.getElementById('battle-plan-summary'),
   battlePlanRouteViewport: document.getElementById('battle-plan-route-viewport'),
@@ -1416,6 +1430,8 @@ let p1Randomizing = false;
 let p2Randomizing = false;
 let p1RandomizeTimer = null;
 let p2RandomizeTimer = null;
+let charSelectCountdown = 0;
+let charSelectCountdownInterval = null;
 const GAMEPAD_DEADZONE = 0.3;
 const GAMEPAD_REPEAT_DELAY_MS = 220;
 const GAMEPAD_REPEAT_INTERVAL_MS = 120;
@@ -8085,6 +8101,11 @@ function openTitleScreen() {
     selectionConfirmTimer = null;
   }
 
+  if (charSelectCountdownInterval) {
+    clearInterval(charSelectCountdownInterval);
+    charSelectCountdownInterval = null;
+  }
+
   clearCharSelectRandomizers();
   if (game.timerInterval) clearInterval(game.timerInterval);
 
@@ -8839,6 +8860,10 @@ function confirmSelection() {
     clearTimeout(selectionConfirmTimer);
     selectionConfirmTimer = null;
   }
+  if (charSelectCountdownInterval) {
+    clearInterval(charSelectCountdownInterval);
+    charSelectCountdownInterval = null;
+  }
   clearCharSelectRandomizers();
 
   if (isBattlePlanMode()) {
@@ -9251,6 +9276,23 @@ function openCharacterSelect(resetRounds = false) {
     p2Selection = randomCpuSelection();
   }
   buildCharSelect();
+
+  charSelectCountdown = CHAR_SELECT_TIMER_SECONDS;
+  if (charSelectCountdownInterval) clearInterval(charSelectCountdownInterval);
+  charSelectCountdownInterval = setInterval(() => {
+    if (game.state !== GAME_STATES.CHAR_SELECT) return;
+    charSelectCountdown--;
+    ui.charSelectTimer.textContent = charSelectCountdown;
+    if (charSelectCountdown <= 0) {
+      clearInterval(charSelectCountdownInterval);
+      charSelectCountdownInterval = null;
+      if (!p1Confirmed) p1Confirmed = true;
+      if (!p2Confirmed) p2Confirmed = true;
+      updateCharSelect();
+      queueSelectionConfirmIfReady();
+    }
+  }, 1000);
+  ui.charSelectTimer.textContent = charSelectCountdown;
 }
 
 ui.startScreen.addEventListener('pointerdown', () => {

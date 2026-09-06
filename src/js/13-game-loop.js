@@ -39,6 +39,23 @@ function openCharacterSelect(resetRounds = false) {
     p2Selection = randomCpuSelection();
   }
   buildCharSelect();
+
+  charSelectCountdown = CHAR_SELECT_TIMER_SECONDS;
+  if (charSelectCountdownInterval) clearInterval(charSelectCountdownInterval);
+  charSelectCountdownInterval = setInterval(() => {
+    if (game.state !== GAME_STATES.CHAR_SELECT) return;
+    charSelectCountdown--;
+    ui.charSelectTimer.textContent = charSelectCountdown;
+    if (charSelectCountdown <= 0) {
+      clearInterval(charSelectCountdownInterval);
+      charSelectCountdownInterval = null;
+      if (!p1Confirmed) p1Confirmed = true;
+      if (!p2Confirmed) p2Confirmed = true;
+      updateCharSelect();
+      queueSelectionConfirmIfReady();
+    }
+  }, 1000);
+  ui.charSelectTimer.textContent = charSelectCountdown;
 }
 
 ui.startScreen.addEventListener('pointerdown', () => {

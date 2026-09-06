@@ -635,12 +635,6 @@ function updateProjectiles(opponent) {
         projectiles.splice(i, 1);
         continue;
       }
-      if (target.health > 0) {
-        const dx = target.x - p.x;
-        if (Math.abs(dx) < p.radius) {
-          target.slowMultiplier = Math.min(target.slowMultiplier, COMBAT.special.smowkdawg.slowMultiplier);
-        }
-      }
       continue;
     }
 
@@ -1191,6 +1185,30 @@ function drawProjectiles() {
         const r = 7 + Math.sin(t * 0.8 + j * 1.2) * 3;
         ctx.globalAlpha = smokeAlpha * (0.25 + Math.sin(t * 1.1 + j) * 0.15);
         ctx.fillStyle = '#999';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let j = 0; j < 8; j++) {
+        const baseX = (j / 8) * W + W / 16;
+        const cx = baseX + Math.sin(t * 0.9 + j * 2.5) * 18;
+        const cy = GROUND - 28 + Math.sin(t * 0.5 + j * 1.4) * 8;
+        const r = 5 + Math.sin(t * 0.7 + j * 1.1) * 2;
+        ctx.globalAlpha = smokeAlpha * (0.18 + Math.sin(t * 0.8 + j) * 0.1);
+        ctx.fillStyle = '#aaa';
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let j = 0; j < 6; j++) {
+        const baseX = (j / 6) * W + W / 12;
+        const cx = baseX + Math.cos(t * 1.1 + j * 1.9) * 20;
+        const cy = GROUND - 42 + Math.sin(t * 0.4 + j * 2.0) * 10;
+        const r = 3 + Math.sin(t * 0.6 + j * 0.9) * 1.5;
+        ctx.globalAlpha = smokeAlpha * (0.12 + Math.sin(t * 0.7 + j) * 0.08);
+        ctx.fillStyle = '#bbb';
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.fill();

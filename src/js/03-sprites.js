@@ -385,13 +385,12 @@ function drawKanoineHalfFace(x, headY, frame) {
 
   x.restore();
 
-  // Glowing red eye on gray side (left eye)
+  // Glowing red eye on gray side (left eye) - pure red, no white
   const flash = (Math.sin(frame * 0.32) + 1) * 0.5;
-  const secondary = Math.floor(6 + flash * 28);
   x.save();
   x.shadowColor = '#ff1744';
   x.shadowBlur = 7 + flash * 7;
-  x.fillStyle = `rgb(255, ${secondary}, ${secondary})`;
+  x.fillStyle = `rgb(255, 0, 0)`;
   x.beginPath();
   x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
   x.fill();
@@ -835,7 +834,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     // Belly
-    x.fillStyle = frozenColor2;
+    x.fillStyle = name === 'KANOINE' ? '#ffffff' : frozenColor2;
     x.beginPath();
     x.ellipse(58, bodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
@@ -1481,7 +1480,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     // Belly
-    x.fillStyle = frozenColor2;
+    x.fillStyle = name === 'KANOINE' ? '#ffffff' : frozenColor2;
     x.beginPath();
     x.ellipse(58, vicBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();
@@ -1735,7 +1734,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fill();
 
     // Belly
-    x.fillStyle = frozenColor2;
+    x.fillStyle = name === 'KANOINE' ? '#ffffff' : frozenColor2;
     x.beginPath();
     x.ellipse(58, defBodyY + 20, 20, 14, 0, 0, Math.PI * 2);
     x.fill();

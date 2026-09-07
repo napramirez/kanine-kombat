@@ -8008,7 +8008,7 @@ function showBattlePlanStepper(fromIndex, toIndex) {
       setBattlePlanTokenPosition(toIndex, true);
       window.setTimeout(() => {
         game.battlePlan.stepperReady = true;
-        ui.battlePlanPrompt.textContent = 'Press SPACE or Y to start the next match';
+        ui.battlePlanPrompt.textContent = 'Press Y to start the next match';
         ui.battlePlanPrompt.classList.add('ready');
       }, 900);
     });
@@ -9670,11 +9670,6 @@ document.addEventListener('keydown', e => {
     else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { navigatePauseSelection(1); e.preventDefault(); }
     else if (e.key === '3' || e.key === 'Numpad3') { ensureAudioReady(); pauseModeButtons[gamepadInput.pauseSelection].click(); e.preventDefault(); }
     return;
-  }
-
-  if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
-    ensureAudioReady();
-    proceedBattlePlanStepper();
   }
 
   if (e.code === 'Space' && game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {

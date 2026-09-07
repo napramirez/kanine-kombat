@@ -223,7 +223,7 @@ function showBattlePlanStepper(fromIndex, toIndex) {
       setBattlePlanTokenPosition(toIndex, true);
       window.setTimeout(() => {
         game.battlePlan.stepperReady = true;
-        ui.battlePlanPrompt.textContent = 'Press SPACE or Y to start the next match';
+        ui.battlePlanPrompt.textContent = 'Press Y to start the next match';
         ui.battlePlanPrompt.classList.add('ready');
       }, 900);
     });

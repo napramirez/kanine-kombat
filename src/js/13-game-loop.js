@@ -435,11 +435,6 @@ document.addEventListener('keydown', e => {
     return;
   }
 
-  if (e.code === 'Space' && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
-    ensureAudioReady();
-    proceedBattlePlanStepper();
-  }
-
   if (e.code === 'Space' && game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
     ensureAudioReady();
     openCharacterSelect(true);

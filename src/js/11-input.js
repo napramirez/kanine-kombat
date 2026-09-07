@@ -164,7 +164,7 @@ function handleGamepadPauseInput(slot, state, now) {
   }
 
   if (isGamepadEdgePressed(slot, state, 'start') || isGamepadEdgePressed(slot, state, 'back')) {
-    openTitleScreen();
+    resumePausedSession();
   }
 }
 

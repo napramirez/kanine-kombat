@@ -47,10 +47,10 @@ function showPauseOverlay(returnState) {
 
   if (returnState === GAME_STATES.FIGHT) {
     ui.pauseTitle.textContent = 'FIGHT PAUSED';
-    ui.pauseCopy.textContent = 'Press ESC or B to resume, or START for mode selection.';
+    ui.pauseCopy.textContent = 'Press ESC, START, or B to resume, or choose a new mode.';
   } else {
     ui.pauseTitle.textContent = 'BATTLE PLAN PAUSED';
-    ui.pauseCopy.textContent = 'Press ESC or B to resume the route, or START for mode selection.';
+    ui.pauseCopy.textContent = 'Press ESC, START, or B to resume the route, or choose a new mode.';
     ui.battlePlanStepper.classList.add('paused-underlay');
   }
 

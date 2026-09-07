@@ -43,7 +43,7 @@ let charSelectCountdown = 0;
 let charSelectCountdownInterval = null;
 const GAMEPAD_DEADZONE = 0.5;
 const GAMEPAD_DEADZONE_RELEASE = 0.35;
-const GAMEPAD_NAV_COOLDOWN_MS = 400;
+const GAMEPAD_NAV_COOLDOWN_MS = 500;
 const GAMEPAD_BUTTONS = {
   confirm: 0,
   back: 1,

@@ -144,23 +144,25 @@ function getBattlePlanTokenPosition(index) {
   const steps = ui.battlePlanRouteSteps.querySelectorAll('.battle-plan-step');
   if (!steps.length) return { left: 0, top: 0 };
 
+  const sx = game.fullscreenScaleX || 1;
+  const sy = game.fullscreenScaleY || 1;
   const routeRect = ui.battlePlanRoute.getBoundingClientRect();
   const firstRect = steps[0].getBoundingClientRect();
   const sampleRect = steps[Math.min(1, steps.length - 1)].getBoundingClientRect();
-  const gap = steps.length > 1 ? sampleRect.left - firstRect.left : 140;
+  const gap = steps.length > 1 ? (sampleRect.left - firstRect.left) / sx : 140;
 
   let rect = firstRect;
-  let left = rect.left - routeRect.left + rect.width / 2;
+  let left = (rect.left - routeRect.left) / sx + rect.width / sx / 2;
   if (index < 0) {
     left -= gap * 0.7;
   } else {
     rect = steps[index].getBoundingClientRect();
-    left = rect.left - routeRect.left + rect.width / 2;
+    left = (rect.left - routeRect.left) / sx + rect.width / sx / 2;
   }
 
   return {
     left,
-    top: firstRect.top - routeRect.top - 96
+    top: (firstRect.top - routeRect.top) / sy - 96
   };
 }
 

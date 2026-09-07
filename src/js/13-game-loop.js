@@ -73,6 +73,10 @@ function updateFullscreenScale() {
     el.style.transform = '';
     el.classList.remove('fs-active');
     ui.battlePlanStepper.style.transform = '';
+    ui.battlePlanStepper.style.width = '';
+    ui.battlePlanStepper.style.height = '';
+    game.fullscreenScaleX = 1;
+    game.fullscreenScaleY = 1;
     return;
   }
   const sw = window.screen.width;
@@ -82,8 +86,14 @@ function updateFullscreenScale() {
   ctx.setTransform(sw / 1024, 0, 0, sh / 600, 0, 0);
   canvas.style.border = 'none';
   el.classList.add('fs-active');
-  ui.battlePlanStepper.style.transform = `scale(${sw / 1024}, ${sh / 600})`;
+  const sx = sw / 1024;
+  const sy = sh / 600;
+  ui.battlePlanStepper.style.width = '1024px';
+  ui.battlePlanStepper.style.height = '600px';
+  ui.battlePlanStepper.style.transform = `scale(${sx}, ${sy})`;
   ui.battlePlanStepper.style.transformOrigin = 'top left';
+  game.fullscreenScaleX = sx;
+  game.fullscreenScaleY = sy;
 }
 
 function updateFullscreenButtons() {

@@ -130,7 +130,7 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if (game.state === GAME_STATES.FIGHT) showPauseOverlay(GAME_STATES.FIGHT);
     else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
-    else if (game.state === GAME_STATES.PAUSED) resumePausedSession();
+    else if (game.state === GAME_STATES.PAUSED) openTitleScreen();
     else if (game.state === GAME_STATES.CHAR_SELECT) openTitleScreen();
     return;
   }

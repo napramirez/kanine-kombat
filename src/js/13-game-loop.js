@@ -124,8 +124,6 @@ ui.startScreen.addEventListener('pointerdown', () => {
 
 // Input handling
 document.addEventListener('keydown', e => {
-  if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) return;
-
   if (e.key === 'p' || e.key === 'NumpadAdd') {
     e.preventDefault();
     if (game.state === GAME_STATES.FIGHT) showPauseOverlay(GAME_STATES.FIGHT);

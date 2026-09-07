@@ -203,7 +203,7 @@ function handleGamepadCharacterSelectInput(slotName, slot, state, now) {
         playUiSound('navigate');
       }
 
-      if (isGamepadEdgePressed(slot, state, 'confirm')) {
+if (isGamepadEdgePressed(slot, state, 'special')) {
         ensureAudioReady();
         p1Confirmed = true;
         updateCharSelect();

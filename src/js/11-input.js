@@ -57,13 +57,13 @@ function isGamepadButtonPressed(gamepad, index) {
   return Boolean(gamepad && gamepad.buttons[index] && gamepad.buttons[index].pressed);
 }
 
-function readGamepadState(gamepad) {
+function readGamepadState(gamepad, prev) {
   const axisX = gamepad.axes[0] || 0;
   const axisY = gamepad.axes[1] || 0;
-  const left = axisX <= -GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadLeft);
-  const right = axisX >= GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadRight);
-  const up = axisY <= -GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadUp);
-  const down = axisY >= GAMEPAD_DEADZONE || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadDown);
+  const left = axisX <= -GAMEPAD_DEADZONE || (prev && prev.left && axisX <= -GAMEPAD_DEADZONE_RELEASE) || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadLeft);
+  const right = axisX >= GAMEPAD_DEADZONE || (prev && prev.right && axisX >= GAMEPAD_DEADZONE_RELEASE) || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadRight);
+  const up = axisY <= -GAMEPAD_DEADZONE || (prev && prev.up && axisY <= -GAMEPAD_DEADZONE_RELEASE) || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadUp);
+  const down = axisY >= GAMEPAD_DEADZONE || (prev && prev.down && axisY >= GAMEPAD_DEADZONE_RELEASE) || isGamepadButtonPressed(gamepad, GAMEPAD_BUTTONS.dpadDown);
 
   return {
     left,
@@ -371,7 +371,7 @@ function pollGamepads() {
       return;
     }
 
-    const state = readGamepadState(gamepad);
+    const state = readGamepadState(gamepad, slot.prev);
     processGamepadSlot(slotName, slot, state, now);
     slot.prev = { ...state };
   });

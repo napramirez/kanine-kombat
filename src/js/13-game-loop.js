@@ -332,6 +332,7 @@ function gameLoop() {
     });
 
     if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
+      ctx.globalAlpha = 1;
       ctx.font = '14px "Press Start 2P", monospace';
       ctx.fillStyle = '#fff';
       ctx.fillText('Press SPACE or A to play again', W / 2, H / 2 + 80);

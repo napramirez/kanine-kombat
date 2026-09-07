@@ -300,6 +300,6 @@ const ui = {
   }
 };
 
-const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton];
-const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]'));
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.fullscreenBtn];
+const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
 

@@ -1,8 +1,8 @@
 // Sprite cache
 const spriteCache = {};
 
-const DOGGOMELEON_FORMS = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG'];
-const DOGGOMELEON_MORPH_FRAMES = 480;
+const DOGGOMELEON_NINJA_POOL = ['SKORPDOG', 'SUBDOG', 'SEKDOG', 'CYDOG', 'TREMODOG', 'RAYNDOG', 'NOOB SAIDOG', 'REPDOG', 'MAKDOG', 'SMOWKDAWG'];
+const DOGGOMELEON_MORPH_FRAMES = 300;
 
 function isMaskedFighter(name) {
 return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG';
@@ -402,15 +402,15 @@ function drawKanoineHalfFace(x, headY, frame) {
 
 
 function getDoggomeleonMorphName(fighter) {
-  if (!fighter || fighter.name !== 'DOGGOMELEON' || fighter.doggomeleonFormIndex < 0) return '';
-  return DOGGOMELEON_FORMS[fighter.doggomeleonFormIndex % DOGGOMELEON_FORMS.length];
+  if (!fighter || fighter.name !== 'DOGGOMELEON' || !fighter.doggomeleonFormName) return '';
+  return fighter.doggomeleonFormName;
 }
 
 function getActiveSpecialName(fighter) {
   if (!fighter) return '';
   if (fighter.name !== 'DOGGOMELEON') return fighter.name;
   if (fighter.attackTimer > 0 && fighter.lastAttackType === 'special' && fighter.specialFormSource) return fighter.specialFormSource;
-  return DOGGOMELEON_FORMS[Math.max(0, fighter.doggomeleonFormIndex || 0)];
+  return fighter.doggomeleonFormName || 'DOGGOMELEON';
 }
 
 function getCharacterByName(name) {

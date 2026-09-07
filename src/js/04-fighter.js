@@ -60,7 +60,7 @@ class Fighter {
     this.doggbalDashHit = false;
     this.doggbalSpinTimer = 0;
     this.doggbalSpinDuration = 0;
-    this.doggomeleonFormIndex = -1;
+    this.doggomeleonFormName = '';
     this.raydogDashActive = false;
     this.raydogDashPhase = '';
     this.raydogDashTimer = 0;
@@ -127,7 +127,7 @@ class Fighter {
     this.doggbalDashHit = false;
     this.doggbalSpinTimer = 0;
     this.doggbalSpinDuration = 0;
-    this.doggomeleonFormIndex = -1;
+    this.doggomeleonFormName = '';
     this.raydogDashActive = false;
     this.raydogDashPhase = '';
     this.raydogDashTimer = 0;
@@ -830,7 +830,8 @@ class Fighter {
     if (this.passiveSpecial < SPECIAL_METER_MAX) return;
 
     this.passiveSpecial = 0;
-    this.doggomeleonFormIndex = (this.doggomeleonFormIndex + 1 + DOGGOMELEON_FORMS.length) % DOGGOMELEON_FORMS.length;
+    const pool = DOGGOMELEON_NINJA_POOL.filter(n => n !== this.doggomeleonFormName);
+    this.doggomeleonFormName = pool[Math.floor(Math.random() * pool.length)];
   }
 
   updateSubdogPassive(opponent) {

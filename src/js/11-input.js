@@ -270,10 +270,13 @@ function handleGamepadBattlePlanInput(slot, state) {
   }
 }
 
-function handleGamepadGameOverInput(slot, state) {
+function handleGamepadGameOverInput(slotName, slot, state) {
   if (game.roundMessageTimer >= ROUND_RULES.restartPromptFrames) return;
-  if (isGamepadEdgePressed(slot, state, 'confirm') || isGamepadEdgePressed(slot, state, 'start')) {
+  if (isGamepadEdgePressed(slot, state, 'start')) {
     ensureAudioReady();
+    if (slotName === 'p2' && game.mode === MATCH_MODES.CPU) {
+      game.mode = MATCH_MODES.VERSUS;
+    }
     openCharacterSelect(true);
   }
 }
@@ -319,7 +322,7 @@ function processGamepadSlot(slotName, slot, state, now) {
   else if (game.state === GAME_STATES.CHAR_SELECT) handleGamepadCharacterSelectInput(slotName, slot, state, now);
   else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) handleGamepadBattlePlanInput(slot, state);
   else if (game.state === GAME_STATES.PAUSED) handleGamepadPauseInput(slot, state, now);
-  else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slot, state);
+  else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slotName, slot, state);
   else if (game.state === GAME_STATES.CONTINUE) handleGamepadContinueInput(slot, state);
 
   if (game.state === GAME_STATES.FIGHT || game.state === GAME_STATES.COUNTDOWN) handleGamepadFightInput(slotName, slot, state);

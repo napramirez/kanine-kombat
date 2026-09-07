@@ -43,10 +43,7 @@ let charSelectCountdown = 0;
 let charSelectCountdownInterval = null;
 const GAMEPAD_DEADZONE = 0.5;
 const GAMEPAD_DEADZONE_RELEASE = 0.35;
-const GAMEPAD_REPEAT_DELAY_MS = 500;
-const GAMEPAD_REPEAT_INTERVAL_MS = 400;
-const CHAR_SELECT_REPEAT_DELAY_MS = 450;
-const CHAR_SELECT_REPEAT_INTERVAL_MS = 350;
+const GAMEPAD_NAV_COOLDOWN_MS = 200;
 const GAMEPAD_BUTTONS = {
   confirm: 0,
   back: 1,
@@ -69,15 +66,13 @@ const gamepadInput = {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
-      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      lastNavAt: 0
     },
     p2: {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
-      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      lastNavAt: 0
     }
   }
 };

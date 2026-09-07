@@ -1469,10 +1469,7 @@ let charSelectCountdown = 0;
 let charSelectCountdownInterval = null;
 const GAMEPAD_DEADZONE = 0.5;
 const GAMEPAD_DEADZONE_RELEASE = 0.35;
-const GAMEPAD_REPEAT_DELAY_MS = 500;
-const GAMEPAD_REPEAT_INTERVAL_MS = 400;
-const CHAR_SELECT_REPEAT_DELAY_MS = 450;
-const CHAR_SELECT_REPEAT_INTERVAL_MS = 350;
+const GAMEPAD_NAV_COOLDOWN_MS = 200;
 const GAMEPAD_BUTTONS = {
   confirm: 0,
   back: 1,
@@ -1495,15 +1492,13 @@ const gamepadInput = {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
-      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      lastNavAt: 0
     },
     p2: {
       index: -1,
       held: { left: false, right: false, up: false, down: false, block: false },
       prev: {},
-      repeatAt: { left: 0, right: 0, up: 0, down: 0 },
-      charSelectRepeatAt: { left: 0, right: 0, up: 0, down: 0 }
+      lastNavAt: 0
     }
   }
 };
@@ -8187,14 +8182,7 @@ function updatePauseModeFocus() {
 
 function clearGamepadSlotHeld(slot) {
   resetInputState(slot.held);
-  slot.repeatAt.left = 0;
-  slot.repeatAt.right = 0;
-  slot.repeatAt.up = 0;
-  slot.repeatAt.down = 0;
-  slot.charSelectRepeatAt.left = 0;
-  slot.charSelectRepeatAt.right = 0;
-  slot.charSelectRepeatAt.up = 0;
-  slot.charSelectRepeatAt.down = 0;
+  slot.lastNavAt = 0;
 }
 
 function clearGamepadSlot(slot, releaseAssignment = false) {
@@ -8252,41 +8240,17 @@ function isGamepadEdgePressed(slot, state, key) {
 }
 
 function shouldRepeatMenuDirection(slot, dir, active, now) {
-  if (!active) {
-    slot.repeatAt[dir] = 0;
-    return false;
-  }
-
-  if (!slot.prev[dir]) {
-    slot.repeatAt[dir] = now + GAMEPAD_REPEAT_DELAY_MS;
-    return true;
-  }
-
-  if (now >= slot.repeatAt[dir]) {
-    slot.repeatAt[dir] = now + GAMEPAD_REPEAT_INTERVAL_MS;
-    return true;
-  }
-
-  return false;
+  if (!active) return false;
+  if (now - (slot.lastNavAt || 0) < GAMEPAD_NAV_COOLDOWN_MS) return false;
+  slot.lastNavAt = now;
+  return true;
 }
 
 function shouldRepeatCharSelectDirection(slot, dir, active, now) {
-  if (!active) {
-    slot.charSelectRepeatAt[dir] = 0;
-    return false;
-  }
-
-  if (!slot.prev[dir]) {
-    slot.charSelectRepeatAt[dir] = now + CHAR_SELECT_REPEAT_DELAY_MS;
-    return true;
-  }
-
-  if (now >= slot.charSelectRepeatAt[dir]) {
-    slot.charSelectRepeatAt[dir] = now + CHAR_SELECT_REPEAT_INTERVAL_MS;
-    return true;
-  }
-
-  return false;
+  if (!active) return false;
+  if (now - (slot.lastNavAt || 0) < GAMEPAD_NAV_COOLDOWN_MS) return false;
+  slot.lastNavAt = now;
+  return true;
 }
 
 function assignGamepadSlot(index) {

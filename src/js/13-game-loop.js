@@ -72,6 +72,7 @@ function updateFullscreenScale() {
     canvas.style.border = '';
     el.style.transform = '';
     el.classList.remove('fs-active');
+    ui.battlePlanStepper.style.transform = '';
     return;
   }
   const sw = window.screen.width;
@@ -81,6 +82,8 @@ function updateFullscreenScale() {
   ctx.setTransform(sw / 1024, 0, 0, sh / 600, 0, 0);
   canvas.style.border = 'none';
   el.classList.add('fs-active');
+  ui.battlePlanStepper.style.transform = `scale(${sw / 1024}, ${sh / 600})`;
+  ui.battlePlanStepper.style.transformOrigin = 'top left';
 }
 
 function updateFullscreenButtons() {

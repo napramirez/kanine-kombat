@@ -341,7 +341,7 @@ function gameLoop() {
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Press START to play again', W / 2, H / 2 + 80);
+    ctx.fillText('Press START or L to play again', W / 2, H / 2 + 80);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
   }
@@ -455,6 +455,12 @@ document.addEventListener('keydown', e => {
     proceedBattlePlanStepper();
   }
 
+  if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
+    if (e.key === 'l' || e.key === 'L') {
+      ensureAudioReady();
+      openCharacterSelect(true);
+    }
+  }
 });
 
 // Prevent scroll

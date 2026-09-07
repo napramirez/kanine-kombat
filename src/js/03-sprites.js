@@ -1,7 +1,7 @@
 // Sprite cache
 const spriteCache = {};
 
-const DOGGOMELEON_NINJA_POOL = ['SKORPDOG', 'SUBDOG', 'SEKDOG', 'CYDOG', 'TREMODOG', 'RAYNDOG', 'NOOB SAIDOG', 'REPDOG', 'MAKDOG', 'SMOWKDAWG'];
+const DOGGOMELEON_NINJA_POOL = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG', 'NOOB SAIDOG', 'REPDOG', 'MAKDOG', 'SMOWKDAWG'];
 const DOGGOMELEON_MORPH_FRAMES = 300;
 
 function isMaskedFighter(name) {

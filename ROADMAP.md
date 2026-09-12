@@ -73,15 +73,18 @@
 
 ## Current Build Notes
 
-- Roster is now 16 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, and `SUBDOG`
+- Roster is now 16 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, and `KANOINE`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
 - `RAYDOG` uses an arc-lightning active special and a passive lightning meter
-- `DOGGOMELEON` cycles through borrowed forms and specials on a passive meter
+- `DOGGOMELEON` cycles through random ninja-type forms on a 5-second passive meter
 - `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that fan out one after another before homing
 - `DOGGABAL` dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
 - `SUBDOG` passively spawns an ice clone every 5 seconds that lasts 2 seconds and freezes the opponent on contact for 2 seconds
+- `MAKDOG` is a red SKORPDOG variant with red vest/mask
+- `KANOINE` is a white dog with gray left half face, pure red glowing left eye, white belly, brown stripe, and fully gray left ear
+- `DOGGOMELEON` excludes robot-ninjas `SEKDOG` and `CYDOG` from its morph pool
 - MAX COMBO triggers at 30 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
 - `REPDOG` summons a green python capture and spits a single large acid glob
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
@@ -91,7 +94,13 @@
 - Battle Plan boss stages are fixed: `Borko's Lair` for `BORKO`, `CATNIP's Domain` for `SHAO CATNIP`
 - Character select supports random-8 selection on the special button with an animated shuffle
 - Standard gamepads now work as alternative controllers across menu, select, fight, pause, Battle Plan, and game over
-- `Esc` pause flow exists for fights and Battle Plan stepper screens
+- Gamepad menu navigation uses a global200ms cooldown across all directions
+- Fullscreen mode available from title screen and pause overlay
+- `P` pause flow exists for fights and Battle Plan stepper screens; `P` in Battle Plan stepper toggles pause
+- Battle Plan stepper advances with `L` (keyboard) or Special/Y (gamepad); `Start` pauses for mode selection
+- Game over restarts with `L` (keyboard) or `Start` (gamepad); P2 `Start` in VS CPU switches to2 Player mode
+- Fullscreen button is navigable with gamepad/keyboard on title and pause screens
+- Battle Plan stepper scales correctly in fullscreen mode
 - Battle Plan continue system:3 credits,10-second countdown, punch to continue, credits reset on timeout or depletion
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in HUD and character select (hidden until2+ wins)
 

@@ -21,7 +21,7 @@
 | Move Right | `Arrow Right` |
 | Jump | `Arrow Up` |
 | Crouch | `Arrow Down` |
-| Block | `4` |
+| Block | `Numpad 4` |
 | Punch | `1` or `Numpad 1` |
 | Kick | `2` or `Numpad 2` |
 | Special | `3` or `Numpad 3` |
@@ -41,7 +41,7 @@ Standard gamepads are supported as an alternative controller.
 | Kick / Back | Right face button (`B` / `Circle`) |
 | Block | Left face button (`X` / `Square`) |
 | Special / Random 8 | Top face button (`Y` / `Triangle`) |
-| Pause / Resume | `Start` / `Options` |
+| Pause / Mode Selection | `Start` / `Options` |
 
 ## Character Select
 
@@ -58,31 +58,31 @@ Standard gamepads are supported as an alternative controller.
 | Pad Confirm | Bottom face button (`A` / `Cross`) |
 | Pad Random 8 | Top face button (`Y` / `Triangle`) |
 | Pad Back to Title | Right face button (`B` / `Circle`) |
-| Return to Title Screen | `Esc` |
+| Return to Title Screen | `P` |
 | CPU Opponent in `VS CPU` | Auto-selects and auto-confirms |
 
 ## Battle Plan Stepper
 
 | Action | Key |
 |---|---|
-| Start Next Match | `Space` |
-| Start Next Match (Pad) | Bottom face button (`A` / `Cross`) |
-| Pause Route Screen | `Esc` |
+| Start Next Match | `L` |
+| Start Next Match (Pad) | Top face button (`Y` / `Triangle`) |
+| Pause Route Screen | `P` |
 | Pause Route Screen (Pad) | `Start` / `Options` |
 
 ## Pause Flow
 
-| State | `Esc` Behavior |
-|---|---|
-| Title Screen | No effect |
-| Character Select | Return to title screen |
-| Fight | Open pause overlay |
-| Battle Plan Stepper | Open pause overlay |
-| Pause Overlay | Resume current session |
+| State | `Esc` Behavior | `P` / `Start` Behavior |
+|---|---|---|
+| Title Screen | No effect | No effect |
+| Character Select | Return to title screen | Return to title screen |
+| Fight | Open pause overlay | Open pause overlay |
+| Battle Plan Stepper | Open pause overlay | Open pause overlay (toggle: resume on second press) |
+| Pause Overlay | Resume current session | Navigate to title screen (mode selection) |
 
 The pause overlay also lets you switch directly to `2 PLAYER`, `VS CPU`, or `BATTLE PLAN`.
-On a gamepad, `Start` or the right face button resumes, and the bottom face button selects the highlighted mode button.
-On a keyboard, arrow keys navigate between mode buttons, and `Enter` or `Space` confirms. `Esc` resumes.
+On a gamepad, `Start` navigates to the title screen for mode selection, `B` resumes, and the bottom face button selects the highlighted mode button.
+On a keyboard, `P` navigates to the title screen, arrow keys navigate between mode buttons, and `L` or `3` confirms. `Esc` resumes.
 
 ## Mouse / UI
 
@@ -96,23 +96,26 @@ On a keyboard, arrow keys navigate between mode buttons, and `Enter` or `Space` 
 
 | Action | Key |
 |---|---|
-| Navigate modes | `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
-| Confirm selection | `Enter` or `Space` |
+| Navigate modes | `W` / `A` / `S` / `D` or `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
+| Confirm selection | `L` (P1) or `3` / `Numpad 3` (P2) |
+| Toggle fullscreen | Click `FULLSCREEN` or navigate to it with controls and confirm |
 
 ## Pause Screen
 
 | Action | Key |
 |---|---|
-| Navigate modes | `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
-| Confirm selection | `Enter` or `Space` |
-| Resume | `Esc` |
+| Navigate modes | `W` / `A` / `S` / `D` or `Arrow Left` / `Arrow Right` / `Arrow Up` / `Arrow Down` |
+| Confirm selection | `L` (P1) or `3` / `Numpad 3` (P2) |
+| Resume | `Esc` or `B` (gamepad) |
+| Mode selection | `P` or `Start` (gamepad) |
 
 ## Post-Match
 
 | Action | Key |
 |---|---|
-| Return to character select after Game Over | `Space` |
-| Return to character select after Game Over (Pad) | Bottom face button (`A` / `Cross`) |
+| Return to character select after Game Over | `L` |
+| Return to character select after Game Over (Pad) | `Start` / `Options` |
+| Switch VS CPU to 2 Player (Pad) | P2 presses `Start` / `Options` |
 
 ## Continue Screen (Battle Plan)
 

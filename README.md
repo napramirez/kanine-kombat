@@ -1,6 +1,6 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with a fifteen-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a sixteen-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - Keyboard and standard gamepad support with mixed-input play
-- 12 initially selectable fighters, plus 3 Battle Plan unlocks:
+- 13 initially selectable fighters, plus 3 Battle Plan unlocks:
   - `DOGGO CAGE`
   - `SKORPDOG`
   - `SMOWKDAWG`
@@ -81,7 +81,7 @@ Optional music files:
 - Final match is always `SHAO CATNIP`
 - `SHAO CATNIP` boss match always uses `CATNIP's Domain`
 - The route stepper appears before the first match and between wins, and scrolls to keep progress visible
-- Press `Space` or controller confirm when prompted to start the next match
+- Press `L` or controller Special when prompted to start the next match
 
 ## Project Structure
 

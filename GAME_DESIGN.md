@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a fifteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a sixteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -29,7 +29,7 @@ Players choose from a shared roster before each match.
 | `SNEK` | Constrictor | 7 | 100 | Hidden black python with red eyes; unlock by completing the Battle Plan as NOOB SAIDOG |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 | `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask |
-| `KANOINE` | Duality | 5 | 100 | White dog, half-gray face, glowing red eye on gray side, brown stripe |
+| `KANOINE` | Duality | 5 | 100 | White dog, gray left half face, pure red glowing left eye, white belly, brown stripe, fully gray left ear |
 
 ### Combat System
 
@@ -51,7 +51,7 @@ Players choose from a shared roster before each match.
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
 - `RAYNDOG`: summons a purple lightning cloud over the opponent for 3 seconds; each zap deals 10 damage
 - `RAYDOG`: active special fires an arc lightning strike that always hits the opponent for 5 damage; passive special fires every 3 seconds when the passive meter fills
-- `DOGGOMELEON`: passively cycles every 8 seconds through `SKORPDOG`, `SUBDOG`, `TREMODOG`, and `RAYNDOG`, borrowing their visuals and special abilities
+- `DOGGOMELEON`: passively cycles every 5 seconds through a random ninja-type character (excluding robot-ninjas `SEKDOG` and `CYDOG`), borrowing their visuals and special abilities
 - `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out one after another before homing
 - `REPDOG`: summons a green python that captures the opponent, then spits a single large acid glob straight at them
 - `DOGGABAL`: dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
@@ -85,7 +85,7 @@ Players choose from a shared roster before each match.
 - Active meter blinks when ready
 - `PASSIVE` special meter is shown only for fighters with passive abilities
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
-- `DOGGOMELEON`'s passive meter fills over 8 seconds and advances to the next borrowed form in the morph cycle
+- `DOGGOMELEON`'s passive meter fills over 5 seconds and advances to a random ninja-type form
 - `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` do not gain active special meter from punch or kick hits
 
 ### Physics
@@ -120,7 +120,7 @@ Players choose from a shared roster before each match.
 - Final match is always `SHAO CATNIP`
 - The `SHAO CATNIP` match always uses `CATNIP's Domain`
 - A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
-- `Space` or controller confirm advances from the route stepper into the next fight
+- `L` or controller Special advances from the route stepper into the next fight
 - Player starts with 3 credits; on loss, a 10-second continue screen appears
 - Press punch to continue (uses1 credit and resumes from current match)
 - If countdown expires or no credits remain, credits reset to3 and player returns to title screen
@@ -146,7 +146,9 @@ fight or battlePlanStepper -> paused
 - `Esc` during a fight opens the fight pause overlay
 - `Esc` during the Battle Plan stepper opens the Battle Plan pause overlay
 - `Esc` while paused resumes the current fight or route stepper
+- `P` during the Battle Plan stepper pauses for mode selection; `P` again resumes
 - On gamepad, `Start` pauses or resumes and the right face button acts as back on menu-style screens
+- In `VS CPU` game over, Player 2 pressing `Start` switches the game mode to `2 PLAYER`
 
 ## Visual Design
 
@@ -160,7 +162,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared fifteen-fighter roster
+- Shared sixteen-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
@@ -176,7 +178,7 @@ fight or battlePlanStepper -> paused
 
 - Health bars, active/passive special meters, timer, player names, and round dots
 - Win streak counter below passive meters (2 Player and VS CPU, hidden until2+ wins)
-- On gamepad, bottom face button confirms/proceeds, right face button acts as back, left face button blocks, top face button triggers special/random, and `Start` pauses or resumes
+- On gamepad, bottom face button confirms/proceeds, right face button acts as back, left face button blocks, top face button triggers special/random, and `Start` pauses or navigates to mode selection
 - Hit sparks, block sparks, KO explosions, and text popups
 - Screen shake and hit stop on impactful hits
 - Victory and defeat poses, including flawless victory messaging

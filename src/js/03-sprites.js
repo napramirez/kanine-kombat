@@ -995,29 +995,38 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
   // Eyes (skip for CYDOG/SEKDOG - they have visor only)
   if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
+    if (name !== 'KANOINE') {
+      x.fillStyle = frozen ? '#e0ffff' : '#fff';
+      x.beginPath();
+      x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
+      x.fill();
+    }
+    // Right eye white
     x.fillStyle = frozen ? '#e0ffff' : '#fff';
-    x.beginPath();
-    x.ellipse(68, headY - 6, 7, 8, 0, 0, Math.PI * 2);
-    x.fill();
     x.beginPath();
     x.ellipse(80, headY - 6, 6, 7, 0, 0, Math.PI * 2);
     x.fill();
 
-    // Pupils
+    // Pupils (skip left pupil for KANOINE)
     const pupilOffset = (state === 'hit' || frozen) ? -2 : 2;
     x.fillStyle = frozenEyeColor;
-    x.beginPath();
-    x.ellipse(70 + pupilOffset, headY - 5, 4, 5, 0, 0, Math.PI * 2);
-    x.fill();
+    if (name !== 'KANOINE') {
+      x.beginPath();
+      x.ellipse(70 + pupilOffset, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+      x.fill();
+    }
     x.beginPath();
     x.ellipse(82 + pupilOffset, headY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
     x.fill();
 
-    // Pupil highlights
+    // Pupil highlights (skip left for KANOINE)
     x.fillStyle = '#fff';
-    x.beginPath();
-    x.arc(71 + pupilOffset, headY - 7, 1.5, 0, Math.PI * 2);
-    x.fill();
+    if (name !== 'KANOINE') {
+      x.beginPath();
+      x.arc(71 + pupilOffset, headY - 7, 1.5, 0, Math.PI * 2);
+      x.fill();
+    }
     x.beginPath();
     x.arc(83 + pupilOffset, headY - 7, 1.2, 0, Math.PI * 2);
     x.fill();
@@ -1632,28 +1641,37 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // Eyes (skip for CYDOG/SEKDOG - they have visor only)
     if (name !== 'CYDOG' && name !== 'SEKDOG') {
+      // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
+      if (name !== 'KANOINE') {
+        x.fillStyle = '#fff';
+        x.beginPath();
+        x.ellipse(68, vicHeadY - 6, 7, 8, 0, 0, Math.PI * 2);
+        x.fill();
+      }
+      // Right eye white
       x.fillStyle = '#fff';
-      x.beginPath();
-      x.ellipse(68, vicHeadY - 6, 7, 8, 0, 0, Math.PI * 2);
-      x.fill();
       x.beginPath();
       x.ellipse(80, vicHeadY - 6, 6, 7, 0, 0, Math.PI * 2);
       x.fill();
 
-      // Pupils
+      // Pupils (skip left for KANOINE)
       x.fillStyle = eyeColor;
-      x.beginPath();
-      x.ellipse(70, vicHeadY - 5, 4, 5, 0, 0, Math.PI * 2);
-      x.fill();
+      if (name !== 'KANOINE') {
+        x.beginPath();
+        x.ellipse(70, vicHeadY - 5, 4, 5, 0, 0, Math.PI * 2);
+        x.fill();
+      }
       x.beginPath();
       x.ellipse(82, vicHeadY - 5, 3.5, 4.5, 0, 0, Math.PI * 2);
       x.fill();
 
-      // Pupil highlights
+      // Pupil highlights (skip left for KANOINE)
       x.fillStyle = '#fff';
-      x.beginPath();
-      x.arc(71, vicHeadY - 7, 1.5, 0, Math.PI * 2);
-      x.fill();
+      if (name !== 'KANOINE') {
+        x.beginPath();
+        x.arc(71, vicHeadY - 7, 1.5, 0, Math.PI * 2);
+        x.fill();
+      }
       x.beginPath();
       x.arc(83, vicHeadY - 7, 1.2, 0, Math.PI * 2);
       x.fill();

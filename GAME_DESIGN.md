@@ -64,7 +64,7 @@ Players choose from a shared roster before each match.
 - Every 12 hits increases punch damage by 1
 - Every 12 hits increases kick damage by 2
 - Knockback increases with combo count
-- MAX COMBO triggers at 30 hits: displays "MAX COMBO" for 60 frames and pushes the opponent to the screen edge (vx=160), resetting the combo counter
+- MAX COMBO triggers at 10 hits: displays "MAX COMBO" for 60 frames and pushes the opponent to the screen edge (vx=160), resetting the combo counter
 
 ### Blocking
 

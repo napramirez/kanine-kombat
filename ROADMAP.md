@@ -85,7 +85,7 @@
 - `MAKDOG` is a red SKORPDOG variant with red vest/mask
 - `KANOINE` is a white dog with gray left half face, pure red glowing left eye, white belly, brown stripe, and fully gray left ear
 - `DOGGOMELEON` excludes robot-ninjas `SEKDOG` and `CYDOG` from its morph pool
-- MAX COMBO triggers at 30 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
+- MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
 - `REPDOG` summons a green python capture and spits a single large acid glob
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
 - `SNEK` is hidden until the Battle Plan is completed as `NOOB SAIDOG`

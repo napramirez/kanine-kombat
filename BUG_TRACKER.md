@@ -70,7 +70,7 @@ None currently tracked.
 - [ ] DOGGABAL has olive green vertical stripe, brown horizontal stripe, and oxygen mask
 - [ ] SUBDOG passive ice clone spawns every 5 seconds, lasts 2 seconds, and freezes opponent on contact for 2 seconds
 - [ ] SUBDOG ice clone can be blocked by the opponent
-- [ ] MAX COMBO triggers at 30 hits, displays "MAX COMBO" text, and pushes opponent to screen edge
+- [ ] MAX COMBO triggers at 10 hits, displays "MAX COMBO" text, and pushes opponent to screen edge
 - [ ] MAX COMBO pushback works during DOGGABAL spin and stun/frozen states
 
 ### Movement

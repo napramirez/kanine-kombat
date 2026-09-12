@@ -56,7 +56,7 @@ Optional music files:
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
 - Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and staggered fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, freeze projectile, and SUBDOG's passive ice clone
-- MAX COMBO at30 hits: displays MAX COMBO text and pushes opponent to the screen edge
+- MAX COMBO at10 hits: displays MAX COMBO text and pushes opponent to the screen edge
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - Battle Plan continue system:3 credits,10-second countdown on loss, press punch to continue
 - Pause flow on `Esc` during fights and Battle Plan route screens

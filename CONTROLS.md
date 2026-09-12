@@ -21,7 +21,7 @@
 | Move Right | `Arrow Right` |
 | Jump | `Arrow Up` |
 | Crouch | `Arrow Down` |
-| Block | `4` or `Numpad 4` |
+| Block | `Numpad 4` |
 | Punch | `1` or `Numpad 1` |
 | Kick | `2` or `Numpad 2` |
 | Special | `3` or `Numpad 3` |

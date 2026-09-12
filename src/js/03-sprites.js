@@ -359,10 +359,10 @@ function drawKanoineHalfFace(x, headY, frame) {
   // Save context for clipping
   x.save();
 
-  // Draw gray half (left side)
+  // Draw gray half (left side) - extend clip to cover full ear
   x.fillStyle = '#888888';
   x.beginPath();
-  x.rect(48, headY - 22, 22, 44);
+  x.rect(48, headY - 36, 22, 58);
   x.clip();
 
   // Redraw head in gray

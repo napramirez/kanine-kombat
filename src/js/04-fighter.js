@@ -1294,23 +1294,27 @@ if (this.specialFormSource === 'TREMODOG' && this.attackTimer > 0 && this.lastAt
       ctx.restore();
     }
 
-    // Draw KANOINE daggers
+    // Draw KANOINE kitchen knives
     if (this.kanoineDaggers.length > 0) {
       const spinAngle = this.frame * 0.2;
       for (const dagger of this.kanoineDaggers) {
         ctx.save();
         ctx.translate(dagger.x + this.shakeX, dagger.y + this.shakeY);
         ctx.rotate(spinAngle);
-        ctx.fillStyle = '#silver';
         ctx.shadowColor = '#ffffff';
         ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.moveTo(0, -12);
-        ctx.lineTo(4, 0);
-        ctx.lineTo(0, 12);
-        ctx.lineTo(-4, 0);
-        ctx.closePath();
-        ctx.fill();
+        // Blade
+        ctx.fillStyle = '#c0c0c0';
+        ctx.fillRect(-2, -14, 4, 16);
+        // Edge highlight
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fillRect(-1, -14, 1, 16);
+        // Handle
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(-3, 2, 6, 5);
+        // Handle rivet
+        ctx.fillStyle = '#d4a843';
+        ctx.fillRect(-1, 4, 2, 2);
         ctx.restore();
       }
     }

@@ -9427,7 +9427,7 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') { keys2.right = true; e.preventDefault(); }
     if (e.key === 'ArrowUp') { keys2.up = true; e.preventDefault(); }
     if (e.key === 'ArrowDown') { keys2.down = true; e.preventDefault(); }
-    if (e.key === 'Numpad4') keys2.block = true;
+    if (k === '4' || e.key === 'Numpad4') keys2.block = true;
     if (k === '1' || e.key === 'Numpad1') { ensureAudioReady(); p2.attack('punch'); e.preventDefault(); }
     if (k === '2' || e.key === 'Numpad2') { ensureAudioReady(); p2.attack('kick'); e.preventDefault(); }
     if (k === '3' || e.key === 'Numpad3') { ensureAudioReady(); p2.attack('special'); e.preventDefault(); }
@@ -9450,7 +9450,7 @@ document.addEventListener('keyup', e => {
     if (e.key === 'ArrowRight') keys2.right = false;
     if (e.key === 'ArrowUp') keys2.up = false;
     if (e.key === 'ArrowDown') keys2.down = false;
-    if (e.key === 'Numpad4') keys2.block = false;
+    if (k === '4' || e.key === 'Numpad4') keys2.block = false;
   }
 });
 

@@ -44,7 +44,7 @@ Players choose from a shared roster before each match.
 - `DOGGO CAGE`: gold/red energy ball
 - `BORKO`: remembers the opponent's position, leaps high toward it, and creates a landing shockwave that deals 10 damage and 1 second of stun if the opponent is caught in the radius
 - `SHAO CATNIP`: blue/purple energy ball
-- `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun
+- `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun; passive fire spit that burns the opponent for 3 seconds, with skull face transformation during burn
 - `SMOWKDAWG`: gray harpoon that pulls the opponent in and applies a 1-second stun (same as SKORPDOG)
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
@@ -86,6 +86,7 @@ Players choose from a shared roster before each match.
 - `PASSIVE` special meter is shown only for fighters with passive abilities
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
 - `DOGGOMELEON`'s passive meter fills over 5 seconds and advances to a random ninja-type form
+- `SKORPDOG`'s passive meter fills over 6 seconds and spits fire at the opponent, burning them for 3 seconds while SKORPDOG's face turns into a skull
 - `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` do not gain active special meter from punch or kick hits
 
 ### Physics

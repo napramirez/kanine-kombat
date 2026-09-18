@@ -380,6 +380,33 @@ function spawnSmowkdawgSmokeCloud(owner) {
   });
 }
 
+function spawnScorpdogFireSpit(owner, target) {
+  const special = COMBAT.special.skorpdog;
+  const x = owner.x + owner.facing * 42;
+  const y = owner.y - 50;
+  const angle = Math.atan2((target.y - 50) - y, target.x - x);
+  projectiles.push({
+    x,
+    y,
+    owner,
+    target,
+    type: 'scorpdogFire',
+    life: 120,
+    radius: 12,
+    speed: special.fireSpeed,
+    dmg: special.fireDamage,
+    vx: Math.cos(angle) * special.fireSpeed,
+    vy: Math.sin(angle) * special.fireSpeed,
+    burnTimer: 0,
+    burnDuration: special.fireDurationFrames,
+    burnTick: special.fireTickInterval,
+    burnTickTimer: 0,
+    hit: false,
+    trail: [],
+    lastOwnerFrame: owner.frame
+  });
+}
+
 function updateNoobSnakeSequence(p, index) {
   if (p.lastOwnerFrame === p.owner.frame) return;
   p.lastOwnerFrame = p.owner.frame;
@@ -635,6 +662,59 @@ function updateProjectiles(opponent) {
       if (p.life <= 0) {
         projectiles.splice(i, 1);
         continue;
+      }
+      continue;
+    }
+
+    if (p.type === 'scorpdogFire') {
+      if (p.lastOwnerFrame === p.owner.frame) continue;
+      p.lastOwnerFrame = p.owner.frame;
+
+      if (!p.hit) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.trail.push({ x: p.x, y: p.y, life: 15 });
+        if (p.trail.length > 12) p.trail.shift();
+        p.trail.forEach(t => t.life--);
+        p.trail = p.trail.filter(t => t.life > 0);
+
+        const hb = target.getHurtbox();
+        if (p.x > hb.x && p.x < hb.x + hb.w && p.y > hb.y && p.y < hb.y + hb.h) {
+          if (target.isBlocking) {
+            addParticle(p.x, p.y, 'block');
+            playImpactSound('block');
+            projectiles.splice(i, 1);
+            continue;
+          }
+          p.hit = true;
+          p.vx = 0;
+          p.vy = 0;
+          target.takeHit(p.dmg, 0, p.owner.facing);
+          addParticle(p.x, p.y, 'hit');
+          playImpactSound('hit');
+        }
+
+        if (p.life <= 0 || p.x < -50 || p.x > W + 50) {
+          projectiles.splice(i, 1);
+          continue;
+        }
+      } else {
+        p.x = target.x;
+        p.y = target.y - 50;
+        p.burnTickTimer++;
+        if (p.burnTickTimer >= p.burnTick) {
+          p.burnTickTimer = 0;
+          p.burnTimer++;
+          if (target.health > 0) {
+            target.takeHit(p.dmg, 0, p.owner.facing);
+            addParticle(target.x + (Math.random() - 0.5) * 20, target.y - 50 + (Math.random() - 0.5) * 20, 'hit');
+          }
+        }
+        p.life--;
+        if (p.life <= 0 || target.health <= 0 || p.burnTimer >= p.burnDuration / p.burnTick) {
+          projectiles.splice(i, 1);
+          continue;
+        }
       }
       continue;
     }
@@ -1518,6 +1598,64 @@ function drawProjectiles() {
         ctx.lineTo(x, waveY);
       }
       ctx.stroke();
+    } else if (p.type === 'scorpdogFire') {
+      if (!p.hit) {
+        // Fire trail
+        p.trail.forEach(t => {
+          const ta = (t.life / 15) * 0.5;
+          ctx.globalAlpha = ta;
+          ctx.fillStyle = '#ff6b00';
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, p.radius * 0.6 * (t.life / 15), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Fire glow
+        ctx.globalAlpha = 0.4;
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.5);
+        glow.addColorStop(0, '#ff4500');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fire core
+        ctx.globalAlpha = 1;
+        const t = Date.now() * 0.01;
+        for (let j = 0; j < 5; j++) {
+          const angle = (j / 5) * Math.PI * 2 + t;
+          const flicker = 3 + Math.sin(t * 3 + j * 2) * 2;
+          const fx = p.x + Math.cos(angle) * flicker;
+          const fy = p.y + Math.sin(angle) * flicker;
+          const r = p.radius * (0.5 + Math.sin(t + j) * 0.3);
+          ctx.fillStyle = j % 2 === 0 ? '#ff4500' : '#ff6b00';
+          ctx.beginPath();
+          ctx.arc(fx, fy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#ffcc00';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Burn effect on target
+        const burnAlpha = Math.min(1, p.life / 30) * 0.7;
+        const t = Date.now() * 0.008;
+        for (let j = 0; j < 6; j++) {
+          const angle = (j / 6) * Math.PI * 2 + t;
+          const flicker = 8 + Math.sin(t * 2 + j * 1.5) * 5;
+          const fx = p.x + Math.cos(angle) * flicker;
+          const fy = p.y + Math.sin(angle) * flicker;
+          const r = 4 + Math.sin(t + j * 0.7) * 2;
+          ctx.globalAlpha = burnAlpha * (0.4 + Math.sin(t * 3 + j) * 0.2);
+          ctx.fillStyle = j % 3 === 0 ? '#ffcc00' : j % 3 === 1 ? '#ff6b00' : '#ff4500';
+          ctx.beginPath();
+          ctx.arc(fx, fy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
     } else {
       // Regular energy ball projectile
       // Trail

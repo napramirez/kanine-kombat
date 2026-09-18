@@ -355,6 +355,74 @@ function drawSekdogChestOpen(x, bodyY, frame) {
   x.restore();
 }
 
+function drawScorpdogSkullFace(x, headY, frame) {
+  x.save();
+
+  // Skull base - full head coverage
+  x.fillStyle = '#f5f5f5';
+  x.beginPath();
+  x.ellipse(70, headY, 22, 20, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Jaw area (slightly darker)
+  x.fillStyle = '#e8e8e8';
+  x.beginPath();
+  x.ellipse(70, headY + 8, 16, 10, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Left eye socket (dark)
+  x.fillStyle = '#1a1a1a';
+  x.beginPath();
+  x.ellipse(62, headY - 5, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Right eye socket (dark)
+  x.beginPath();
+  x.ellipse(78, headY - 5, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Eye socket glow (red)
+  x.fillStyle = '#ff1744';
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 8;
+  x.beginPath();
+  x.ellipse(62, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(78, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.shadowBlur = 0;
+
+  // Nose holes
+  x.fillStyle = '#1a1a1a';
+  x.beginPath();
+  x.ellipse(66, headY + 4, 3, 3.5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(74, headY + 4, 3, 3.5, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Teeth line
+  x.strokeStyle = '#1a1a1a';
+  x.lineWidth = 2;
+  x.beginPath();
+  x.moveTo(58, headY + 12);
+  x.lineTo(82, headY + 12);
+  x.stroke();
+
+  // Individual teeth
+  x.fillStyle = '#f5f5f5';
+  for (let t = 0; t < 6; t++) {
+    x.fillRect(59 + t * 4, headY + 10.5, 3, 4);
+  }
+  x.fillStyle = '#1a1a1a';
+  for (let t = 0; t < 6; t++) {
+    x.fillRect(61.5 + t * 4, headY + 10.5, 1, 4);
+  }
+
+  x.restore();
+}
+
 function drawKanoineHalfFace(x, headY, frame) {
   // Save context for clipping
   x.save();
@@ -1030,6 +1098,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
   if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, headY, frame);
 
+  // SKORPDOG skull face during fire passive
+  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    drawScorpdogSkullFace(x, headY, frame);
+  }
+
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
   if (isRaydog(name)) drawRaydogSparks(x, bodyY, headY, frame, frozen);
@@ -1674,6 +1747,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
 
+    // SKORPDOG skull face during fire passive (victory)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+      drawScorpdogSkullFace(x, vicHeadY, frame);
+    }
+
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogSparks(x, vicBodyY, vicHeadY, frame, frozen);
@@ -1896,6 +1974,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // CYDOG/SEKDOG visor (defeat)
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);
+
+    // SKORPDOG skull face during fire passive (defeat)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+      drawScorpdogSkullFace(x, defHeadY, frame);
+    }
 
     // Tongue sticking out
     if (!isMaskedFighter(name)) {

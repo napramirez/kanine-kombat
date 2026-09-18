@@ -1225,7 +1225,12 @@ const COMBAT = {
     },
     skorpdog: {
       ownerLockFrames: 2,
-      pointBlankGap: 6
+      pointBlankGap: 6,
+      passiveIntervalFrames: 360,
+      fireDurationFrames: 180,
+      fireDamage: 3,
+      fireTickInterval: 15,
+      fireSpeed: 10
     },
     cydog: {
       netSpeed: 11,
@@ -2163,6 +2168,74 @@ function drawSekdogChestOpen(x, bodyY, frame) {
   x.restore();
 }
 
+function drawScorpdogSkullFace(x, headY, frame) {
+  x.save();
+
+  // Skull base - full head coverage
+  x.fillStyle = '#f5f5f5';
+  x.beginPath();
+  x.ellipse(70, headY, 22, 20, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Jaw area (slightly darker)
+  x.fillStyle = '#e8e8e8';
+  x.beginPath();
+  x.ellipse(70, headY + 8, 16, 10, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Left eye socket (dark)
+  x.fillStyle = '#1a1a1a';
+  x.beginPath();
+  x.ellipse(62, headY - 5, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Right eye socket (dark)
+  x.beginPath();
+  x.ellipse(78, headY - 5, 7, 8, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Eye socket glow (red)
+  x.fillStyle = '#ff1744';
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 8;
+  x.beginPath();
+  x.ellipse(62, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(78, headY - 5, 4, 5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.shadowBlur = 0;
+
+  // Nose holes
+  x.fillStyle = '#1a1a1a';
+  x.beginPath();
+  x.ellipse(66, headY + 4, 3, 3.5, 0, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.ellipse(74, headY + 4, 3, 3.5, 0, 0, Math.PI * 2);
+  x.fill();
+
+  // Teeth line
+  x.strokeStyle = '#1a1a1a';
+  x.lineWidth = 2;
+  x.beginPath();
+  x.moveTo(58, headY + 12);
+  x.lineTo(82, headY + 12);
+  x.stroke();
+
+  // Individual teeth
+  x.fillStyle = '#f5f5f5';
+  for (let t = 0; t < 6; t++) {
+    x.fillRect(59 + t * 4, headY + 10.5, 3, 4);
+  }
+  x.fillStyle = '#1a1a1a';
+  for (let t = 0; t < 6; t++) {
+    x.fillRect(61.5 + t * 4, headY + 10.5, 1, 4);
+  }
+
+  x.restore();
+}
+
 function drawKanoineHalfFace(x, headY, frame) {
   // Save context for clipping
   x.save();
@@ -2838,6 +2911,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
   if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, headY, frame);
 
+  // SKORPDOG skull face during fire passive
+  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    drawScorpdogSkullFace(x, headY, frame);
+  }
+
   if (isDoggoCage(name)) drawDoggoCageSunglasses(x, headY, frozen);
   if (isRaydog(name)) drawRaydogGear(x, bodyY, headY, frozen);
   if (isRaydog(name)) drawRaydogSparks(x, bodyY, headY, frame, frozen);
@@ -3482,6 +3560,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
 
+    // SKORPDOG skull face during fire passive (victory)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+      drawScorpdogSkullFace(x, vicHeadY, frame);
+    }
+
     if (isDoggoCage(name)) drawDoggoCageSunglasses(x, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogGear(x, vicBodyY, vicHeadY, frozen);
     if (isRaydog(name)) drawRaydogSparks(x, vicBodyY, vicHeadY, frame, frozen);
@@ -3705,6 +3788,11 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     // CYDOG/SEKDOG visor (defeat)
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);
 
+    // SKORPDOG skull face during fire passive (defeat)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+      drawScorpdogSkullFace(x, defHeadY, frame);
+    }
+
     // Tongue sticking out
     if (!isMaskedFighter(name)) {
       x.fillStyle = '#ff6b8a';
@@ -3825,6 +3913,7 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
+    this.skorpdogFireTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -3892,6 +3981,7 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
+    this.skorpdogFireTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -4602,6 +4692,19 @@ class Fighter {
     spawnSmowkdawgSmokeCloud(this);
   }
 
+  updateScorpdogPassive(opponent) {
+    if (this.name !== 'SKORPDOG' || this.health <= 0) return;
+
+    if (this.skorpdogFireTimer > 0) this.skorpdogFireTimer--;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    this.passiveSpecial = 0;
+    this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+    spawnScorpdogFireSpit(this, opponent);
+  }
+
   updateKanoinePassive(opponent) {
     if (this.name !== 'KANOINE' || this.health <= 0) return;
 
@@ -4681,6 +4784,7 @@ class Fighter {
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
     this.updateSmowkdawgPassive(opponent);
+    this.updateScorpdogPassive(opponent);
     this.updateKanoinePassive(opponent);
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
@@ -5623,6 +5727,33 @@ function spawnSmowkdawgSmokeCloud(owner) {
   });
 }
 
+function spawnScorpdogFireSpit(owner, target) {
+  const special = COMBAT.special.skorpdog;
+  const x = owner.x + owner.facing * 42;
+  const y = owner.y - 50;
+  const angle = Math.atan2((target.y - 50) - y, target.x - x);
+  projectiles.push({
+    x,
+    y,
+    owner,
+    target,
+    type: 'scorpdogFire',
+    life: 120,
+    radius: 12,
+    speed: special.fireSpeed,
+    dmg: special.fireDamage,
+    vx: Math.cos(angle) * special.fireSpeed,
+    vy: Math.sin(angle) * special.fireSpeed,
+    burnTimer: 0,
+    burnDuration: special.fireDurationFrames,
+    burnTick: special.fireTickInterval,
+    burnTickTimer: 0,
+    hit: false,
+    trail: [],
+    lastOwnerFrame: owner.frame
+  });
+}
+
 function updateNoobSnakeSequence(p, index) {
   if (p.lastOwnerFrame === p.owner.frame) return;
   p.lastOwnerFrame = p.owner.frame;
@@ -5878,6 +6009,59 @@ function updateProjectiles(opponent) {
       if (p.life <= 0) {
         projectiles.splice(i, 1);
         continue;
+      }
+      continue;
+    }
+
+    if (p.type === 'scorpdogFire') {
+      if (p.lastOwnerFrame === p.owner.frame) continue;
+      p.lastOwnerFrame = p.owner.frame;
+
+      if (!p.hit) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.trail.push({ x: p.x, y: p.y, life: 15 });
+        if (p.trail.length > 12) p.trail.shift();
+        p.trail.forEach(t => t.life--);
+        p.trail = p.trail.filter(t => t.life > 0);
+
+        const hb = target.getHurtbox();
+        if (p.x > hb.x && p.x < hb.x + hb.w && p.y > hb.y && p.y < hb.y + hb.h) {
+          if (target.isBlocking) {
+            addParticle(p.x, p.y, 'block');
+            playImpactSound('block');
+            projectiles.splice(i, 1);
+            continue;
+          }
+          p.hit = true;
+          p.vx = 0;
+          p.vy = 0;
+          target.takeHit(p.dmg, 0, p.owner.facing);
+          addParticle(p.x, p.y, 'hit');
+          playImpactSound('hit');
+        }
+
+        if (p.life <= 0 || p.x < -50 || p.x > W + 50) {
+          projectiles.splice(i, 1);
+          continue;
+        }
+      } else {
+        p.x = target.x;
+        p.y = target.y - 50;
+        p.burnTickTimer++;
+        if (p.burnTickTimer >= p.burnTick) {
+          p.burnTickTimer = 0;
+          p.burnTimer++;
+          if (target.health > 0) {
+            target.takeHit(p.dmg, 0, p.owner.facing);
+            addParticle(target.x + (Math.random() - 0.5) * 20, target.y - 50 + (Math.random() - 0.5) * 20, 'hit');
+          }
+        }
+        p.life--;
+        if (p.life <= 0 || target.health <= 0 || p.burnTimer >= p.burnDuration / p.burnTick) {
+          projectiles.splice(i, 1);
+          continue;
+        }
       }
       continue;
     }
@@ -6761,6 +6945,64 @@ function drawProjectiles() {
         ctx.lineTo(x, waveY);
       }
       ctx.stroke();
+    } else if (p.type === 'scorpdogFire') {
+      if (!p.hit) {
+        // Fire trail
+        p.trail.forEach(t => {
+          const ta = (t.life / 15) * 0.5;
+          ctx.globalAlpha = ta;
+          ctx.fillStyle = '#ff6b00';
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, p.radius * 0.6 * (t.life / 15), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Fire glow
+        ctx.globalAlpha = 0.4;
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.5);
+        glow.addColorStop(0, '#ff4500');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fire core
+        ctx.globalAlpha = 1;
+        const t = Date.now() * 0.01;
+        for (let j = 0; j < 5; j++) {
+          const angle = (j / 5) * Math.PI * 2 + t;
+          const flicker = 3 + Math.sin(t * 3 + j * 2) * 2;
+          const fx = p.x + Math.cos(angle) * flicker;
+          const fy = p.y + Math.sin(angle) * flicker;
+          const r = p.radius * (0.5 + Math.sin(t + j) * 0.3);
+          ctx.fillStyle = j % 2 === 0 ? '#ff4500' : '#ff6b00';
+          ctx.beginPath();
+          ctx.arc(fx, fy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#ffcc00';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Burn effect on target
+        const burnAlpha = Math.min(1, p.life / 30) * 0.7;
+        const t = Date.now() * 0.008;
+        for (let j = 0; j < 6; j++) {
+          const angle = (j / 6) * Math.PI * 2 + t;
+          const flicker = 8 + Math.sin(t * 2 + j * 1.5) * 5;
+          const fx = p.x + Math.cos(angle) * flicker;
+          const fy = p.y + Math.sin(angle) * flicker;
+          const r = 4 + Math.sin(t + j * 0.7) * 2;
+          ctx.globalAlpha = burnAlpha * (0.4 + Math.sin(t * 3 + j) * 0.2);
+          ctx.fillStyle = j % 3 === 0 ? '#ffcc00' : j % 3 === 1 ? '#ff6b00' : '#ff4500';
+          ctx.beginPath();
+          ctx.arc(fx, fy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
     } else {
       // Regular energy ball projectile
       // Trail
@@ -7560,6 +7802,7 @@ const CHARACTERS = [
     speed: 5,
     health: 100,
     specialGain: 0.25,
+    passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.skorpdog.passiveIntervalFrames,
     desc: 'STRIKER'
   },
   {

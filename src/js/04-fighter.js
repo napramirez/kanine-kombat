@@ -77,6 +77,7 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
+    this.skorpdogFireTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -144,6 +145,7 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
+    this.skorpdogFireTimer = 0;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
   }
@@ -854,6 +856,19 @@ class Fighter {
     spawnSmowkdawgSmokeCloud(this);
   }
 
+  updateScorpdogPassive(opponent) {
+    if (this.name !== 'SKORPDOG' || this.health <= 0) return;
+
+    if (this.skorpdogFireTimer > 0) this.skorpdogFireTimer--;
+
+    this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
+    if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
+
+    this.passiveSpecial = 0;
+    this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+    spawnScorpdogFireSpit(this, opponent);
+  }
+
   updateKanoinePassive(opponent) {
     if (this.name !== 'KANOINE' || this.health <= 0) return;
 
@@ -933,6 +948,7 @@ class Fighter {
     this.updateRaydogPassive(opponent);
     this.updateSubdogPassive(opponent);
     this.updateSmowkdawgPassive(opponent);
+    this.updateScorpdogPassive(opponent);
     this.updateKanoinePassive(opponent);
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;

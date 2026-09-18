@@ -97,7 +97,12 @@ const COMBAT = {
     },
     skorpdog: {
       ownerLockFrames: 2,
-      pointBlankGap: 6
+      pointBlankGap: 6,
+      passiveIntervalFrames: 360,
+      fireDurationFrames: 180,
+      fireDamage: 3,
+      fireTickInterval: 15,
+      fireSpeed: 10
     },
     cydog: {
       netSpeed: 11,

@@ -16,7 +16,9 @@ function openCharacterSelect(resetRounds = false) {
     p1.roundsWon = 0;
     p2.roundsWon = 0;
     game.round = 1;
+    game.teamRoundsWon = { A: 0, B: 0 };
     updateRoundDots();
+    removeTeamHUD();
   }
 
   ui.startScreen.style.display = 'none';
@@ -37,6 +39,9 @@ function openCharacterSelect(resetRounds = false) {
     p2Selection = randomCpuSelection();
   } else if (isCpuMode()) {
     p2Selection = randomCpuSelection();
+  } else if (isTeamVsTeamMode()) {
+    cpu1Selection = randomCpuSelection();
+    cpu2Selection = randomCpuSelection();
   }
   buildCharSelect();
 
@@ -137,6 +142,7 @@ document.addEventListener('keydown', e => {
       if (isP2Start && game.mode === MATCH_MODES.CPU) {
         game.mode = MATCH_MODES.VERSUS;
       }
+      removeTeamHUD();
       openCharacterSelect(true);
     }
     return;
@@ -227,16 +233,43 @@ function gameLoop() {
   drawBackground();
 
   if (game.state === GAME_STATES.FIGHT) {
-    p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), p2);
-    if (isCpuControlledMode()) updateCpuInput(p2, p1);
-    p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
-    checkHit(p1, p2);
-    checkHit(p2, p1);
-    updateProjectiles(p2);
-    updateProjectiles(p1);
+    if (isTeamVsTeamMode()) {
+      p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
+      p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
+      updateCpuInput(cpu1, getClosestOpponent(cpu1));
+      cpu1.update(keys2, null);
+      updateCpuInput(cpu2, getClosestOpponent(cpu2));
+      cpu2.update(keys2, null);
 
-    if (p1.health <= 0 || p2.health <= 0) {
-      endRound();
+      const teamA = [p1, p2];
+      const teamB = [cpu1, cpu2];
+      for (const a of teamA) {
+        for (const b of teamB) {
+          checkHit(a, b);
+          checkHit(b, a);
+        }
+      }
+      updateProjectiles(p1);
+      updateProjectiles(p2);
+      updateProjectiles(cpu1);
+      updateProjectiles(cpu2);
+
+      const allDead = team => team.every(f => f.health <= 0);
+      if (allDead(teamA) || allDead(teamB)) {
+        endRound();
+      }
+    } else {
+      p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), p2);
+      if (isCpuControlledMode()) updateCpuInput(p2, p1);
+      p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
+      checkHit(p1, p2);
+      checkHit(p2, p1);
+      updateProjectiles(p2);
+      updateProjectiles(p1);
+
+      if (p1.health <= 0 || p2.health <= 0) {
+        endRound();
+      }
     }
   } else if (game.state === GAME_STATES.COUNTDOWN) {
     if (game.countdownPhase === COUNTDOWN_PHASES.ROUND) {
@@ -256,21 +289,11 @@ function gameLoop() {
     game.roundMessageTimer--;
 
     // Update victory/defeat animations
-    if (p1.victoryTimer > 0) {
-      p1.victoryTimer--;
-      p1.frame++;
-    }
-    if (p2.victoryTimer > 0) {
-      p2.victoryTimer--;
-      p2.frame++;
-    }
-    if (p1.defeatTimer > 0) {
-      p1.defeatTimer--;
-      p1.frame++;
-    }
-    if (p2.defeatTimer > 0) {
-      p2.defeatTimer--;
-      p2.frame++;
+    const allFighters = getAllFighters();
+    for (const f of allFighters) {
+      if (!f) continue;
+      if (f.victoryTimer > 0) { f.victoryTimer--; f.frame++; }
+      if (f.defeatTimer > 0) { f.defeatTimer--; f.frame++; }
     }
 
     if (game.roundMessageTimer <= 0 && game.state === GAME_STATES.ROUND_END) {
@@ -284,8 +307,15 @@ function gameLoop() {
 
   updateParticles();
 
-  p1.draw();
-  p2.draw();
+  if (isTeamVsTeamMode()) {
+    p1.draw();
+    p2.draw();
+    cpu1.draw();
+    cpu2.draw();
+  } else {
+    p1.draw();
+    p2.draw();
+  }
   drawProjectiles();
   drawParticles();
 
@@ -382,12 +412,19 @@ ui.battlePlanButton.addEventListener('click', () => {
   openCharacterSelect();
 });
 
+ui.teamButton.addEventListener('click', () => {
+  ensureAudioReady();
+  game.mode = MATCH_MODES.TEAM_VS_TEAM;
+  playUiSound('start');
+  openCharacterSelect();
+});
+
 ui.pauseModeButtons.addEventListener('click', e => {
   const button = e.target.closest('[data-mode]');
   if (!button) return;
 
   const mode = button.dataset.mode;
-  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN) {
+  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM) {
     leavePausedSessionForMode(mode);
   }
 });

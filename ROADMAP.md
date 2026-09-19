@@ -24,6 +24,8 @@
 - [x] Thirteenth character (`SNEK`)
 - [x] Fourteenth character (`REPDOG`)
 - [x] Fifteenth character (`DOGGABAL`)
+- [x] Sixteenth character (`KANOINE`)
+- [x] Seventeenth character (`PIXZEL ZLASZH`)
 - [x] Character-specific stats and movesets
 - [ ] 3 new background stages
 - [ ] Stage selection
@@ -73,7 +75,7 @@
 
 ## Current Build Notes
 
-- Roster is now 16 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, and `KANOINE`
+- Roster is now 17 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, `KANOINE`, and `PIXZEL ZLASZH`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
@@ -84,6 +86,8 @@
 - `SUBDOG` passively spawns an ice clone every 5 seconds that lasts 2 seconds and freezes the opponent on contact for 2 seconds
 - `MAKDOG` is a red SKORPDOG variant with red vest/mask
 - `KANOINE` is a white dog with gray left half face, pure red glowing left eye, white belly, brown stripe, and fully gray left ear
+- `PIXZEL ZLASZH` is a hidden black dog with V-shaped red visor, rainbow outline glow, and red pixel puff particles; active special steals opponent's passive or active at random, falls back to black katana slash with red pixel trail; unlock by completing Battle Plan as DOGGOMELEON
+- `SKORPDOG` has a passive fire spit that burns the opponent for 3 seconds with skull face transformation
 - `DOGGOMELEON` excludes robot-ninjas `SEKDOG` and `CYDOG` from its morph pool
 - MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
 - `REPDOG` summons a green python capture and spits a single large acid glob

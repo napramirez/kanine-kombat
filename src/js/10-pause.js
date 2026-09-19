@@ -73,6 +73,7 @@ function leavePausedSessionForMode(mode) {
   resumeAudioFromOverlay();
   game.mode = mode;
   if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
+  removeTeamHUD();
   ensureAudioReady();
   playUiSound('start');
   openCharacterSelect(true);
@@ -100,6 +101,7 @@ function openTitleScreen() {
   clearAllGamepadHeld();
   resetCpuState();
   resetBattlePlanState();
+  removeTeamHUD();
   ui.charSelect.style.display = 'none';
   ui.startScreen.style.display = 'flex';
   game.state = GAME_STATES.MENU;

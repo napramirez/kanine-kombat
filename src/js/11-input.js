@@ -381,6 +381,10 @@ function updateCharSelectModeUI() {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';
+  } else if (isTeamVsTeamMode()) {
+    ui.p2SelectLabel.textContent = 'PLAYER 2';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
+    ui.fightButton.textContent = 'TEAM FIGHT!';
   } else if (isCpuMode()) {
     ui.p2SelectLabel.textContent = 'CHOOSE FOR CPU';
     ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
@@ -395,7 +399,7 @@ function updateCharSelectModeUI() {
 function updateCpuInput(cpuFighter, opponent) {
   resetInputState(keys2);
 
-  if (cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
+  if (!opponent || cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
 
   cpuState.attackCooldown = Math.max(0, cpuState.attackCooldown - 1);
   cpuState.blockFrames = Math.max(0, cpuState.blockFrames - 1);

@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 16+ fighters are present: 13 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, and `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`
+- 17+ fighters are present: 13 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`, and `PIXZEL ZLASZH` unlocks when the Battle Plan is completed as `DOGGOMELEON`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states, with a global navigation cooldown
@@ -17,6 +17,8 @@ Use these prompts to iterate on the current game.
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - `DOGGOMELEON` passively cycles through random ninja-type characters every 5 seconds
 - `KANOINE` has a white body, gray left face half, pure red glowing left eye, white belly, brown stripe, and fully gray left ear
+- `PIXZEL ZLASZH` has a black body, V-shaped red visor, rainbow outline glow, red pixel puff particles, and an active special that steals the opponent's passive or active at random, falling back to a pure black katana slash with red pixel trail
+- `SKORPDOG` has a passive fire spit that burns the opponent for 3 seconds with skull face transformation
 - `P` pause flow exists for fights and Battle Plan stepper screens; `Start` navigates to mode selection from pause
 
 ## Quick Fixes

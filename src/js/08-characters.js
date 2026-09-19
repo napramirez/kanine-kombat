@@ -16,6 +16,7 @@ let game = {
   continueCountdown: 0,
   continueTimerInterval: null,
   winStreak: { p1: 0, p2: 0 },
+  teamRoundsWon: { A: 0, B: 0 },
   pause: {
     active: false,
     returnState: '',
@@ -245,10 +246,23 @@ const CHARACTERS = [
     specialGain: 0.25,
     passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.smowkdawg.passiveIntervalFrames,
     desc: 'STRIKER'
+  },
+  {
+    id: 'pixzel',
+    name: 'PIXZEL ZLASZH',
+    hidden: true,
+    color1: '#0a0a0a',
+    color2: '#111111',
+    eyeColor: '#ff1744',
+    speed: 6,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'GLITCH'
   }
 ];
 
 const HIDDEN_CHARACTER_UNLOCKS_KEY = 'kanine-kombat-hidden-character-unlocks-v1';
+
 const unlockedHiddenCharacterIds = (() => {
   try {
     const stored = JSON.parse(window.localStorage.getItem(HIDDEN_CHARACTER_UNLOCKS_KEY) || '[]');
@@ -294,6 +308,8 @@ function unlockHiddenCharacter(id) {
 
 let p1Selection = getSelectableCharacterIndex(0);
 let p2Selection = getSelectableCharacterIndex(1, p1Selection);
+let cpu1Selection = 0;
+let cpu2Selection = 0;
 let p1Confirmed = false;
 let p2Confirmed = false;
 
@@ -302,6 +318,8 @@ const keys2 = { left: false, right: false, up: false, down: false, block: false 
 
 let p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
 let p2 = new Fighter(PLAYER_SPAWNS.p2, CHARACTERS[p2Selection], -1);
+let cpu1 = null;
+let cpu2 = null;
 
 function isCpuMode() {
   return game.mode === MATCH_MODES.CPU;
@@ -311,8 +329,46 @@ function isBattlePlanMode() {
   return game.mode === MATCH_MODES.BATTLE_PLAN;
 }
 
+function isTeamVsTeamMode() {
+  return game.mode === MATCH_MODES.TEAM_VS_TEAM;
+}
+
 function isCpuControlledMode() {
   return isCpuMode() || isBattlePlanMode();
+}
+
+function getAllFighters() {
+  if (isTeamVsTeamMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
+  return [p1, p2];
+}
+
+function getTeamFighters(team) {
+  return getAllFighters().filter(f => f && f.team === team && f.health > 0);
+}
+
+function getAliveOpponents(fighter) {
+  if (!fighter.team) return [fighter === p1 ? p2 : p1];
+  const oppTeam = fighter.team === 'A' ? 'B' : 'A';
+  return getTeamFighters(oppTeam);
+}
+
+function getClosestOpponent(fighter) {
+  const opponents = getAliveOpponents(fighter);
+  if (opponents.length === 0) return null;
+  let closest = opponents[0];
+  let minDist = Math.abs(fighter.x - closest.x);
+  for (let i = 1; i < opponents.length; i++) {
+    const dist = Math.abs(fighter.x - opponents[i].x);
+    if (dist < minDist) {
+      minDist = dist;
+      closest = opponents[i];
+    }
+  }
+  return closest;
+}
+
+function getTeamTotalHealth(team) {
+  return getTeamFighters(team).reduce((sum, f) => sum + f.health, 0);
 }
 
 function getCharacterById(id) {

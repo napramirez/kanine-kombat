@@ -102,6 +102,21 @@ function spawnSmokePuff(x, y) {
   });
 }
 
+function spawnPixzelPixelPuff(x, y) {
+  particles.push({
+    x: x + (Math.random() - 0.5) * 20,
+    y: y - Math.random() * 10,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: -0.3 - Math.random() * 0.8,
+    life: 25 + Math.floor(Math.random() * 10),
+    maxLife: 35,
+    color: ['#ff1744', '#ff4444', '#cc0000', '#ff6b6b'][Math.floor(Math.random() * 4)],
+    size: 3 + Math.random() * 4,
+    type: 'pixelPuff',
+    glow: true
+  });
+}
+
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
@@ -112,7 +127,7 @@ function updateParticles() {
     }
     p.x += p.vx;
     p.y += p.vy;
-    if (p.type === 'smokePuff') {
+    if (p.type === 'smokePuff' || p.type === 'pixelPuff') {
       p.vx *= 0.98;
     } else {
       p.vy += 0.2;
@@ -155,6 +170,16 @@ function drawParticles() {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size * alpha * 0.6, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'pixelPuff') {
+      ctx.save();
+      if (p.glow) {
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+      }
+      ctx.fillStyle = p.color;
+      const s = p.size * alpha;
+      ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+      ctx.restore();
     } else {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size * alpha, p.size * alpha);

@@ -77,9 +77,15 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
-    this.skorpdogFireTimer = 0;
+    this.skorpdogFireActive = false;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
+    this.pixzelStealTimer = 0;
+    this.pixzelStolenPassive = '';
+    this.pixzelStolenActive = '';
+    this.pixzelKatanaActive = false;
+    this.pixzelKatanaTimer = 0;
+    this.team = null;
   }
 
   reset(x) {
@@ -145,9 +151,14 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
-    this.skorpdogFireTimer = 0;
+    this.skorpdogFireActive = false;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
+    this.pixzelStealTimer = 0;
+    this.pixzelStolenPassive = '';
+    this.pixzelStolenActive = '';
+    this.pixzelKatanaActive = false;
+    this.pixzelKatanaTimer = 0;
   }
 
   getHurtbox() {
@@ -217,7 +228,7 @@ class Fighter {
         this.teleportPunchDone = false;
         this.sekdogChestOpen = true;
       } else if (this.name === 'BORKO') {
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.borko;
         this.attackTimer = special.airFrames;
         this.borkoImpactX = Math.max(
@@ -244,7 +255,7 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'DOGGABAL') {
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.doggbal;
         this.attackTimer = special.dashFrames;
         this.doggbalDashActive = true;
@@ -283,7 +294,7 @@ class Fighter {
         this.isCrouching = false;
       } else if (this.specialFormSource === 'MAKDOG') {
         const special = COMBAT.special.makdog;
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         this.attackTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         this.makdogSpecialActive = true;
         this.makdogSpecialPhase = 'eyeGlow';
@@ -305,11 +316,15 @@ class Fighter {
         this.onGround = true;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'PIXZEL ZLASZH') {
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        this.attackTimer = COMBAT.special.duration;
+        this.triggerPixzelSteal(opponent);
       } else {
         this.attackTimer = COMBAT.special.duration;
       }
       this.special = 0;
-      if (this.specialFormSource !== 'KANOINE') spawnProjectile(this);
+      if (this.specialFormSource !== 'KANOINE' && this.specialFormSource !== 'PIXZEL ZLASZH') spawnProjectile(this);
       if (this.name === 'CYDOG') {
         this.attackTimer = 0;
         this.state = 'idle';
@@ -859,13 +874,11 @@ class Fighter {
   updateScorpdogPassive(opponent) {
     if (this.name !== 'SKORPDOG' || this.health <= 0) return;
 
-    if (this.skorpdogFireTimer > 0) this.skorpdogFireTimer--;
-
     this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
     if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
 
     this.passiveSpecial = 0;
-    this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+    this.skorpdogFireActive = true;
     spawnScorpdogFireSpit(this, opponent);
   }
 
@@ -886,6 +899,12 @@ class Fighter {
       }
       return;
     }
+
+    this.updateKanoineDaggers(opponent);
+  }
+
+  updateKanoineDaggers(opponent) {
+    const special = COMBAT.special.kanoine;
 
     // Update daggers
     for (let i = this.kanoineDaggers.length - 1; i >= 0; i--) {
@@ -942,19 +961,154 @@ class Fighter {
     }
   }
 
+  updatePixzelPassive(opponent) {
+    if (this.name !== 'PIXZEL ZLASZH' || this.health <= 0) return;
+
+    if (this.pixzelStealTimer > 0) {
+      this.pixzelStealTimer--;
+      // Re-trigger stolen passive periodically
+      if (this.pixzelStolenPassive && this.pixzelStealTimer % 60 === 0) {
+        this.triggerStolenPassive(opponent);
+      }
+      // Update stolen KANOINE daggers
+      if (this.pixzelStolenPassive === 'KANOINE') {
+        this.updateKanoineDaggers(opponent);
+      }
+      if (this.pixzelStealTimer <= 0) {
+        this.pixzelStolenPassive = '';
+        this.pixzelStolenActive = '';
+        this.kanoineDaggers = [];
+      }
+    }
+  }
+
+  triggerPixzelSteal(opponent) {
+    const special = COMBAT.special.pixzel;
+    this.pixzelStealTimer = special.stealDurationFrames;
+
+    // Randomly choose to steal passive or active
+    const stealPassive = Math.random() < 0.5;
+
+    if (stealPassive && opponent.passiveSpecialGain > 0) {
+      // Steal opponent's passive ability
+      this.pixzelStolenPassive = opponent.name;
+      this.pixzelStolenActive = '';
+      this.triggerStolenPassive(opponent);
+    } else if (!stealPassive) {
+      // Steal opponent's active special
+      this.pixzelStolenActive = opponent.name;
+      this.pixzelStolenPassive = '';
+      this.triggerStolenActive(opponent);
+    } else {
+      // Cannot imitate - use katana slash
+      this.pixzelStolenPassive = '';
+      this.pixzelStolenActive = '';
+      this.triggerKatanaSlash(opponent);
+    }
+  }
+
+  triggerStolenPassive(opponent) {
+    const stolenName = this.pixzelStolenPassive;
+    if (stolenName === 'RAYDOG') {
+      spawnRaydogPassiveArcLightning(this, opponent);
+    } else if (stolenName === 'SUBDOG') {
+      spawnSubdogIceClone(this);
+    } else if (stolenName === 'SMOWKDAWG') {
+      spawnSmowkdawgSmokeCloud(this);
+    } else if (stolenName === 'SKORPDOG') {
+      this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+      spawnScorpdogFireSpit(this, opponent);
+    } else if (stolenName === 'KANOINE') {
+      const special = COMBAT.special.kanoine;
+      this.kanoineDaggers = [
+        { angle: 0, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false },
+        { angle: Math.PI, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false }
+      ];
+    } else if (stolenName === 'DOGGOMELEON') {
+      const pool = DOGGOMELEON_NINJA_POOL.filter(n => n !== this.doggomeleonFormName);
+      this.doggomeleonFormName = pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+
+  triggerStolenActive(opponent) {
+    const stolenName = this.pixzelStolenActive;
+    this.specialFormSource = stolenName;
+    this.attackTimer = COMBAT.special.duration;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    spawnProjectile(this);
+  }
+
+  triggerKatanaSlash(opponent) {
+    const special = COMBAT.special.pixzel;
+    this.pixzelKatanaActive = true;
+    this.pixzelKatanaTimer = special.katanaSlashFrames;
+    this.attackTimer = special.katanaSlashFrames;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.vx = 0;
+  }
+
+  updateKatanaSlash(opponent) {
+    if (!this.pixzelKatanaActive) return;
+
+    const special = COMBAT.special.pixzel;
+    this.pixzelKatanaTimer--;
+
+    // Spawn red pixel square trail particles
+    if (this.frame % 2 === 0) {
+      const slashX = this.x + this.facing * (40 + Math.random() * 30);
+      const slashY = this.y - 40 - Math.random() * 40;
+      spawnPixzelPixelPuff(slashX, slashY);
+    }
+
+    // Hit detection at the midpoint of the slash
+    if (this.pixzelKatanaTimer === Math.floor(special.katanaSlashFrames / 2)) {
+      const dx = Math.abs(opponent.x - this.x);
+      const dy = Math.abs((opponent.y - 50) - (this.y - 50));
+      if (dx < special.katanaRange && dy < 60) {
+        opponent.takeHit(special.katanaDamage, special.katanaKnockback, this.facing);
+        addParticle(opponent.x, opponent.y - 50, 'hit');
+        playImpactSound('hit');
+        game.screenShake = COMBAT.effects.hitShake;
+        game.hitStop = COMBAT.effects.meleeHitStop;
+      }
+    }
+
+    if (this.pixzelKatanaTimer <= 0) {
+      this.pixzelKatanaActive = false;
+      this.attackTimer = 0;
+      this.state = 'idle';
+    }
+  }
+
   update(keys, opponent) {
+    const effectiveOpponent = (isTeamVsTeamMode() && this.team) ? getClosestOpponent(this) : opponent;
     this.frame++;
     this.updateDoggomeleonMorph();
-    this.updateRaydogPassive(opponent);
-    this.updateSubdogPassive(opponent);
-    this.updateSmowkdawgPassive(opponent);
-    this.updateScorpdogPassive(opponent);
-    this.updateKanoinePassive(opponent);
+    if (effectiveOpponent) {
+      this.updateRaydogPassive(effectiveOpponent);
+      this.updateSubdogPassive(effectiveOpponent);
+      this.updateSmowkdawgPassive(effectiveOpponent);
+      this.updateScorpdogPassive(effectiveOpponent);
+      this.updateKanoinePassive(effectiveOpponent);
+      this.updatePixzelPassive(effectiveOpponent);
+      if (this.pixzelKatanaActive) this.updateKatanaSlash(effectiveOpponent);
+    }
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
       if (this.smowkdawgPuffTimer <= 0) {
         this.smowkdawgPuffTimer = 6 + Math.floor(Math.random() * 4);
         spawnSmokePuff(this.x, this.y);
+      }
+    }
+    if (this.name === 'PIXZEL ZLASZH' && this.health > 0) {
+      this.smowkdawgPuffTimer--;
+      if (this.smowkdawgPuffTimer <= 0) {
+        this.smowkdawgPuffTimer = 8 + Math.floor(Math.random() * 5);
+        spawnPixzelPixelPuff(this.x, this.y);
       }
     }
     if (this.smokeCloudTimer > 0) this.smokeCloudTimer--;
@@ -1076,38 +1230,38 @@ class Fighter {
     }
 
     if (this.teleportPhase) {
-      this.updateSekdogTeleport(opponent);
+      if (effectiveOpponent) this.updateSekdogTeleport(effectiveOpponent);
       return;
     }
 
     if (this.borkoLeapActive) {
-      this.updateBorkoSpecial(opponent);
+      if (effectiveOpponent) this.updateBorkoSpecial(effectiveOpponent);
       return;
     }
 
     if (this.snekSlitherActive) {
-      this.updateSnekSlither(opponent);
+      if (effectiveOpponent) this.updateSnekSlither(effectiveOpponent);
       return;
     }
 
     if (this.makdogSpecialActive) {
-      this.updateMakdogSpecial(opponent);
+      if (effectiveOpponent) this.updateMakdogSpecial(effectiveOpponent);
       return;
     }
 
     if (this.raydogDashActive) {
-      this.updateRaydogSupermanDash(opponent);
+      if (effectiveOpponent) this.updateRaydogSupermanDash(effectiveOpponent);
       return;
     }
 
     if (this.doggbalDashActive) {
-      this.updateDoggbalDash(opponent);
+      if (effectiveOpponent) this.updateDoggbalDash(effectiveOpponent);
       return;
     }
 
     // Face opponent
-    if (this.attackTimer <= 0 && this.hitTimer <= 0) {
-      this.facing = opponent.x > this.x ? 1 : -1;
+    if (this.attackTimer <= 0 && this.hitTimer <= 0 && effectiveOpponent) {
+      this.facing = effectiveOpponent.x > this.x ? 1 : -1;
     }
 
     // Timers

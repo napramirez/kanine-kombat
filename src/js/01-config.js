@@ -17,7 +17,8 @@ const GAME_STATES = {
 const MATCH_MODES = {
   VERSUS: 'versus',
   CPU: 'cpu',
-  BATTLE_PLAN: 'battlePlan'
+  BATTLE_PLAN: 'battlePlan',
+  TEAM_VS_TEAM: 'teamVsTeam'
 };
 
 const CHAR_SELECT_TIMER_SECONDS = 30;
@@ -44,7 +45,11 @@ const FIGHTER_LAYOUT = {
 
 const PLAYER_SPAWNS = {
   p1: 250,
-  p2: 774
+  p2: 774,
+  teamA1: 200,
+  teamA2: 300,
+  teamB1: 724,
+  teamB2: 824
 };
 
 const SPECIAL_METER_MAX = 100;
@@ -195,6 +200,13 @@ const COMBAT = {
       stunMs: 1000,
       rollBackSpeed: 10,
       rollBackFrames: 20
+    },
+    pixzel: {
+      stealDurationFrames: 120,
+      katanaDamage: 20,
+      katanaKnockback: 12,
+      katanaRange: 150,
+      katanaSlashFrames: 20
     }
   },
   block: {
@@ -267,6 +279,7 @@ const ui = {
   startButton: document.getElementById('start-btn'),
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
+  teamButton: document.getElementById('team-btn'),
   fightButton: document.getElementById('fight-btn'),
   p1SelectLabel: document.getElementById('p1-select-label'),
   p2SelectLabel: document.getElementById('p2-select-label'),
@@ -305,6 +318,8 @@ const ui = {
   }
 };
 
-const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.fullscreenBtn];
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.fullscreenBtn];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
+
+const teamUI = { elements: null };
 

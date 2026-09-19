@@ -72,6 +72,17 @@ None currently tracked.
 - [ ] SUBDOG ice clone can be blocked by the opponent
 - [ ] MAX COMBO triggers at 10 hits, displays "MAX COMBO" text, and pushes opponent to screen edge
 - [ ] MAX COMBO pushback works during DOGGABAL spin and stun/frozen states
+- [ ] PIXZEL ZLASZH has black body, V-shaped red visor, and rainbow outline glow
+- [ ] PIXZEL ZLASZH spawns red glowing pixel squares from feet
+- [ ] PIXZEL ZLASZH active special steals opponent's passive or active at random
+- [ ] PIXZEL ZLASZH falls back to black katana slash when opponent has no passive to steal
+- [ ] PIXZEL ZLASZH katana slash has red pixel square trail
+- [ ] PIXZEL ZLASZH stolen passive re-triggers periodically during steal duration
+- [ ] PIXZEL ZLASZH is hidden until Battle Plan is completed as DOGGOMELEON
+- [ ] PIXZEL ZLASZH unlock persists after returning to title screen and reopening game
+- [ ] SKORPDOG passive fire spit burns opponent for 3 seconds
+- [ ] SKORPDOG skull face appears when fire is in flight, reverts to normal face on hit
+- [ ] KANOINE orbiting daggers home toward opponent on proximity
 
 ### Movement
 - [ ] Jump height is consistent

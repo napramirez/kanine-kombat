@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a sixteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a seventeen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -30,6 +30,7 @@ Players choose from a shared roster before each match.
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
 | `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask |
 | `KANOINE` | Duality | 5 | 100 | White dog, gray left half face, pure red glowing left eye, white belly, brown stripe, fully gray left ear |
+| `PIXZEL ZLASZH` | Glitch | 6 | 100 | Hidden black dog with V-shaped red visor, rainbow outline glow; unlock by completing the Battle Plan as DOGGOMELEON |
 
 ### Combat System
 
@@ -57,6 +58,7 @@ Players choose from a shared roster before each match.
 - `DOGGABAL`: dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
 - `SNEK`: slithers rapidly toward the opponent, coils around them, and applies a 3-second full stun
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds; passive ice clone spawns every 5 seconds at SUBDOG's position, lasts 2 seconds, and freezes the opponent on contact for 2 seconds
+- `PIXZEL ZLASZH`: active special randomly steals opponent's passive or active special; falls back to a pure black katana slash with red pixel trail when opponent has no passive to steal
 
 ### Combo System
 
@@ -77,7 +79,7 @@ Players choose from a shared roster before each match.
 
 - `ACTIVE` special meter is the normal player-triggered special meter
 - Base active-meter passive gain is `0.08` per frame
-- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
+- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, and `PIXZEL ZLASZH` gain active meter at `0.25` per frame; `RAYDOG` gains active meter at `0.75` per frame
 - On hit, attacker gains `damage * 0.8`
 - On hurt, defender gains `damage * 0.5`
 - On blocked hits, defenders gain `damage * 0.3`; `SHAO CATNIP` gains `damage * 0.5`; `BORKO` gains `damage * 0.75`
@@ -163,7 +165,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared sixteen-fighter roster
+- Shared seventeen-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route
@@ -173,6 +175,7 @@ fight or battlePlanStepper -> paused
 - Hidden fighters are absent from character select, Random 8, and unscripted CPU pools until unlocked
 - Defeating the Battle Plan `BORKO` sub-boss unlocks `BORKO`; defeating the `SHAO CATNIP` final boss unlocks `SHAO CATNIP`
 - Completing the Battle Plan as `NOOB SAIDOG` unlocks `SNEK`
+- Completing the Battle Plan as `DOGGOMELEON` unlocks `PIXZEL ZLASZH`
 - Unlocks persist in browser local storage; the two bosses remain explicitly scripted Battle Plan encounters rather than random route opponents
 
 ### HUD and Effects

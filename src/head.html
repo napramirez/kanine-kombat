@@ -126,15 +126,18 @@
 
   .player-name {
     position: absolute;
-    top: 44px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #fff;
     font-size: 11px;
     font-family: 'Press Start 2P', monospace;
-    text-shadow: 2px 2px #000;
+    text-shadow: 2px 2px 2px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000;
+    z-index: 1;
+    pointer-events: none;
   }
 
-  #p1-name { left: 22px; color: #ff6b6b; }
-  #p2-name { right: 22px; color: #74b9ff; }
+  #p1-name { left: 8px; }
+  #p2-name { right: 8px; }
 
   #ko-flash {
     position: absolute;

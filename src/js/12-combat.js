@@ -762,8 +762,10 @@ function createTeamHUD() {
     el.container.appendChild(h1.wrap);
     sideEl.h1 = h1.bar;
 
-    const n1 = makeLabel('team-' + s.prefix + '-n1', '', s.color1);
-    n1.style.cssText = `position:absolute;top:30px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px #000;`;
+    const n1 = makeLabel('team-' + s.prefix + '-n1', '', '#fff');
+    n1.style.cssText = `position:absolute;top:10px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px 1px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:16px;line-height:16px;`;
+    if (s.x === 'right') n1.style.paddingRight = '6px';
+    else n1.style.paddingLeft = '6px';
     el.container.appendChild(n1);
     sideEl.n1 = n1;
 
@@ -783,8 +785,10 @@ function createTeamHUD() {
     el.container.appendChild(h2.wrap);
     sideEl.h2 = h2.bar;
 
-    const n2 = makeLabel('team-' + s.prefix + '-n2', '', s.color1);
-    n2.style.cssText = `position:absolute;top:90px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px #000;`;
+    const n2 = makeLabel('team-' + s.prefix + '-n2', '', '#fff');
+    n2.style.cssText = `position:absolute;top:70px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px 1px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:16px;line-height:16px;`;
+    if (s.x === 'right') n2.style.paddingRight = '6px';
+    else n2.style.paddingLeft = '6px';
     el.container.appendChild(n2);
     sideEl.n2 = n2;
 

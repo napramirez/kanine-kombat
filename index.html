@@ -10169,50 +10169,50 @@ function createTeamHUD() {
 
   sides.forEach(s => {
     const sideEl = {};
-    const xStyle = s.x + ':12px;';
+    const xStyle = s.x + ':20px;';
 
     const h1 = makeBar('team-' + s.prefix + '-h1', `linear-gradient(180deg, ${s.color1}, ${s.color2})`, s.x === 'right');
-    h1.wrap.style.cssText = `position:absolute;top:10px;${xStyle}width:38%;height:16px;background:#222;border:2px solid #888;overflow:hidden;`;
+    h1.wrap.style.cssText = `position:absolute;top:12px;${xStyle}width:42%;height:30px;background:#222;border:3px solid #888;overflow:hidden;`;
     el.container.appendChild(h1.wrap);
     sideEl.h1 = h1.bar;
 
     const n1 = makeLabel('team-' + s.prefix + '-n1', '', '#fff');
-    n1.style.cssText = `position:absolute;top:10px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px 1px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:16px;line-height:16px;`;
-    if (s.x === 'right') n1.style.paddingRight = '6px';
-    else n1.style.paddingLeft = '6px';
+    n1.style.cssText = `position:absolute;top:12px;${xStyle}font-size:11px;font-family:'Press Start 2P',monospace;text-shadow:2px 2px 2px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:30px;line-height:30px;`;
+    if (s.x === 'right') n1.style.paddingRight = '8px';
+    else n1.style.paddingLeft = '8px';
     el.container.appendChild(n1);
     sideEl.n1 = n1;
 
     const s1 = makeBar('team-' + s.prefix + '-s1', `linear-gradient(90deg, ${s.color2}, ${s.color1})`, s.x === 'right');
-    s1.wrap.style.cssText = `position:absolute;top:42px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;`;
+    s1.wrap.style.cssText = `position:absolute;top:46px;${xStyle}width:28%;height:12px;background:#111;border:2px solid #555;overflow:hidden;`;
     el.container.appendChild(s1.wrap);
     sideEl.s1 = s1.bar;
 
     const p1 = makeBar('team-' + s.prefix + '-p1', `linear-gradient(90deg, ${s.pColor}, ${s.pColor})`, s.x === 'right');
-    p1.wrap.style.cssText = `position:absolute;top:54px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;display:none;`;
+    p1.wrap.style.cssText = `position:absolute;top:62px;${xStyle}width:28%;height:12px;background:#111;border:2px solid #555;overflow:hidden;display:none;`;
     el.container.appendChild(p1.wrap);
     sideEl.p1 = p1.bar;
     sideEl.p1Wrap = p1.wrap;
 
     const h2 = makeBar('team-' + s.prefix + '-h2', `linear-gradient(180deg, ${s.color1}, ${s.color2})`, s.x === 'right');
-    h2.wrap.style.cssText = `position:absolute;top:70px;${xStyle}width:38%;height:16px;background:#222;border:2px solid #888;overflow:hidden;`;
+    h2.wrap.style.cssText = `position:absolute;top:82px;${xStyle}width:42%;height:30px;background:#222;border:3px solid #888;overflow:hidden;`;
     el.container.appendChild(h2.wrap);
     sideEl.h2 = h2.bar;
 
     const n2 = makeLabel('team-' + s.prefix + '-n2', '', '#fff');
-    n2.style.cssText = `position:absolute;top:70px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px 1px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:16px;line-height:16px;`;
-    if (s.x === 'right') n2.style.paddingRight = '6px';
-    else n2.style.paddingLeft = '6px';
+    n2.style.cssText = `position:absolute;top:82px;${xStyle}font-size:11px;font-family:'Press Start 2P',monospace;text-shadow:2px 2px 2px #000,-1px -1px 1px #000,1px -1px 1px #000,-1px 1px 1px #000;z-index:1;pointer-events:none;height:30px;line-height:30px;`;
+    if (s.x === 'right') n2.style.paddingRight = '8px';
+    else n2.style.paddingLeft = '8px';
     el.container.appendChild(n2);
     sideEl.n2 = n2;
 
     const s2 = makeBar('team-' + s.prefix + '-s2', `linear-gradient(90deg, ${s.color2}, ${s.color1})`, s.x === 'right');
-    s2.wrap.style.cssText = `position:absolute;top:102px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;`;
+    s2.wrap.style.cssText = `position:absolute;top:116px;${xStyle}width:28%;height:12px;background:#111;border:2px solid #555;overflow:hidden;`;
     el.container.appendChild(s2.wrap);
     sideEl.s2 = s2.bar;
 
     const p2 = makeBar('team-' + s.prefix + '-p2', `linear-gradient(90deg, ${s.pColor}, ${s.pColor})`, s.x === 'right');
-    p2.wrap.style.cssText = `position:absolute;top:114px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;display:none;`;
+    p2.wrap.style.cssText = `position:absolute;top:132px;${xStyle}width:28%;height:12px;background:#111;border:2px solid #555;overflow:hidden;display:none;`;
     el.container.appendChild(p2.wrap);
     sideEl.p2 = p2.bar;
     sideEl.p2Wrap = p2.wrap;
@@ -10242,6 +10242,13 @@ function createTeamHUD() {
 
     el.sideBars[s.prefix] = sideEl;
   });
+
+  const timer = document.createElement('div');
+  timer.id = 'team-timer';
+  timer.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);background:#111;border:3px solid #888;color:#f1c40f;font-size:22px;padding:4px 16px;font-family:"Press Start 2P",monospace;min-width:70px;text-align:center;pointer-events:none;';
+  timer.textContent = game.timer;
+  el.container.appendChild(timer);
+  el.timer = timer;
 
   overlay.appendChild(el.container);
   teamUI.elements = el;
@@ -10311,6 +10318,8 @@ function updateTeamUI() {
   updateFighterBars(el.sideBars.a, p2, '2');
   updateFighterBars(el.sideBars.b, cpu1, '1');
   updateFighterBars(el.sideBars.b, cpu2, '2');
+
+  el.timer.textContent = game.timer;
 }
 
 

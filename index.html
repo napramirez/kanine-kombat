@@ -10242,12 +10242,6 @@ function createTeamHUD() {
 
   overlay.appendChild(el.container);
   teamUI.elements = el;
-
-  const t = document.createElement('div');
-  t.id = 'team-label';
-  t.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-family:"Press Start 2P",monospace;color:#f1c40f;text-shadow:2px 2px #000;pointer-events:none;z-index:5;';
-  t.textContent = 'TEAM VS TEAM';
-  el.container.appendChild(t);
 }
 
 function removeTeamHUD() {

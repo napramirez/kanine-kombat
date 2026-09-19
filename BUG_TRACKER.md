@@ -70,8 +70,49 @@ None currently tracked.
 - [ ] DOGGABAL has olive green vertical stripe, brown horizontal stripe, and oxygen mask
 - [ ] SUBDOG passive ice clone spawns every 5 seconds, lasts 2 seconds, and freezes opponent on contact for 2 seconds
 - [ ] SUBDOG ice clone can be blocked by the opponent
-- [ ] MAX COMBO triggers at 10 hits, displays "MAX COMBO" text, and pushes opponent to screen edge
-- [ ] MAX COMBO pushback works during DOGGABAL spin and stun/frozen states
+- [ ] MAX COMBO triggers at 10 hits, displays "MAX COMBO" text, and pushes both fighters apart
+- [ ] Defeated fighters immediately show defeat pose (crossed eyes, tongue, stars) and cannot attack, take damage, gain meter, or activate specials
+- [ ] Health <= 0 guards prevent dead fighters from attacking, being hit, or gaining meter
+- [ ] PIXZEL ZLASZH has black body, V-shaped red visor, and rainbow outline glow
+- [ ] PIXZEL ZLASZH spawns red glowing pixel squares from feet
+- [ ] PIXZEL ZLASZH active special steals opponent's passive or active at random
+- [ ] PIXZEL ZLASZH falls back to black katana slash when opponent has no passive to steal
+- [ ] PIXZEL ZLASZH katana slash has red pixel square trail
+- [ ] PIXZEL ZLASZH stolen passive re-triggers periodically during steal duration
+- [ ] PIXZEL ZLASZH is hidden until Battle Plan is completed as DOGGOMELEON
+- [ ] PIXZEL ZLASZH unlock persists after returning to title screen and reopening game
+- [ ] SKORPDOG passive fire spit burns opponent for 3 seconds
+- [ ] SKORPDOG skull face appears when fire is in flight, reverts to normal face on hit
+- [ ] KANOINE orbiting daggers home toward opponent on proximity
+
+### Team VS Team
+- [ ] Team HUD displays health, special, passive, and combo for all 4 fighters
+- [ ] Team round wins tracked separately (best of 3)
+- [ ] Friendly fire prevention: teammates cannot damage each other (melee, projectiles, specials)
+- [ ] CPU targets closest human opponent
+- [ ] Humans can freely attack either CPU opponent
+- [ ] Defeated team members show defeat pose and cannot continue fighting
+- [ ] Defeated team members stay in defeat pose when their team wins the round
+- [ ] Team mode character select allows both P1 and P2 to pick fighters
+- [ ] CPU fighters are randomly pre-selected on the opposing side
+
+### MAKDOG
+- [ ] Eye glow phase flashes green
+- [ ] Lift phase raises opponent 220px
+- [ ] Hold phase suspends opponent
+- [ ] Slam phase deals 30 damage, 8 knockback, 1-second stun
+- [ ] Opponent immobilized during entire grapple sequence
+
+### KANOINE
+- [ ] Active special is a dash-punch that flies through opponent
+- [ ] Passive daggers spawn every 5 seconds, last 2 seconds
+- [ ] Daggers home toward opponent within 300px range, dealing 5 damage each
+
+### SMOWKDAWG Passive
+- [ ] Smoke cloud spawns every 8 seconds, lasts 3 seconds
+- [ ] Movement speed doubles during smoke cloud
+- [ ] Jump velocity boosted by 25% during smoke cloud
+- [ ] SMOWKDAWG becomes nearly invisible (15% opacity) during smoke cloud
 
 ### Movement
 - [ ] Jump height is consistent

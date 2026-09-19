@@ -5,7 +5,7 @@ const DOGGOMELEON_NINJA_POOL = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG', 'NO
 const DOGGOMELEON_MORPH_FRAMES = 300;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG' || name === 'PIXZEL ZLASZH';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -79,6 +79,17 @@ function getMaskedTrimColors(name, frozen) {
       hoodieEdge: '#222',
       centerStripe: '#111',
       innerEar: '#333'
+    };
+  }
+
+  if (name === 'PIXZEL ZLASZH') {
+    return {
+      limbColor: '#0a0a0a',
+      pawColor: '#111',
+      hoodieColor: '#0a0a0a',
+      hoodieEdge: '#222',
+      centerStripe: '#0a0a0a',
+      innerEar: '#222'
     };
   }
 
@@ -192,6 +203,15 @@ function getMaskedGearColors(name, frozen, frame = 0) {
     };
   }
 
+  if (name === 'PIXZEL ZLASZH') {
+    return {
+      vestColor: getRainbowColor(frame, 0),
+      vestHighlight: getRainbowColor(frame, 1.2),
+      maskColor: getRainbowColor(frame, 2.4),
+      maskEdge: getRainbowColor(frame, 3.6)
+    };
+  }
+
   return {
     vestColor: '#87ceeb',
     vestHighlight: '#b0e0e6',
@@ -249,6 +269,37 @@ function drawCydogVisor(x, headY, frame) {
   x.fillStyle = `rgb(0, 191, ${blue})`;
   // Thin rectangular visor spanning both eyes
   x.fillRect(58, headY - 12, 34, 6);
+  x.restore();
+}
+
+function drawPixzelVisor(x, headY, frame) {
+  const flash = (Math.sin(frame * 0.3) + 1) * 0.5;
+  const red = Math.floor(200 + flash * 55);
+  x.save();
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 10 + flash * 10;
+  x.fillStyle = `rgb(${red}, 20, 68)`;
+  x.strokeStyle = `rgb(${red}, 20, 68)`;
+  x.lineWidth = 5;
+  x.lineCap = 'round';
+  x.lineJoin = 'round';
+  // V-shaped visor (very obtuse, wide angle)
+  x.beginPath();
+  x.moveTo(52, headY - 14);
+  x.lineTo(70, headY - 8);
+  x.lineTo(88, headY - 14);
+  x.stroke();
+  // Glow dots at tips
+  x.fillStyle = `rgba(${red}, 20, 68, 0.8)`;
+  x.beginPath();
+  x.arc(52, headY - 14, 3, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.arc(88, headY - 14, 3, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.arc(70, headY - 8, 3, 0, Math.PI * 2);
+  x.fill();
   x.restore();
 }
 
@@ -823,7 +874,9 @@ function drawSnekSprite(x, frame, state, frozen) {
 
 function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false, fighter = null) {
   const frozenSuffix = frozen ? '-frozen' : '';
-  const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}`;
+  const skullSuffix = (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) ? '-skull' : '';
+  const katanaSuffix = (name === 'PIXZEL ZLASZH' && fighter && fighter.pixzelKatanaActive) ? '-katana' : '';
+  const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}${skullSuffix}${katanaSuffix}`;
   if (spriteCache[key]) return spriteCache[key];
 
   const c = document.createElement('canvas');
@@ -979,6 +1032,31 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.arc(70, headY, 23, -2.5, -0.6);
     x.stroke();
 
+    // PIXZEL ZLASZH rainbow outline glow (body only)
+    if (name === 'PIXZEL ZLASZH' && !frozen) {
+      const glowColor = getRainbowColor(frame, 0, 0.6);
+      x.save();
+      x.shadowColor = glowColor;
+      x.shadowBlur = 12;
+      x.strokeStyle = getRainbowColor(frame, 0);
+      x.lineWidth = 2.5;
+      // Body outline only
+      x.beginPath();
+      x.ellipse(58, bodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+      x.stroke();
+      x.restore();
+      // Head outline glow
+      x.save();
+      x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+      x.shadowBlur = 15;
+      x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+      x.lineWidth = 2;
+      x.beginPath();
+      x.ellipse(70, headY, 24, 22, 0, 0, Math.PI * 2);
+      x.stroke();
+      x.restore();
+    }
+
     // Snout mask
     x.fillStyle = maskColor;
     x.beginPath();
@@ -1055,8 +1133,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   // KANOINE half-face (gray side with glowing red eye)
   if (name === 'KANOINE') drawKanoineHalfFace(x, headY, frame);
 
-  // Eyes (skip for CYDOG/SEKDOG - they have visor only)
-  if (name !== 'CYDOG' && name !== 'SEKDOG') {
+  // Eyes (skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+  if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
     // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
     if (name !== 'KANOINE') {
       x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -1097,9 +1175,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
   if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, headY, frame);
+  if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, headY, frame);
 
-  // SKORPDOG skull face during fire passive
-  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+  // SKORPDOG skull face during fire spit (in flight)
+  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
     drawScorpdogSkullFace(x, headY, frame);
   }
 
@@ -1449,6 +1528,69 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
         x.quadraticCurveTo(78, waveY + 4, 94, waveY);
         x.stroke();
       }
+    } else if (name === 'PIXZEL ZLASZH') {
+      // Pure black katana (longer blade)
+      x.save();
+      x.translate(70, bodyY - 10);
+      x.rotate(-0.8 + frame * 0.15);
+      // Blade (pure black, longer)
+      x.fillStyle = '#000';
+      x.beginPath();
+      x.moveTo(0, -3);
+      x.lineTo(65, -2);
+      x.lineTo(70, 0);
+      x.lineTo(65, 2);
+      x.lineTo(0, 3);
+      x.closePath();
+      x.fill();
+      // Blade edge highlight
+      x.strokeStyle = '#333';
+      x.lineWidth = 1;
+      x.beginPath();
+      x.moveTo(5, -2);
+      x.lineTo(65, -1);
+      x.stroke();
+      // Red pixels on blade
+      x.fillStyle = '#ff1744';
+      x.shadowColor = '#ff1744';
+      x.shadowBlur = 4;
+      for (let i = 0; i < 6; i++) {
+        const px = 10 + i * 9;
+        const py = (Math.random() - 0.5) * 3;
+        const s = 2 + Math.random() * 1.5;
+        x.fillRect(px - s / 2, py - s / 2, s, s);
+      }
+      x.shadowBlur = 0;
+      // Guard
+      x.fillStyle = '#1a1a1a';
+      x.fillRect(-3, -6, 6, 12);
+      // Handle
+      x.fillStyle = '#0a0a0a';
+      x.fillRect(-15, -3, 14, 6);
+      // Handle wrap
+      x.strokeStyle = '#222';
+      x.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        x.beginPath();
+        x.moveTo(-13 + i * 3, -3);
+        x.lineTo(-11 + i * 3, 3);
+        x.stroke();
+      }
+      x.restore();
+      // Red pixel square slash trail
+      x.save();
+      x.shadowColor = '#ff1744';
+      x.shadowBlur = 8;
+      x.fillStyle = '#ff1744';
+      for (let i = 0; i < 5; i++) {
+        const trailAngle = -0.8 + frame * 0.15;
+        const dist = 20 + i * 10;
+        const px = 70 + Math.cos(trailAngle) * dist + (Math.random() - 0.5) * 6;
+        const py = bodyY - 10 + Math.sin(trailAngle) * dist + (Math.random() - 0.5) * 6;
+        const s = 3 + Math.random() * 2;
+        x.fillRect(px - s / 2, py - s / 2, s, s);
+      }
+      x.restore();
     } else {
       const sf = frame % 12;
       const ballX = 95 + sf * 4;
@@ -1643,6 +1785,30 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(70, vicHeadY, 23, -2.5, -0.6);
       x.stroke();
 
+      // PIXZEL ZLASZH rainbow outline glow (victory, body only)
+      if (name === 'PIXZEL ZLASZH' && !frozen) {
+        const glowColor = getRainbowColor(frame, 0, 0.6);
+        x.save();
+        x.shadowColor = glowColor;
+        x.shadowBlur = 12;
+        x.strokeStyle = getRainbowColor(frame, 0);
+        x.lineWidth = 2.5;
+        x.beginPath();
+        x.ellipse(58, vicBodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+        // Head outline glow
+        x.save();
+        x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+        x.shadowBlur = 15;
+        x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+        x.lineWidth = 2;
+        x.beginPath();
+        x.ellipse(70, vicHeadY, 24, 22, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+      }
+
       // Snout mask
       x.fillStyle = maskColor;
       x.beginPath();
@@ -1706,8 +1872,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(40 - jumpOffset * 0.3, 104, 14, 6);
     x.fillRect(60 + jumpOffset * 0.3, 104, 14, 6);
 
-    // Eyes (skip for CYDOG/SEKDOG - they have visor only)
-    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    // Eyes (skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
       // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
       if (name !== 'KANOINE') {
         x.fillStyle = '#fff';
@@ -1746,9 +1912,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
+    if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, vicHeadY, frame);
 
-    // SKORPDOG skull face during fire passive (victory)
-    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    // SKORPDOG skull face during fire spit (victory)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
       drawScorpdogSkullFace(x, vicHeadY, frame);
     }
 
@@ -1911,6 +2078,30 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(70, defHeadY, 23, -2.5, -0.6);
       x.stroke();
 
+      // PIXZEL ZLASZH rainbow outline glow (defeat, body only)
+      if (name === 'PIXZEL ZLASZH' && !frozen) {
+        const glowColor = getRainbowColor(frame, 0, 0.6);
+        x.save();
+        x.shadowColor = glowColor;
+        x.shadowBlur = 12;
+        x.strokeStyle = getRainbowColor(frame, 0);
+        x.lineWidth = 2.5;
+        x.beginPath();
+        x.ellipse(58, defBodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+        // Head outline glow
+        x.save();
+        x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+        x.shadowBlur = 15;
+        x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+        x.lineWidth = 2;
+        x.beginPath();
+        x.ellipse(70, defHeadY, 24, 22, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+      }
+
       // Snout mask
       x.fillStyle = maskColor;
       x.beginPath();
@@ -1948,8 +2139,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(23, defBodyY + 23, 14, 6);
     x.fillRect(83, defBodyY + 23, 14, 6);
 
-    // X eyes (dead) - skip for CYDOG/SEKDOG - they have visor only)
-    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    // X eyes (dead) - skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
       x.strokeStyle = '#333';
       x.lineWidth = 3;
       // Left X
@@ -1974,9 +2165,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // CYDOG/SEKDOG visor (defeat)
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);
+    if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, defHeadY, frame);
 
-    // SKORPDOG skull face during fire passive (defeat)
-    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    // SKORPDOG skull face during fire spit (defeat)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
       drawScorpdogSkullFace(x, defHeadY, frame);
     }
 

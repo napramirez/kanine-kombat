@@ -381,6 +381,10 @@ function updateCharSelectModeUI() {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';
+  } else if (isTeamVsTeamMode()) {
+    ui.p2SelectLabel.textContent = 'PLAYER 2';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
+    ui.fightButton.textContent = 'TEAM FIGHT!';
   } else if (isCpuMode()) {
     ui.p2SelectLabel.textContent = 'CHOOSE FOR CPU';
     ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
@@ -392,10 +396,11 @@ function updateCharSelectModeUI() {
   }
 }
 
-function updateCpuInput(cpuFighter, opponent) {
-  resetInputState(keys2);
+function updateCpuInput(cpuFighter, opponent, targetKeys) {
+  targetKeys = targetKeys || keys2;
+  resetInputState(targetKeys);
 
-  if (cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
+  if (!opponent || cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
 
   cpuState.attackCooldown = Math.max(0, cpuState.attackCooldown - 1);
   cpuState.blockFrames = Math.max(0, cpuState.blockFrames - 1);
@@ -413,16 +418,16 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (cpuState.blockFrames > 0) {
-    keys2.block = true;
-    if (closeRange && Math.random() > 0.5) keys2.down = true;
+    targetKeys.block = true;
+    if (closeRange && Math.random() > 0.5) targetKeys.down = true;
     return;
   }
 
   if (cpuState.retreatFrames > 0) {
-    keys2.left = !towardLeft;
-    keys2.right = towardLeft;
+    targetKeys.left = !towardLeft;
+    targetKeys.right = towardLeft;
     if (cpuState.jumpCooldown === 0 && Math.random() > 0.9) {
-      keys2.up = true;
+      targetKeys.up = true;
       cpuState.jumpCooldown = 45;
     }
     return;
@@ -446,21 +451,21 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (absDistance > 58) {
-    keys2.left = towardLeft;
-    keys2.right = !towardLeft;
+    targetKeys.left = towardLeft;
+    targetKeys.right = !towardLeft;
   } else {
-    keys2.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
-    keys2.right = !keys2.left;
+    targetKeys.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
+    targetKeys.right = !targetKeys.left;
     if (Math.random() > 0.96) cpuState.strafeBias *= -1;
   }
 
   if (cpuState.jumpCooldown === 0 && midRange && Math.random() > 0.985) {
-    keys2.up = true;
+    targetKeys.up = true;
     cpuState.jumpCooldown = 70;
   }
 
   if (closeRange && Math.random() > 0.985) {
-    keys2.down = true;
+    targetKeys.down = true;
   }
 }
 

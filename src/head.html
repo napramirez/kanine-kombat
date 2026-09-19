@@ -286,6 +286,20 @@
 
   #pause-battle-plan-btn:hover { background: #6c2d8d; }
 
+  #team-btn {
+    background: #1a5c3a;
+    border-color: #4cff88;
+  }
+
+  #team-btn:hover { background: #2a7a4f; }
+
+  #pause-team-btn {
+    background: #1a5c3a;
+    border-color: #4cff88;
+  }
+
+  #pause-team-btn:hover { background: #2a7a4f; }
+
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -1025,5 +1039,35 @@
 
   .round-dot.won-p1 { background: #e74c3c; border-color: #ff6b6b; box-shadow: 0 0 6px #e74c3c; }
   .round-dot.won-p2 { background: #2980b9; border-color: #74b9ff; box-shadow: 0 0 6px #2980b9; }
+
+  .team-bar-wrap {
+    position: absolute;
+    height: 16px;
+    background: #222;
+    border: 2px solid #888;
+    overflow: hidden;
+  }
+
+  .team-bar {
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .team-label {
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 1px 1px #000;
+  }
+
+  .team-combo {
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  .team-round-dots {
+    position: absolute;
+    top: 8px;
+  }
 
 </style>

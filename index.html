@@ -286,6 +286,20 @@
 
   #pause-battle-plan-btn:hover { background: #6c2d8d; }
 
+  #team-btn {
+    background: #1a5c3a;
+    border-color: #4cff88;
+  }
+
+  #team-btn:hover { background: #2a7a4f; }
+
+  #pause-team-btn {
+    background: #1a5c3a;
+    border-color: #4cff88;
+  }
+
+  #pause-team-btn:hover { background: #2a7a4f; }
+
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -1026,6 +1040,36 @@
   .round-dot.won-p1 { background: #e74c3c; border-color: #ff6b6b; box-shadow: 0 0 6px #e74c3c; }
   .round-dot.won-p2 { background: #2980b9; border-color: #74b9ff; box-shadow: 0 0 6px #2980b9; }
 
+  .team-bar-wrap {
+    position: absolute;
+    height: 16px;
+    background: #222;
+    border: 2px solid #888;
+    overflow: hidden;
+  }
+
+  .team-bar {
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .team-label {
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 1px 1px #000;
+  }
+
+  .team-combo {
+    font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px #000;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  .team-round-dots {
+    position: absolute;
+    top: 8px;
+  }
+
 </style>
 </head>
 <body>
@@ -1069,6 +1113,7 @@
       <button class="mode-btn" id="start-btn">2 PLAYER</button>
       <button class="mode-btn" id="cpu-btn">VS CPU</button>
       <button class="mode-btn" id="battle-plan-btn">BATTLE PLAN</button>
+      <button class="mode-btn" id="team-btn">TEAM VS TEAM</button>
     </div>
     <button id="fullscreen-btn">FULLSCREEN</button>
   </div>
@@ -1111,6 +1156,7 @@
       <button class="mode-btn" data-mode="versus">2 PLAYER</button>
       <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
       <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
+      <button class="mode-btn" id="pause-team-btn" data-mode="teamVsTeam">TEAM VS TEAM</button>
     </div>
     <button id="fullscreen-btn-pause">FULLSCREEN</button>
     <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
@@ -1145,7 +1191,8 @@ const GAME_STATES = {
 const MATCH_MODES = {
   VERSUS: 'versus',
   CPU: 'cpu',
-  BATTLE_PLAN: 'battlePlan'
+  BATTLE_PLAN: 'battlePlan',
+  TEAM_VS_TEAM: 'teamVsTeam'
 };
 
 const CHAR_SELECT_TIMER_SECONDS = 30;
@@ -1172,7 +1219,11 @@ const FIGHTER_LAYOUT = {
 
 const PLAYER_SPAWNS = {
   p1: 250,
-  p2: 774
+  p2: 774,
+  teamA1: 200,
+  teamA2: 300,
+  teamB1: 724,
+  teamB2: 824
 };
 
 const SPECIAL_METER_MAX = 100;
@@ -1323,6 +1374,13 @@ const COMBAT = {
       stunMs: 1000,
       rollBackSpeed: 10,
       rollBackFrames: 20
+    },
+    pixzel: {
+      stealDurationFrames: 120,
+      katanaDamage: 20,
+      katanaKnockback: 12,
+      katanaRange: 150,
+      katanaSlashFrames: 20
     }
   },
   block: {
@@ -1395,6 +1453,7 @@ const ui = {
   startButton: document.getElementById('start-btn'),
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
+  teamButton: document.getElementById('team-btn'),
   fightButton: document.getElementById('fight-btn'),
   p1SelectLabel: document.getElementById('p1-select-label'),
   p2SelectLabel: document.getElementById('p2-select-label'),
@@ -1433,8 +1492,10 @@ const ui = {
   }
 };
 
-const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.fullscreenBtn];
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.fullscreenBtn];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
+
+const teamUI = { elements: null };
 
 
 // === 02-audio.js ===
@@ -1818,7 +1879,7 @@ const DOGGOMELEON_NINJA_POOL = ['SKORPDOG', 'SUBDOG', 'TREMODOG', 'RAYNDOG', 'NO
 const DOGGOMELEON_MORPH_FRAMES = 300;
 
 function isMaskedFighter(name) {
-return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG';
+return name === 'SKORPDOG' || name === 'SUBDOG' || name === 'SEKDOG' || name === 'CYDOG' || name === 'TREMODOG' || name === 'RAYNDOG' || name === 'DOGGOMELEON' || name === 'NOOB SAIDOG' || name === 'REPDOG' || name === 'MAKDOG' || name === 'SMOWKDAWG' || name === 'PIXZEL ZLASZH';
 }
 
 function getRainbowColor(frame, phase = 0, alpha = 1) {
@@ -1892,6 +1953,17 @@ function getMaskedTrimColors(name, frozen) {
       hoodieEdge: '#222',
       centerStripe: '#111',
       innerEar: '#333'
+    };
+  }
+
+  if (name === 'PIXZEL ZLASZH') {
+    return {
+      limbColor: '#0a0a0a',
+      pawColor: '#111',
+      hoodieColor: '#0a0a0a',
+      hoodieEdge: '#222',
+      centerStripe: '#0a0a0a',
+      innerEar: '#222'
     };
   }
 
@@ -2005,6 +2077,15 @@ function getMaskedGearColors(name, frozen, frame = 0) {
     };
   }
 
+  if (name === 'PIXZEL ZLASZH') {
+    return {
+      vestColor: getRainbowColor(frame, 0),
+      vestHighlight: getRainbowColor(frame, 1.2),
+      maskColor: getRainbowColor(frame, 2.4),
+      maskEdge: getRainbowColor(frame, 3.6)
+    };
+  }
+
   return {
     vestColor: '#87ceeb',
     vestHighlight: '#b0e0e6',
@@ -2062,6 +2143,37 @@ function drawCydogVisor(x, headY, frame) {
   x.fillStyle = `rgb(0, 191, ${blue})`;
   // Thin rectangular visor spanning both eyes
   x.fillRect(58, headY - 12, 34, 6);
+  x.restore();
+}
+
+function drawPixzelVisor(x, headY, frame) {
+  const flash = (Math.sin(frame * 0.3) + 1) * 0.5;
+  const red = Math.floor(200 + flash * 55);
+  x.save();
+  x.shadowColor = '#ff1744';
+  x.shadowBlur = 10 + flash * 10;
+  x.fillStyle = `rgb(${red}, 20, 68)`;
+  x.strokeStyle = `rgb(${red}, 20, 68)`;
+  x.lineWidth = 5;
+  x.lineCap = 'round';
+  x.lineJoin = 'round';
+  // V-shaped visor (very obtuse, wide angle)
+  x.beginPath();
+  x.moveTo(52, headY - 14);
+  x.lineTo(70, headY - 8);
+  x.lineTo(88, headY - 14);
+  x.stroke();
+  // Glow dots at tips
+  x.fillStyle = `rgba(${red}, 20, 68, 0.8)`;
+  x.beginPath();
+  x.arc(52, headY - 14, 3, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.arc(88, headY - 14, 3, 0, Math.PI * 2);
+  x.fill();
+  x.beginPath();
+  x.arc(70, headY - 8, 3, 0, Math.PI * 2);
+  x.fill();
   x.restore();
 }
 
@@ -2636,7 +2748,9 @@ function drawSnekSprite(x, frame, state, frozen) {
 
 function createDogSprite(color1, color2, eyeColor, name, facing, frame, state, scale = 1, frozen = false, fighter = null) {
   const frozenSuffix = frozen ? '-frozen' : '';
-  const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}`;
+  const skullSuffix = (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) ? '-skull' : '';
+  const katanaSuffix = (name === 'PIXZEL ZLASZH' && fighter && fighter.pixzelKatanaActive) ? '-katana' : '';
+  const key = `${name}-${facing}-${frame}-${state}${frozenSuffix}${skullSuffix}${katanaSuffix}`;
   if (spriteCache[key]) return spriteCache[key];
 
   const c = document.createElement('canvas');
@@ -2792,6 +2906,31 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.arc(70, headY, 23, -2.5, -0.6);
     x.stroke();
 
+    // PIXZEL ZLASZH rainbow outline glow (body only)
+    if (name === 'PIXZEL ZLASZH' && !frozen) {
+      const glowColor = getRainbowColor(frame, 0, 0.6);
+      x.save();
+      x.shadowColor = glowColor;
+      x.shadowBlur = 12;
+      x.strokeStyle = getRainbowColor(frame, 0);
+      x.lineWidth = 2.5;
+      // Body outline only
+      x.beginPath();
+      x.ellipse(58, bodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+      x.stroke();
+      x.restore();
+      // Head outline glow
+      x.save();
+      x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+      x.shadowBlur = 15;
+      x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+      x.lineWidth = 2;
+      x.beginPath();
+      x.ellipse(70, headY, 24, 22, 0, 0, Math.PI * 2);
+      x.stroke();
+      x.restore();
+    }
+
     // Snout mask
     x.fillStyle = maskColor;
     x.beginPath();
@@ -2868,8 +3007,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   // KANOINE half-face (gray side with glowing red eye)
   if (name === 'KANOINE') drawKanoineHalfFace(x, headY, frame);
 
-  // Eyes (skip for CYDOG/SEKDOG - they have visor only)
-  if (name !== 'CYDOG' && name !== 'SEKDOG') {
+  // Eyes (skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+  if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
     // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
     if (name !== 'KANOINE') {
       x.fillStyle = frozen ? '#e0ffff' : '#fff';
@@ -2910,9 +3049,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
   if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, headY, frame);
   if (name === 'REPDOG') drawRepdogEyes(x, headY, frame);
   if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, headY, frame);
+  if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, headY, frame);
 
-  // SKORPDOG skull face during fire passive
-  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+  // SKORPDOG skull face during fire spit (in flight)
+  if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
     drawScorpdogSkullFace(x, headY, frame);
   }
 
@@ -3262,6 +3402,69 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
         x.quadraticCurveTo(78, waveY + 4, 94, waveY);
         x.stroke();
       }
+    } else if (name === 'PIXZEL ZLASZH') {
+      // Pure black katana (longer blade)
+      x.save();
+      x.translate(70, bodyY - 10);
+      x.rotate(-0.8 + frame * 0.15);
+      // Blade (pure black, longer)
+      x.fillStyle = '#000';
+      x.beginPath();
+      x.moveTo(0, -3);
+      x.lineTo(65, -2);
+      x.lineTo(70, 0);
+      x.lineTo(65, 2);
+      x.lineTo(0, 3);
+      x.closePath();
+      x.fill();
+      // Blade edge highlight
+      x.strokeStyle = '#333';
+      x.lineWidth = 1;
+      x.beginPath();
+      x.moveTo(5, -2);
+      x.lineTo(65, -1);
+      x.stroke();
+      // Red pixels on blade
+      x.fillStyle = '#ff1744';
+      x.shadowColor = '#ff1744';
+      x.shadowBlur = 4;
+      for (let i = 0; i < 6; i++) {
+        const px = 10 + i * 9;
+        const py = (Math.random() - 0.5) * 3;
+        const s = 2 + Math.random() * 1.5;
+        x.fillRect(px - s / 2, py - s / 2, s, s);
+      }
+      x.shadowBlur = 0;
+      // Guard
+      x.fillStyle = '#1a1a1a';
+      x.fillRect(-3, -6, 6, 12);
+      // Handle
+      x.fillStyle = '#0a0a0a';
+      x.fillRect(-15, -3, 14, 6);
+      // Handle wrap
+      x.strokeStyle = '#222';
+      x.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        x.beginPath();
+        x.moveTo(-13 + i * 3, -3);
+        x.lineTo(-11 + i * 3, 3);
+        x.stroke();
+      }
+      x.restore();
+      // Red pixel square slash trail
+      x.save();
+      x.shadowColor = '#ff1744';
+      x.shadowBlur = 8;
+      x.fillStyle = '#ff1744';
+      for (let i = 0; i < 5; i++) {
+        const trailAngle = -0.8 + frame * 0.15;
+        const dist = 20 + i * 10;
+        const px = 70 + Math.cos(trailAngle) * dist + (Math.random() - 0.5) * 6;
+        const py = bodyY - 10 + Math.sin(trailAngle) * dist + (Math.random() - 0.5) * 6;
+        const s = 3 + Math.random() * 2;
+        x.fillRect(px - s / 2, py - s / 2, s, s);
+      }
+      x.restore();
     } else {
       const sf = frame % 12;
       const ballX = 95 + sf * 4;
@@ -3456,6 +3659,30 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(70, vicHeadY, 23, -2.5, -0.6);
       x.stroke();
 
+      // PIXZEL ZLASZH rainbow outline glow (victory, body only)
+      if (name === 'PIXZEL ZLASZH' && !frozen) {
+        const glowColor = getRainbowColor(frame, 0, 0.6);
+        x.save();
+        x.shadowColor = glowColor;
+        x.shadowBlur = 12;
+        x.strokeStyle = getRainbowColor(frame, 0);
+        x.lineWidth = 2.5;
+        x.beginPath();
+        x.ellipse(58, vicBodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+        // Head outline glow
+        x.save();
+        x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+        x.shadowBlur = 15;
+        x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+        x.lineWidth = 2;
+        x.beginPath();
+        x.ellipse(70, vicHeadY, 24, 22, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+      }
+
       // Snout mask
       x.fillStyle = maskColor;
       x.beginPath();
@@ -3519,8 +3746,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(40 - jumpOffset * 0.3, 104, 14, 6);
     x.fillRect(60 + jumpOffset * 0.3, 104, 14, 6);
 
-    // Eyes (skip for CYDOG/SEKDOG - they have visor only)
-    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    // Eyes (skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
       // Left eye white (skip for KANOINE - red glow drawn by drawKanoineHalfFace)
       if (name !== 'KANOINE') {
         x.fillStyle = '#fff';
@@ -3559,9 +3786,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     if (name === 'NOOB SAIDOG') drawNoobSaidogEyes(x, vicHeadY, frame);
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, vicHeadY, frame);
+    if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, vicHeadY, frame);
 
-    // SKORPDOG skull face during fire passive (victory)
-    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    // SKORPDOG skull face during fire spit (victory)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
       drawScorpdogSkullFace(x, vicHeadY, frame);
     }
 
@@ -3724,6 +3952,30 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.arc(70, defHeadY, 23, -2.5, -0.6);
       x.stroke();
 
+      // PIXZEL ZLASZH rainbow outline glow (defeat, body only)
+      if (name === 'PIXZEL ZLASZH' && !frozen) {
+        const glowColor = getRainbowColor(frame, 0, 0.6);
+        x.save();
+        x.shadowColor = glowColor;
+        x.shadowBlur = 12;
+        x.strokeStyle = getRainbowColor(frame, 0);
+        x.lineWidth = 2.5;
+        x.beginPath();
+        x.ellipse(58, defBodyY + 14, 32, 24, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+        // Head outline glow
+        x.save();
+        x.shadowColor = getRainbowColor(frame, 1.5, 0.5);
+        x.shadowBlur = 15;
+        x.strokeStyle = getRainbowColor(frame, 1.5, 0.6);
+        x.lineWidth = 2;
+        x.beginPath();
+        x.ellipse(70, defHeadY, 24, 22, 0, 0, Math.PI * 2);
+        x.stroke();
+        x.restore();
+      }
+
       // Snout mask
       x.fillStyle = maskColor;
       x.beginPath();
@@ -3761,8 +4013,8 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
     x.fillRect(23, defBodyY + 23, 14, 6);
     x.fillRect(83, defBodyY + 23, 14, 6);
 
-    // X eyes (dead) - skip for CYDOG/SEKDOG - they have visor only)
-    if (name !== 'CYDOG' && name !== 'SEKDOG') {
+    // X eyes (dead) - skip for CYDOG/SEKDOG/PIXZEL ZLASZH - they have visor only)
+    if (name !== 'CYDOG' && name !== 'SEKDOG' && name !== 'PIXZEL ZLASZH') {
       x.strokeStyle = '#333';
       x.lineWidth = 3;
       // Left X
@@ -3787,9 +4039,10 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
 
     // CYDOG/SEKDOG visor (defeat)
     if (name === 'CYDOG' || name === 'SEKDOG') drawCydogVisor(x, defHeadY, frame);
+    if (name === 'PIXZEL ZLASZH') drawPixzelVisor(x, defHeadY, frame);
 
-    // SKORPDOG skull face during fire passive (defeat)
-    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireTimer > 0) {
+    // SKORPDOG skull face during fire spit (defeat)
+    if (name === 'SKORPDOG' && fighter && fighter.skorpdogFireActive) {
       drawScorpdogSkullFace(x, defHeadY, frame);
     }
 
@@ -3861,7 +4114,6 @@ class Fighter {
     this.comboCount = 0;
     this.lastHitTime = 0;
     this.maxComboTimer = 0;
-    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -3913,9 +4165,15 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
-    this.skorpdogFireTimer = 0;
+    this.skorpdogFireActive = false;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
+    this.pixzelStealTimer = 0;
+    this.pixzelStolenPassive = '';
+    this.pixzelStolenActive = '';
+    this.pixzelKatanaActive = false;
+    this.pixzelKatanaTimer = 0;
+    this.team = null;
   }
 
   reset(x) {
@@ -3933,7 +4191,6 @@ class Fighter {
     this.blockTimer = 0;
     this.comboCount = 0;
     this.maxComboTimer = 0;
-    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -3981,9 +4238,14 @@ class Fighter {
     this.sekdogChestOpen = false;
     this.smowkdawgPuffTimer = 0;
     this.smokeCloudTimer = 0;
-    this.skorpdogFireTimer = 0;
+    this.skorpdogFireActive = false;
     this.specialFormSource = '';
     this.kanoineDaggers = [];
+    this.pixzelStealTimer = 0;
+    this.pixzelStolenPassive = '';
+    this.pixzelStolenActive = '';
+    this.pixzelKatanaActive = false;
+    this.pixzelKatanaTimer = 0;
   }
 
   getHurtbox() {
@@ -4028,6 +4290,7 @@ class Fighter {
   }
 
   attack(type) {
+    if (this.health <= 0) return;
     if (this.freezeTimer > 0) return;
     if (this.stunnedTimer > 0) return;
     if (this.harpoonLockTimer > 0) return;
@@ -4053,7 +4316,7 @@ class Fighter {
         this.teleportPunchDone = false;
         this.sekdogChestOpen = true;
       } else if (this.name === 'BORKO') {
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.borko;
         this.attackTimer = special.airFrames;
         this.borkoImpactX = Math.max(
@@ -4080,7 +4343,7 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'DOGGABAL') {
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.doggbal;
         this.attackTimer = special.dashFrames;
         this.doggbalDashActive = true;
@@ -4119,7 +4382,7 @@ class Fighter {
         this.isCrouching = false;
       } else if (this.specialFormSource === 'MAKDOG') {
         const special = COMBAT.special.makdog;
-        const opponent = this === p1 ? p2 : p1;
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         this.attackTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         this.makdogSpecialActive = true;
         this.makdogSpecialPhase = 'eyeGlow';
@@ -4141,11 +4404,15 @@ class Fighter {
         this.onGround = true;
         this.isBlocking = false;
         this.isCrouching = false;
+      } else if (this.specialFormSource === 'PIXZEL ZLASZH') {
+        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        this.attackTimer = COMBAT.special.duration;
+        this.triggerPixzelSteal(opponent);
       } else {
         this.attackTimer = COMBAT.special.duration;
       }
       this.special = 0;
-      if (this.specialFormSource !== 'KANOINE') spawnProjectile(this);
+      if (this.specialFormSource !== 'KANOINE' && this.specialFormSource !== 'PIXZEL ZLASZH') spawnProjectile(this);
       if (this.name === 'CYDOG') {
         this.attackTimer = 0;
         this.state = 'idle';
@@ -4157,6 +4424,7 @@ class Fighter {
   }
 
   takeHit(dmg, kb, attackerFacing) {
+    if (this.health <= 0) return null;
     if (this.hitCooldown > 0) return null;
     const incomingDamage = dmg;
     const blocked = this.isBlocking;
@@ -4176,7 +4444,7 @@ class Fighter {
     }
 
     this.health = Math.max(0, this.health - dmg);
-    if (!this.maxComboPushback) this.vx = attackerFacing * kb;
+    this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
     const blockedMeterGain = this.name === 'BORKO'
@@ -4695,13 +4963,11 @@ class Fighter {
   updateScorpdogPassive(opponent) {
     if (this.name !== 'SKORPDOG' || this.health <= 0) return;
 
-    if (this.skorpdogFireTimer > 0) this.skorpdogFireTimer--;
-
     this.passiveSpecial = Math.min(SPECIAL_METER_MAX, this.passiveSpecial + this.passiveSpecialGain);
     if (this.passiveSpecial < SPECIAL_METER_MAX || opponent.health <= 0) return;
 
     this.passiveSpecial = 0;
-    this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+    this.skorpdogFireActive = true;
     spawnScorpdogFireSpit(this, opponent);
   }
 
@@ -4722,6 +4988,12 @@ class Fighter {
       }
       return;
     }
+
+    this.updateKanoineDaggers(opponent);
+  }
+
+  updateKanoineDaggers(opponent) {
+    const special = COMBAT.special.kanoine;
 
     // Update daggers
     for (let i = this.kanoineDaggers.length - 1; i >= 0; i--) {
@@ -4778,14 +5050,142 @@ class Fighter {
     }
   }
 
+  updatePixzelPassive(opponent) {
+    if (this.name !== 'PIXZEL ZLASZH' || this.health <= 0) return;
+
+    if (this.pixzelStealTimer > 0) {
+      this.pixzelStealTimer--;
+      // Re-trigger stolen passive periodically
+      if (this.pixzelStolenPassive && this.pixzelStealTimer % 60 === 0) {
+        this.triggerStolenPassive(opponent);
+      }
+      // Update stolen KANOINE daggers
+      if (this.pixzelStolenPassive === 'KANOINE') {
+        this.updateKanoineDaggers(opponent);
+      }
+      if (this.pixzelStealTimer <= 0) {
+        this.pixzelStolenPassive = '';
+        this.pixzelStolenActive = '';
+        this.kanoineDaggers = [];
+      }
+    }
+  }
+
+  triggerPixzelSteal(opponent) {
+    const special = COMBAT.special.pixzel;
+    this.pixzelStealTimer = special.stealDurationFrames;
+
+    // Randomly choose to steal passive or active
+    const stealPassive = Math.random() < 0.5;
+
+    if (stealPassive && opponent.passiveSpecialGain > 0) {
+      // Steal opponent's passive ability
+      this.pixzelStolenPassive = opponent.name;
+      this.pixzelStolenActive = '';
+      this.triggerStolenPassive(opponent);
+    } else if (!stealPassive) {
+      // Steal opponent's active special
+      this.pixzelStolenActive = opponent.name;
+      this.pixzelStolenPassive = '';
+      this.triggerStolenActive(opponent);
+    } else {
+      // Cannot imitate - use katana slash
+      this.pixzelStolenPassive = '';
+      this.pixzelStolenActive = '';
+      this.triggerKatanaSlash(opponent);
+    }
+  }
+
+  triggerStolenPassive(opponent) {
+    const stolenName = this.pixzelStolenPassive;
+    if (stolenName === 'RAYDOG') {
+      spawnRaydogPassiveArcLightning(this, opponent);
+    } else if (stolenName === 'SUBDOG') {
+      spawnSubdogIceClone(this);
+    } else if (stolenName === 'SMOWKDAWG') {
+      spawnSmowkdawgSmokeCloud(this);
+    } else if (stolenName === 'SKORPDOG') {
+      this.skorpdogFireTimer = COMBAT.special.skorpdog.fireDurationFrames;
+      spawnScorpdogFireSpit(this, opponent);
+    } else if (stolenName === 'KANOINE') {
+      const special = COMBAT.special.kanoine;
+      this.kanoineDaggers = [
+        { angle: 0, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false },
+        { angle: Math.PI, x: this.x, y: this.y - 50, targetX: 0, targetY: 0, phase: 'orbit', timer: special.daggerDurationFrames, hit: false }
+      ];
+    } else if (stolenName === 'DOGGOMELEON') {
+      const pool = DOGGOMELEON_NINJA_POOL.filter(n => n !== this.doggomeleonFormName);
+      this.doggomeleonFormName = pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+
+  triggerStolenActive(opponent) {
+    const stolenName = this.pixzelStolenActive;
+    this.specialFormSource = stolenName;
+    this.attackTimer = COMBAT.special.duration;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    spawnProjectile(this);
+  }
+
+  triggerKatanaSlash(opponent) {
+    const special = COMBAT.special.pixzel;
+    this.pixzelKatanaActive = true;
+    this.pixzelKatanaTimer = special.katanaSlashFrames;
+    this.attackTimer = special.katanaSlashFrames;
+    this.state = 'special';
+    this.isBlocking = false;
+    this.isCrouching = false;
+    this.vx = 0;
+  }
+
+  updateKatanaSlash(opponent) {
+    if (!this.pixzelKatanaActive) return;
+
+    const special = COMBAT.special.pixzel;
+    this.pixzelKatanaTimer--;
+
+    // Spawn red pixel square trail particles
+    if (this.frame % 2 === 0) {
+      const slashX = this.x + this.facing * (40 + Math.random() * 30);
+      const slashY = this.y - 40 - Math.random() * 40;
+      spawnPixzelPixelPuff(slashX, slashY);
+    }
+
+    // Hit detection at the midpoint of the slash
+    if (this.pixzelKatanaTimer === Math.floor(special.katanaSlashFrames / 2)) {
+      const dx = Math.abs(opponent.x - this.x);
+      const dy = Math.abs((opponent.y - 50) - (this.y - 50));
+      if (dx < special.katanaRange && dy < 60) {
+        opponent.takeHit(special.katanaDamage, special.katanaKnockback, this.facing);
+        addParticle(opponent.x, opponent.y - 50, 'hit');
+        playImpactSound('hit');
+        game.screenShake = COMBAT.effects.hitShake;
+        game.hitStop = COMBAT.effects.meleeHitStop;
+      }
+    }
+
+    if (this.pixzelKatanaTimer <= 0) {
+      this.pixzelKatanaActive = false;
+      this.attackTimer = 0;
+      this.state = 'idle';
+    }
+  }
+
   update(keys, opponent) {
+    const effectiveOpponent = (isTeamVsTeamMode() && this.team) ? getClosestOpponent(this) : opponent;
     this.frame++;
     this.updateDoggomeleonMorph();
-    this.updateRaydogPassive(opponent);
-    this.updateSubdogPassive(opponent);
-    this.updateSmowkdawgPassive(opponent);
-    this.updateScorpdogPassive(opponent);
-    this.updateKanoinePassive(opponent);
+    if (effectiveOpponent) {
+      this.updateRaydogPassive(effectiveOpponent);
+      this.updateSubdogPassive(effectiveOpponent);
+      this.updateSmowkdawgPassive(effectiveOpponent);
+      this.updateScorpdogPassive(effectiveOpponent);
+      this.updateKanoinePassive(effectiveOpponent);
+      this.updatePixzelPassive(effectiveOpponent);
+      if (this.pixzelKatanaActive) this.updateKatanaSlash(effectiveOpponent);
+    }
     if (this.name === 'SMOWKDAWG' && this.health > 0) {
       this.smowkdawgPuffTimer--;
       if (this.smowkdawgPuffTimer <= 0) {
@@ -4793,17 +5193,33 @@ class Fighter {
         spawnSmokePuff(this.x, this.y);
       }
     }
+    if (this.name === 'PIXZEL ZLASZH' && this.health > 0) {
+      this.smowkdawgPuffTimer--;
+      if (this.smowkdawgPuffTimer <= 0) {
+        this.smowkdawgPuffTimer = 8 + Math.floor(Math.random() * 5);
+        spawnPixzelPixelPuff(this.x, this.y);
+      }
+    }
     if (this.smokeCloudTimer > 0) this.smokeCloudTimer--;
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;
 
+    if (this.health <= 0) {
+      if (this.state !== 'defeat') {
+        this.state = 'defeat';
+        this.defeatTimer = ROUND_RULES.roundMessageFrames;
+      }
+      if (this.defeatTimer > 0) this.defeatTimer--;
+      if (this.victoryTimer > 0) this.victoryTimer--;
+      return;
+    }
+
     // Frozen state
     if (this.freezeTimer > 0) {
       this.freezeTimer -= PHYSICS.freezeTickMs;
       this.state = 'frozen';
-      if (!this.maxComboPushback) this.vx *= 0.9;
-      if (this.maxComboPushback && Math.abs(this.vx) < 2) this.maxComboPushback = false;
+      this.vx *= 0.9;
       this.vy += PHYSICS.gravity;
       this.y += this.vy;
       if (this.y >= GROUND) {
@@ -4831,10 +5247,9 @@ class Fighter {
       if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
         const dir = -this.makdogSpinDir;
         this.vx = dir * COMBAT.special.makdog.rollBackSpeed;
-      } else if (!this.maxComboPushback) {
+      } else {
         this.vx *= 0.9;
       }
-      if (this.maxComboPushback && Math.abs(this.vx) < 2 && !(wasSpinning && this.doggbalSpinTimer > 0)) this.maxComboPushback = false;
       this.isBlocking = false;
       this.isCrouching = false;
       this.vy += PHYSICS.gravity;
@@ -4850,7 +5265,6 @@ class Fighter {
         this.doggbalSpinTimer = 0;
         this.doggbalSpinDuration = 0;
         this.makdogSpinDir = 0;
-        this.maxComboPushback = false;
         this.state = 'idle';
       }
       return;
@@ -4912,38 +5326,38 @@ class Fighter {
     }
 
     if (this.teleportPhase) {
-      this.updateSekdogTeleport(opponent);
+      if (effectiveOpponent) this.updateSekdogTeleport(effectiveOpponent);
       return;
     }
 
     if (this.borkoLeapActive) {
-      this.updateBorkoSpecial(opponent);
+      if (effectiveOpponent) this.updateBorkoSpecial(effectiveOpponent);
       return;
     }
 
     if (this.snekSlitherActive) {
-      this.updateSnekSlither(opponent);
+      if (effectiveOpponent) this.updateSnekSlither(effectiveOpponent);
       return;
     }
 
     if (this.makdogSpecialActive) {
-      this.updateMakdogSpecial(opponent);
+      if (effectiveOpponent) this.updateMakdogSpecial(effectiveOpponent);
       return;
     }
 
     if (this.raydogDashActive) {
-      this.updateRaydogSupermanDash(opponent);
+      if (effectiveOpponent) this.updateRaydogSupermanDash(effectiveOpponent);
       return;
     }
 
     if (this.doggbalDashActive) {
-      this.updateDoggbalDash(opponent);
+      if (effectiveOpponent) this.updateDoggbalDash(effectiveOpponent);
       return;
     }
 
     // Face opponent
-    if (this.attackTimer <= 0 && this.hitTimer <= 0) {
-      this.facing = opponent.x > this.x ? 1 : -1;
+    if (this.attackTimer <= 0 && this.hitTimer <= 0 && effectiveOpponent) {
+      this.facing = effectiveOpponent.x > this.x ? 1 : -1;
     }
 
     // Timers
@@ -5281,6 +5695,21 @@ function spawnSmokePuff(x, y) {
   });
 }
 
+function spawnPixzelPixelPuff(x, y) {
+  particles.push({
+    x: x + (Math.random() - 0.5) * 20,
+    y: y - Math.random() * 10,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: -0.3 - Math.random() * 0.8,
+    life: 25 + Math.floor(Math.random() * 10),
+    maxLife: 35,
+    color: ['#ff1744', '#ff4444', '#cc0000', '#ff6b6b'][Math.floor(Math.random() * 4)],
+    size: 3 + Math.random() * 4,
+    type: 'pixelPuff',
+    glow: true
+  });
+}
+
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
@@ -5291,7 +5720,7 @@ function updateParticles() {
     }
     p.x += p.vx;
     p.y += p.vy;
-    if (p.type === 'smokePuff') {
+    if (p.type === 'smokePuff' || p.type === 'pixelPuff') {
       p.vx *= 0.98;
     } else {
       p.vy += 0.2;
@@ -5334,6 +5763,16 @@ function drawParticles() {
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size * alpha * 0.6, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'pixelPuff') {
+      ctx.save();
+      if (p.glow) {
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+      }
+      ctx.fillStyle = p.color;
+      const s = p.size * alpha;
+      ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+      ctx.restore();
     } else {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size * alpha, p.size * alpha);
@@ -5379,12 +5818,12 @@ function spawnProjectile(owner) {
   } else if (specialName === 'BORKO') {
     return;
   } else if (specialName === 'RAYNDOG') {
-    spawnRayndogLightningCloud(owner, owner === p1 ? p2 : p1);
+    spawnRayndogLightningCloud(owner, isTeamVsTeamMode() && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1));
     return;
   } else if (specialName === 'RAYDOG') {
     return;
   } else if (specialName === 'NOOB SAIDOG' || specialName === 'REPDOG') {
-    spawnNoobSaidogSequence(owner, owner === p1 ? p2 : p1, specialName);
+    spawnNoobSaidogSequence(owner, isTeamVsTeamMode() && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1), specialName);
     return;
   } else if (specialName === 'SNEK') {
     return;
@@ -5897,7 +6336,11 @@ function updateRepdogAcid(p, index) {
     return;
   }
 
-  const target = p.owner === p1 ? p2 : p1;
+  const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
+  if (!target || target.health <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
   const targetX = target.x;
   const targetY = target.y - target.height / 2;
   const dx = targetX - p.x;
@@ -5937,10 +6380,13 @@ function updateSnekCoil(p, index) {
   if (p.owner.health <= 0 || p.target.health <= 0 || p.life <= 0) projectiles.splice(index, 1);
 }
 
-function updateProjectiles(opponent) {
+function updateProjectiles(owner) {
+  const targets = isTeamVsTeamMode() && owner.team ? getAliveOpponents(owner) : [owner === p1 ? p2 : p1];
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
-    const target = p.owner === p1 ? p2 : p1;
+    if (p.owner !== owner) continue;
+
+    const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
 
     if (p.type === 'noobSnake') {
       updateNoobSnakeSequence(p, i);
@@ -6030,6 +6476,7 @@ function updateProjectiles(opponent) {
           if (target.isBlocking) {
             addParticle(p.x, p.y, 'block');
             playImpactSound('block');
+            p.owner.skorpdogFireActive = false;
             projectiles.splice(i, 1);
             continue;
           }
@@ -6037,11 +6484,13 @@ function updateProjectiles(opponent) {
           p.vx = 0;
           p.vy = 0;
           target.takeHit(p.dmg, 0, p.owner.facing);
+          p.owner.skorpdogFireActive = false;
           addParticle(p.x, p.y, 'hit');
           playImpactSound('hit');
         }
 
         if (p.life <= 0 || p.x < -50 || p.x > W + 50) {
+          p.owner.skorpdogFireActive = false;
           projectiles.splice(i, 1);
           continue;
         }
@@ -6223,8 +6672,9 @@ function updateProjectiles(opponent) {
       continue;
     }
 
-    // Collision with opponent
-    if (opponent !== p.owner && !p.hit) {
+    // Collision with opponents
+    for (const opponent of targets) {
+    if (opponent !== p.owner && !p.hit && opponent.health > 0) {
       const hb = opponent.getHurtbox();
       if (p.x > hb.x && p.x < hb.x + hb.w &&
           p.y > hb.y && p.y < hb.y + hb.h) {
@@ -6305,6 +6755,7 @@ function updateProjectiles(opponent) {
         }
       }
     }
+    } // end targets loop
   }
 }
 
@@ -6839,7 +7290,7 @@ function drawProjectiles() {
       ctx.restore();
     } else if (p.type === 'net') {
       p.rotation += 0.12;
-      const target = p.owner === p1 ? p2 : p1;
+      const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
       const capturedHurtbox = p.hit ? target.getHurtbox() : null;
       const netRadiusX = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.w * 0.65) : p.radius;
       const netRadiusY = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.h * 0.58) : p.radius;
@@ -7737,6 +8188,7 @@ let game = {
   continueCountdown: 0,
   continueTimerInterval: null,
   winStreak: { p1: 0, p2: 0 },
+  teamRoundsWon: { A: 0, B: 0 },
   pause: {
     active: false,
     returnState: '',
@@ -7966,10 +8418,23 @@ const CHARACTERS = [
     specialGain: 0.25,
     passiveSpecialGain: SPECIAL_METER_MAX / COMBAT.special.smowkdawg.passiveIntervalFrames,
     desc: 'STRIKER'
+  },
+  {
+    id: 'pixzel',
+    name: 'PIXZEL ZLASZH',
+    hidden: true,
+    color1: '#0a0a0a',
+    color2: '#111111',
+    eyeColor: '#ff1744',
+    speed: 6,
+    health: 100,
+    specialGain: 0.25,
+    desc: 'GLITCH'
   }
 ];
 
 const HIDDEN_CHARACTER_UNLOCKS_KEY = 'kanine-kombat-hidden-character-unlocks-v1';
+
 const unlockedHiddenCharacterIds = (() => {
   try {
     const stored = JSON.parse(window.localStorage.getItem(HIDDEN_CHARACTER_UNLOCKS_KEY) || '[]');
@@ -8015,14 +8480,19 @@ function unlockHiddenCharacter(id) {
 
 let p1Selection = getSelectableCharacterIndex(0);
 let p2Selection = getSelectableCharacterIndex(1, p1Selection);
+let cpu1Selection = 0;
+let cpu2Selection = 0;
 let p1Confirmed = false;
 let p2Confirmed = false;
 
 const keys1 = { left: false, right: false, up: false, down: false, block: false };
 const keys2 = { left: false, right: false, up: false, down: false, block: false };
+const cpuKeys = { left: false, right: false, up: false, down: false, block: false };
 
 let p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
 let p2 = new Fighter(PLAYER_SPAWNS.p2, CHARACTERS[p2Selection], -1);
+let cpu1 = null;
+let cpu2 = null;
 
 function isCpuMode() {
   return game.mode === MATCH_MODES.CPU;
@@ -8032,8 +8502,46 @@ function isBattlePlanMode() {
   return game.mode === MATCH_MODES.BATTLE_PLAN;
 }
 
+function isTeamVsTeamMode() {
+  return game.mode === MATCH_MODES.TEAM_VS_TEAM;
+}
+
 function isCpuControlledMode() {
   return isCpuMode() || isBattlePlanMode();
+}
+
+function getAllFighters() {
+  if (isTeamVsTeamMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
+  return [p1, p2];
+}
+
+function getTeamFighters(team) {
+  return getAllFighters().filter(f => f && f.team === team && f.health > 0);
+}
+
+function getAliveOpponents(fighter) {
+  if (!fighter.team) return [fighter === p1 ? p2 : p1];
+  const oppTeam = fighter.team === 'A' ? 'B' : 'A';
+  return getTeamFighters(oppTeam);
+}
+
+function getClosestOpponent(fighter) {
+  const opponents = getAliveOpponents(fighter);
+  if (opponents.length === 0) return null;
+  let closest = opponents[0];
+  let minDist = Math.abs(fighter.x - closest.x);
+  for (let i = 1; i < opponents.length; i++) {
+    const dist = Math.abs(fighter.x - opponents[i].x);
+    if (dist < minDist) {
+      minDist = dist;
+      closest = opponents[i];
+    }
+  }
+  return closest;
+}
+
+function getTeamTotalHealth(team) {
+  return getTeamFighters(team).reduce((sum, f) => sum + f.health, 0);
 }
 
 function getCharacterById(id) {
@@ -8391,6 +8899,7 @@ function leavePausedSessionForMode(mode) {
   resumeAudioFromOverlay();
   game.mode = mode;
   if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
+  removeTeamHUD();
   ensureAudioReady();
   playUiSound('start');
   openCharacterSelect(true);
@@ -8418,6 +8927,7 @@ function openTitleScreen() {
   clearAllGamepadHeld();
   resetCpuState();
   resetBattlePlanState();
+  removeTeamHUD();
   ui.charSelect.style.display = 'none';
   ui.startScreen.style.display = 'flex';
   game.state = GAME_STATES.MENU;
@@ -8811,6 +9321,10 @@ function updateCharSelectModeUI() {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';
+  } else if (isTeamVsTeamMode()) {
+    ui.p2SelectLabel.textContent = 'PLAYER 2';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
+    ui.fightButton.textContent = 'TEAM FIGHT!';
   } else if (isCpuMode()) {
     ui.p2SelectLabel.textContent = 'CHOOSE FOR CPU';
     ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
@@ -8822,10 +9336,11 @@ function updateCharSelectModeUI() {
   }
 }
 
-function updateCpuInput(cpuFighter, opponent) {
-  resetInputState(keys2);
+function updateCpuInput(cpuFighter, opponent, targetKeys) {
+  targetKeys = targetKeys || keys2;
+  resetInputState(targetKeys);
 
-  if (cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
+  if (!opponent || cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
 
   cpuState.attackCooldown = Math.max(0, cpuState.attackCooldown - 1);
   cpuState.blockFrames = Math.max(0, cpuState.blockFrames - 1);
@@ -8843,16 +9358,16 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (cpuState.blockFrames > 0) {
-    keys2.block = true;
-    if (closeRange && Math.random() > 0.5) keys2.down = true;
+    targetKeys.block = true;
+    if (closeRange && Math.random() > 0.5) targetKeys.down = true;
     return;
   }
 
   if (cpuState.retreatFrames > 0) {
-    keys2.left = !towardLeft;
-    keys2.right = towardLeft;
+    targetKeys.left = !towardLeft;
+    targetKeys.right = towardLeft;
     if (cpuState.jumpCooldown === 0 && Math.random() > 0.9) {
-      keys2.up = true;
+      targetKeys.up = true;
       cpuState.jumpCooldown = 45;
     }
     return;
@@ -8876,21 +9391,21 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (absDistance > 58) {
-    keys2.left = towardLeft;
-    keys2.right = !towardLeft;
+    targetKeys.left = towardLeft;
+    targetKeys.right = !towardLeft;
   } else {
-    keys2.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
-    keys2.right = !keys2.left;
+    targetKeys.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
+    targetKeys.right = !targetKeys.left;
     if (Math.random() > 0.96) cpuState.strafeBias *= -1;
   }
 
   if (cpuState.jumpCooldown === 0 && midRange && Math.random() > 0.985) {
-    keys2.up = true;
+    targetKeys.up = true;
     cpuState.jumpCooldown = 70;
   }
 
   if (closeRange && Math.random() > 0.985) {
-    keys2.down = true;
+    targetKeys.down = true;
   }
 }
 
@@ -9144,6 +9659,19 @@ function confirmSelection() {
       prepareBattlePlanRoute(CHARACTERS[p1Selection].id);
     }
     loadBattlePlanMatch();
+  } else if (isTeamVsTeamMode()) {
+    game.stage = pickRandomBackgroundStage();
+    p1 = new Fighter(PLAYER_SPAWNS.teamA1, CHARACTERS[p1Selection], 1);
+    p1.team = 'A';
+    p2 = new Fighter(PLAYER_SPAWNS.teamA2, CHARACTERS[p2Selection], 1);
+    p2.team = 'A';
+    cpu1 = new Fighter(PLAYER_SPAWNS.teamB1, CHARACTERS[cpu1Selection], -1);
+    cpu1.team = 'B';
+    cpu2 = new Fighter(PLAYER_SPAWNS.teamB2, CHARACTERS[cpu2Selection], -1);
+    cpu2.team = 'B';
+    createTeamHUD();
+    ui.p1Name.textContent = p1.name;
+    ui.p2Name.textContent = p2.name;
   } else {
     game.stage = pickRandomBackgroundStage();
     p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
@@ -9211,6 +9739,8 @@ ui.fightButton.addEventListener('click', () => {
 });
 
 function checkHit(attacker, defender) {
+  if (attacker.team && defender.team && attacker.team === defender.team) return;
+  if (attacker.health <= 0 || defender.health <= 0) return;
   const atkBox = attacker.getAttackBox();
   if (!atkBox) return;
 
@@ -9236,9 +9766,9 @@ function checkHit(attacker, defender) {
     attacker.lastHitTime = Date.now();
 
     if (attacker.comboCount >= 10) {
-      defender.vx = attacker.facing * 160;
-      defender.maxComboPushback = true;
-      addParticle(defender.x, defender.y - 50, 'ko');
+      attacker.vx = -attacker.facing * 20;
+      defender.vx = attacker.facing * 20;
+      addParticle(attacker.x, attacker.y - 50, 'ko');
       game.screenShake = COMBAT.effects.koShake;
       attacker.comboCount = 0;
       attacker.lastHitTime = 0;
@@ -9258,10 +9788,18 @@ function checkHit(attacker, defender) {
 }
 
 function startRound() {
-  p1.reset(PLAYER_SPAWNS.p1);
-  p2.reset(PLAYER_SPAWNS.p2);
+  if (isTeamVsTeamMode()) {
+    p1.reset(PLAYER_SPAWNS.teamA1);
+    p2.reset(PLAYER_SPAWNS.teamA2);
+    cpu1.reset(PLAYER_SPAWNS.teamB1);
+    cpu2.reset(PLAYER_SPAWNS.teamB2);
+  } else {
+    p1.reset(PLAYER_SPAWNS.p1);
+    p2.reset(PLAYER_SPAWNS.p2);
+  }
   resetInputState(keys1);
   resetInputState(keys2);
+  resetInputState(cpuKeys);
   resetCpuState();
   game.timer = ROUND_RULES.timerSeconds;
   game.state = GAME_STATES.COUNTDOWN;
@@ -9301,6 +9839,11 @@ function endRound() {
 
   syncMusicMode();
 
+  if (isTeamVsTeamMode()) {
+    endRoundTeam();
+    return;
+  }
+
   let winner = null;
   let loser = null;
   if (p1.health <= 0 && p2.health > 0) { winner = p2; loser = p1; }
@@ -9320,7 +9863,10 @@ function endRound() {
       && unlockHiddenCharacter(game.battlePlan.route[game.battlePlan.currentIndex]);
     const unlockedSnek = battlePlanMatchComplete && winner === p1 && isNoobCatnipFinal
       && unlockHiddenCharacter('snek');
-    const unlockMessage = [unlockedBoss ? `${p2.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '']
+    const unlockedPixzel = battlePlanMatchComplete && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1
+      && game.battlePlan.playerCharacterId === 'doggomeleon'
+      && unlockHiddenCharacter('pixzel');
+    const unlockMessage = [unlockedBoss ? `${p2.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '', unlockedPixzel ? 'PIXZEL ZLASZH UNLOCKED!' : '']
       .filter(Boolean)
       .join('\n');
     if (battlePlanMatchComplete && winner === p1 && game.battlePlan.currentIndex === game.battlePlan.route.length - 1) {
@@ -9370,6 +9916,63 @@ function endRound() {
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
       if (isBattlePlanMode() && winner === p2) game.credits = 3;
+      return;
+    }
+  } else {
+    game.roundMessage = 'DRAW!';
+    playRoundCue('draw');
+  }
+
+  game.round++;
+}
+
+function endRoundTeam() {
+  const teamAAlive = getTeamFighters('A');
+  const teamBAlive = getTeamFighters('B');
+  const teamATotal = getTeamTotalHealth('A');
+  const teamBTotal = getTeamTotalHealth('B');
+
+  let winningTeam = null;
+  if (teamAAlive.length > 0 && teamBAlive.length === 0) winningTeam = 'A';
+  else if (teamBAlive.length > 0 && teamAAlive.length === 0) winningTeam = 'B';
+  else if (teamAAlive.length > 0 && teamBAlive.length > 0) {
+    if (teamATotal > teamBTotal) winningTeam = 'A';
+    else if (teamBTotal > teamATotal) winningTeam = 'B';
+  }
+
+  if (winningTeam) {
+    if (winningTeam === 'A') {
+      game.teamRoundsWon.A++;
+      game.roundMessage = 'TEAM A\nWINS!';
+    } else {
+      game.teamRoundsWon.B++;
+      game.roundMessage = 'TEAM B\nWINS!';
+    }
+    updateTeamRoundDots();
+    playRoundCue('win');
+
+    const allFighters = getAllFighters();
+    allFighters.forEach(f => {
+      if (!f) return;
+      if (f.health > 0 && f.team === winningTeam) {
+        f.victoryTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'victory';
+      } else {
+        f.defeatTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'defeat';
+      }
+    });
+
+    if (game.teamRoundsWon.A >= ROUND_RULES.winsToFinish || game.teamRoundsWon.B >= ROUND_RULES.winsToFinish) {
+      if (game.teamRoundsWon.A >= ROUND_RULES.winsToFinish) {
+        game.winStreak.p1++;
+        game.winStreak.p2 = 0;
+      } else {
+        game.winStreak.p1 = 0;
+      }
+      game.state = GAME_STATES.GAME_OVER;
+      game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
+      game.roundMessage = winningTeam === 'A' ? 'TEAM A\nWINS THE MATCH!' : 'TEAM B\nWINS THE MATCH!';
       return;
     }
   } else {
@@ -9504,6 +10107,205 @@ function updateUI() {
   } else {
     ui.p2Combo.classList.remove('active');
   }
+
+  if (isTeamVsTeamMode()) updateTeamUI();
+}
+
+function createTeamHUD() {
+  removeTeamHUD();
+  const overlay = document.getElementById('ui-overlay');
+  const el = {};
+
+  document.getElementById('health-bars').style.display = 'none';
+  document.getElementById('special-bars').style.display = 'none';
+  document.getElementById('passive-bars').style.display = 'none';
+  ui.p1Name.style.display = 'none';
+  ui.p2Name.style.display = 'none';
+  ui.p1SpecialLabel.style.display = 'none';
+  ui.p2SpecialLabel.style.display = 'none';
+  ui.p1PassiveLabel.style.display = 'none';
+  ui.p2PassiveLabel.style.display = 'none';
+  ui.p1Combo.style.display = 'none';
+  ui.p2Combo.style.display = 'none';
+  ui.p1WinStreak.style.display = 'none';
+  ui.p2WinStreak.style.display = 'none';
+  document.getElementById('p1-rounds').style.display = 'none';
+  document.getElementById('p2-rounds').style.display = 'none';
+
+  el.container = document.createElement('div');
+  el.container.id = 'team-hud';
+  el.container.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;';
+
+  function makeBar(id, color, floatRight) {
+    const wrap = document.createElement('div');
+    wrap.className = 'team-bar-wrap';
+    wrap.id = id + '-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'team-bar';
+    bar.id = id;
+    bar.style.background = color;
+    if (floatRight) bar.style.float = 'right';
+    bar.style.width = '100%';
+    wrap.appendChild(bar);
+    return { wrap, bar };
+  }
+
+  function makeLabel(id, text, color) {
+    const lbl = document.createElement('span');
+    lbl.className = 'team-label';
+    lbl.id = id;
+    lbl.textContent = text;
+    lbl.style.color = color;
+    return lbl;
+  }
+
+  const sides = [
+    { prefix: 'a', x: 'left', color1: '#ff6b6b', color2: '#c0392b', pColor: '#81ecec' },
+    { prefix: 'b', x: 'right', color1: '#74b9ff', color2: '#2980b9', pColor: '#a29bfe' }
+  ];
+
+  el.sideBars = {};
+
+  sides.forEach(s => {
+    const sideEl = {};
+    const xStyle = s.x + ':12px;';
+
+    const h1 = makeBar('team-' + s.prefix + '-h1', `linear-gradient(180deg, ${s.color1}, ${s.color2})`, s.x === 'right');
+    h1.wrap.style.cssText = `position:absolute;top:10px;${xStyle}width:38%;height:16px;background:#222;border:2px solid #888;overflow:hidden;`;
+    el.container.appendChild(h1.wrap);
+    sideEl.h1 = h1.bar;
+
+    const n1 = makeLabel('team-' + s.prefix + '-n1', '', s.color1);
+    n1.style.cssText = `position:absolute;top:30px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px #000;`;
+    el.container.appendChild(n1);
+    sideEl.n1 = n1;
+
+    const s1 = makeBar('team-' + s.prefix + '-s1', `linear-gradient(90deg, ${s.color2}, ${s.color1})`, s.x === 'right');
+    s1.wrap.style.cssText = `position:absolute;top:42px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;`;
+    el.container.appendChild(s1.wrap);
+    sideEl.s1 = s1.bar;
+
+    const p1 = makeBar('team-' + s.prefix + '-p1', `linear-gradient(90deg, ${s.pColor}, ${s.pColor})`, s.x === 'right');
+    p1.wrap.style.cssText = `position:absolute;top:54px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;display:none;`;
+    el.container.appendChild(p1.wrap);
+    sideEl.p1 = p1.bar;
+    sideEl.p1Wrap = p1.wrap;
+
+    const h2 = makeBar('team-' + s.prefix + '-h2', `linear-gradient(180deg, ${s.color1}, ${s.color2})`, s.x === 'right');
+    h2.wrap.style.cssText = `position:absolute;top:70px;${xStyle}width:38%;height:16px;background:#222;border:2px solid #888;overflow:hidden;`;
+    el.container.appendChild(h2.wrap);
+    sideEl.h2 = h2.bar;
+
+    const n2 = makeLabel('team-' + s.prefix + '-n2', '', s.color1);
+    n2.style.cssText = `position:absolute;top:90px;${xStyle}font-size:9px;font-family:'Press Start 2P',monospace;text-shadow:1px 1px #000;`;
+    el.container.appendChild(n2);
+    sideEl.n2 = n2;
+
+    const s2 = makeBar('team-' + s.prefix + '-s2', `linear-gradient(90deg, ${s.color2}, ${s.color1})`, s.x === 'right');
+    s2.wrap.style.cssText = `position:absolute;top:102px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;`;
+    el.container.appendChild(s2.wrap);
+    sideEl.s2 = s2.bar;
+
+    const p2 = makeBar('team-' + s.prefix + '-p2', `linear-gradient(90deg, ${s.pColor}, ${s.pColor})`, s.x === 'right');
+    p2.wrap.style.cssText = `position:absolute;top:114px;${xStyle}width:26%;height:10px;background:#111;border:1px solid #555;overflow:hidden;display:none;`;
+    el.container.appendChild(p2.wrap);
+    sideEl.p2 = p2.bar;
+    sideEl.p2Wrap = p2.wrap;
+
+    const c1 = document.createElement('div');
+    c1.className = 'team-combo';
+    c1.id = 'team-' + s.prefix + '-c1';
+    c1.style.cssText = `position:absolute;bottom:140px;${xStyle}font-size:14px;font-family:'Press Start 2P',monospace;color:${s.color1};text-shadow:2px 2px #000;opacity:0;transition:opacity 0.15s;`;
+    el.container.appendChild(c1);
+    sideEl.c1 = c1;
+
+    const c2 = document.createElement('div');
+    c2.className = 'team-combo';
+    c2.id = 'team-' + s.prefix + '-c2';
+    c2.style.cssText = `position:absolute;bottom:100px;${xStyle}font-size:14px;font-family:'Press Start 2P',monospace;color:${s.color1};text-shadow:2px 2px #000;opacity:0;transition:opacity 0.15s;`;
+    el.container.appendChild(c2);
+    sideEl.c2 = c2;
+
+    const rd = document.createElement('div');
+    rd.className = 'team-round-dots';
+    rd.id = 'team-' + s.prefix + '-rounds';
+    rd.style.cssText = `position:absolute;top:8px;${s.x === 'left' ? 'left:300px' : 'right:300px'};`;
+    rd.innerHTML = '<span class="round-dot" id="team-' + s.prefix + '-r1"></span><span class="round-dot" id="team-' + s.prefix + '-r2"></span>';
+    el.container.appendChild(rd);
+    sideEl.r1 = rd.querySelector('#team-' + s.prefix + '-r1');
+    sideEl.r2 = rd.querySelector('#team-' + s.prefix + '-r2');
+
+    el.sideBars[s.prefix] = sideEl;
+  });
+
+  overlay.appendChild(el.container);
+  teamUI.elements = el;
+}
+
+function removeTeamHUD() {
+  const existing = document.getElementById('team-hud');
+  if (existing) existing.remove();
+  teamUI.elements = null;
+
+  document.getElementById('health-bars').style.display = '';
+  document.getElementById('special-bars').style.display = '';
+  document.getElementById('passive-bars').style.display = '';
+  ui.p1Name.style.display = '';
+  ui.p2Name.style.display = '';
+  ui.p1SpecialLabel.style.display = '';
+  ui.p2SpecialLabel.style.display = '';
+  ui.p1PassiveLabel.style.display = '';
+  ui.p2PassiveLabel.style.display = '';
+  ui.p1Combo.style.display = '';
+  ui.p2Combo.style.display = '';
+  document.getElementById('p1-rounds').style.display = '';
+  document.getElementById('p2-rounds').style.display = '';
+}
+
+function updateTeamRoundDots() {
+  if (!teamUI.elements) return;
+  const el = teamUI.elements;
+  el.sideBars.a.r1.className = 'round-dot' + (game.teamRoundsWon.A >= 1 ? ' won-p1' : '');
+  el.sideBars.a.r2.className = 'round-dot' + (game.teamRoundsWon.A >= 2 ? ' won-p1' : '');
+  el.sideBars.b.r1.className = 'round-dot' + (game.teamRoundsWon.B >= 1 ? ' won-p2' : '');
+  el.sideBars.b.r2.className = 'round-dot' + (game.teamRoundsWon.B >= 2 ? ' won-p2' : '');
+}
+
+function updateTeamUI() {
+  if (!teamUI.elements) return;
+  const el = teamUI.elements;
+  const now = Date.now();
+
+  function updateFighterBars(sideEl, fighter, suffix) {
+    if (!fighter) return;
+    sideEl['h' + suffix].style.width = Math.max(0, fighter.health) + '%';
+    sideEl['s' + suffix].style.width = fighter.special + '%';
+    const hasP = hasPassiveSpecialAbility(fighter);
+    sideEl['p' + suffix + 'Wrap'].style.display = hasP ? 'block' : 'none';
+    if (hasP) sideEl['p' + suffix].style.width = fighter.passiveSpecial + '%';
+
+    const comboEl = sideEl['c' + suffix];
+    if (fighter.comboCount >= 2 && now - fighter.lastHitTime < COMBAT.comboResetMs) {
+      comboEl.textContent = fighter.comboCount + '-HIT COMBO';
+      comboEl.style.opacity = '1';
+    } else if (fighter.maxComboTimer > 0) {
+      fighter.maxComboTimer--;
+      comboEl.textContent = 'MAX COMBO';
+      comboEl.style.opacity = '1';
+    } else {
+      comboEl.style.opacity = '0';
+    }
+  }
+
+  el.sideBars.a.n1.textContent = p1.name;
+  el.sideBars.a.n2.textContent = p2.name;
+  el.sideBars.b.n1.textContent = cpu1.name + ' CPU';
+  el.sideBars.b.n2.textContent = cpu2.name + ' CPU';
+
+  updateFighterBars(el.sideBars.a, p1, '1');
+  updateFighterBars(el.sideBars.a, p2, '2');
+  updateFighterBars(el.sideBars.b, cpu1, '1');
+  updateFighterBars(el.sideBars.b, cpu2, '2');
 }
 
 
@@ -9526,7 +10328,9 @@ function openCharacterSelect(resetRounds = false) {
     p1.roundsWon = 0;
     p2.roundsWon = 0;
     game.round = 1;
+    game.teamRoundsWon = { A: 0, B: 0 };
     updateRoundDots();
+    removeTeamHUD();
   }
 
   ui.startScreen.style.display = 'none';
@@ -9547,6 +10351,9 @@ function openCharacterSelect(resetRounds = false) {
     p2Selection = randomCpuSelection();
   } else if (isCpuMode()) {
     p2Selection = randomCpuSelection();
+  } else if (isTeamVsTeamMode()) {
+    cpu1Selection = randomCpuSelection();
+    cpu2Selection = randomCpuSelection();
   }
   buildCharSelect();
 
@@ -9647,6 +10454,7 @@ document.addEventListener('keydown', e => {
       if (isP2Start && game.mode === MATCH_MODES.CPU) {
         game.mode = MATCH_MODES.VERSUS;
       }
+      removeTeamHUD();
       openCharacterSelect(true);
     }
     return;
@@ -9737,16 +10545,43 @@ function gameLoop() {
   drawBackground();
 
   if (game.state === GAME_STATES.FIGHT) {
-    p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), p2);
-    if (isCpuControlledMode()) updateCpuInput(p2, p1);
-    p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
-    checkHit(p1, p2);
-    checkHit(p2, p1);
-    updateProjectiles(p2);
-    updateProjectiles(p1);
+    if (isTeamVsTeamMode()) {
+      p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
+      p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
+      updateCpuInput(cpu1, getClosestOpponent(cpu1), cpuKeys);
+      cpu1.update(cpuKeys, null);
+      updateCpuInput(cpu2, getClosestOpponent(cpu2), cpuKeys);
+      cpu2.update(cpuKeys, null);
 
-    if (p1.health <= 0 || p2.health <= 0) {
-      endRound();
+      const teamA = [p1, p2];
+      const teamB = [cpu1, cpu2];
+      for (const a of teamA) {
+        for (const b of teamB) {
+          checkHit(a, b);
+          checkHit(b, a);
+        }
+      }
+      updateProjectiles(p1);
+      updateProjectiles(p2);
+      updateProjectiles(cpu1);
+      updateProjectiles(cpu2);
+
+      const allDead = team => team.every(f => f.health <= 0);
+      if (allDead(teamA) || allDead(teamB)) {
+        endRound();
+      }
+    } else {
+      p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), p2);
+      if (isCpuControlledMode()) updateCpuInput(p2, p1);
+      p2.update(isCpuControlledMode() ? keys2 : mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), p1);
+      checkHit(p1, p2);
+      checkHit(p2, p1);
+      updateProjectiles(p2);
+      updateProjectiles(p1);
+
+      if (p1.health <= 0 || p2.health <= 0) {
+        endRound();
+      }
     }
   } else if (game.state === GAME_STATES.COUNTDOWN) {
     if (game.countdownPhase === COUNTDOWN_PHASES.ROUND) {
@@ -9766,21 +10601,11 @@ function gameLoop() {
     game.roundMessageTimer--;
 
     // Update victory/defeat animations
-    if (p1.victoryTimer > 0) {
-      p1.victoryTimer--;
-      p1.frame++;
-    }
-    if (p2.victoryTimer > 0) {
-      p2.victoryTimer--;
-      p2.frame++;
-    }
-    if (p1.defeatTimer > 0) {
-      p1.defeatTimer--;
-      p1.frame++;
-    }
-    if (p2.defeatTimer > 0) {
-      p2.defeatTimer--;
-      p2.frame++;
+    const allFighters = getAllFighters();
+    for (const f of allFighters) {
+      if (!f) continue;
+      if (f.victoryTimer > 0) { f.victoryTimer--; f.frame++; }
+      if (f.defeatTimer > 0) { f.defeatTimer--; f.frame++; }
     }
 
     if (game.roundMessageTimer <= 0 && game.state === GAME_STATES.ROUND_END) {
@@ -9794,8 +10619,15 @@ function gameLoop() {
 
   updateParticles();
 
-  p1.draw();
-  p2.draw();
+  if (isTeamVsTeamMode()) {
+    p1.draw();
+    p2.draw();
+    cpu1.draw();
+    cpu2.draw();
+  } else {
+    p1.draw();
+    p2.draw();
+  }
   drawProjectiles();
   drawParticles();
 
@@ -9892,12 +10724,19 @@ ui.battlePlanButton.addEventListener('click', () => {
   openCharacterSelect();
 });
 
+ui.teamButton.addEventListener('click', () => {
+  ensureAudioReady();
+  game.mode = MATCH_MODES.TEAM_VS_TEAM;
+  playUiSound('start');
+  openCharacterSelect();
+});
+
 ui.pauseModeButtons.addEventListener('click', e => {
   const button = e.target.closest('[data-mode]');
   if (!button) return;
 
   const mode = button.dataset.mode;
-  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN) {
+  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM) {
     leavePausedSessionForMode(mode);
   }
 });

@@ -353,9 +353,8 @@ function checkHit(attacker, defender) {
     attacker.lastHitTime = Date.now();
 
     if (attacker.comboCount >= 10) {
-      defender.vx = attacker.facing * 160;
-      defender.maxComboPushback = true;
-      addParticle(defender.x, defender.y - 50, 'ko');
+      attacker.vx = -attacker.facing * 20;
+      addParticle(attacker.x, attacker.y - 50, 'ko');
       game.screenShake = COMBAT.effects.koShake;
       attacker.comboCount = 0;
       attacker.lastHitTime = 0;

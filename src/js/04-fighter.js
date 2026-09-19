@@ -25,7 +25,6 @@ class Fighter {
     this.comboCount = 0;
     this.lastHitTime = 0;
     this.maxComboTimer = 0;
-    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -103,7 +102,6 @@ class Fighter {
     this.blockTimer = 0;
     this.comboCount = 0;
     this.maxComboTimer = 0;
-    this.maxComboPushback = false;
     this.isBlocking = false;
     this.isCrouching = false;
     this.onGround = true;
@@ -357,7 +355,7 @@ class Fighter {
     }
 
     this.health = Math.max(0, this.health - dmg);
-    if (!this.maxComboPushback) this.vx = attackerFacing * kb;
+    this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
     const blockedMeterGain = this.name === 'BORKO'
@@ -1132,8 +1130,7 @@ class Fighter {
     if (this.freezeTimer > 0) {
       this.freezeTimer -= PHYSICS.freezeTickMs;
       this.state = 'frozen';
-      if (!this.maxComboPushback) this.vx *= 0.9;
-      if (this.maxComboPushback && Math.abs(this.vx) < 2) this.maxComboPushback = false;
+      this.vx *= 0.9;
       this.vy += PHYSICS.gravity;
       this.y += this.vy;
       if (this.y >= GROUND) {
@@ -1161,10 +1158,9 @@ class Fighter {
       if (this.makdogSpinDir && this.doggbalSpinTimer > 0) {
         const dir = -this.makdogSpinDir;
         this.vx = dir * COMBAT.special.makdog.rollBackSpeed;
-      } else if (!this.maxComboPushback) {
+      } else {
         this.vx *= 0.9;
       }
-      if (this.maxComboPushback && Math.abs(this.vx) < 2 && !(wasSpinning && this.doggbalSpinTimer > 0)) this.maxComboPushback = false;
       this.isBlocking = false;
       this.isCrouching = false;
       this.vy += PHYSICS.gravity;
@@ -1180,7 +1176,6 @@ class Fighter {
         this.doggbalSpinTimer = 0;
         this.doggbalSpinDuration = 0;
         this.makdogSpinDir = 0;
-        this.maxComboPushback = false;
         this.state = 'idle';
       }
       return;

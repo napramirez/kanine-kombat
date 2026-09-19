@@ -386,6 +386,7 @@ function startRound() {
   }
   resetInputState(keys1);
   resetInputState(keys2);
+  resetInputState(cpuKeys);
   resetCpuState();
   game.timer = ROUND_RULES.timerSeconds;
   game.state = GAME_STATES.COUNTDOWN;

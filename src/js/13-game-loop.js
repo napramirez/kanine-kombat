@@ -236,10 +236,10 @@ function gameLoop() {
     if (isTeamVsTeamMode()) {
       p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
       p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
-      updateCpuInput(cpu1, getClosestOpponent(cpu1));
-      cpu1.update(keys2, null);
-      updateCpuInput(cpu2, getClosestOpponent(cpu2));
-      cpu2.update(keys2, null);
+      updateCpuInput(cpu1, getClosestOpponent(cpu1), cpuKeys);
+      cpu1.update(cpuKeys, null);
+      updateCpuInput(cpu2, getClosestOpponent(cpu2), cpuKeys);
+      cpu2.update(cpuKeys, null);
 
       const teamA = [p1, p2];
       const teamB = [cpu1, cpu2];

@@ -315,6 +315,7 @@ let p2Confirmed = false;
 
 const keys1 = { left: false, right: false, up: false, down: false, block: false };
 const keys2 = { left: false, right: false, up: false, down: false, block: false };
+const cpuKeys = { left: false, right: false, up: false, down: false, block: false };
 
 let p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
 let p2 = new Fighter(PLAYER_SPAWNS.p2, CHARACTERS[p2Selection], -1);

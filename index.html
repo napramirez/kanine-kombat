@@ -8492,6 +8492,7 @@ let p2Confirmed = false;
 
 const keys1 = { left: false, right: false, up: false, down: false, block: false };
 const keys2 = { left: false, right: false, up: false, down: false, block: false };
+const cpuKeys = { left: false, right: false, up: false, down: false, block: false };
 
 let p1 = new Fighter(PLAYER_SPAWNS.p1, CHARACTERS[p1Selection], 1);
 let p2 = new Fighter(PLAYER_SPAWNS.p2, CHARACTERS[p2Selection], -1);
@@ -9340,8 +9341,9 @@ function updateCharSelectModeUI() {
   }
 }
 
-function updateCpuInput(cpuFighter, opponent) {
-  resetInputState(keys2);
+function updateCpuInput(cpuFighter, opponent, targetKeys) {
+  targetKeys = targetKeys || keys2;
+  resetInputState(targetKeys);
 
   if (!opponent || cpuFighter.health <= 0 || opponent.health <= 0 || cpuFighter.hitTimer > 0 || cpuFighter.freezeTimer > 0 || cpuFighter.teleportPhase) return;
 
@@ -9361,16 +9363,16 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (cpuState.blockFrames > 0) {
-    keys2.block = true;
-    if (closeRange && Math.random() > 0.5) keys2.down = true;
+    targetKeys.block = true;
+    if (closeRange && Math.random() > 0.5) targetKeys.down = true;
     return;
   }
 
   if (cpuState.retreatFrames > 0) {
-    keys2.left = !towardLeft;
-    keys2.right = towardLeft;
+    targetKeys.left = !towardLeft;
+    targetKeys.right = towardLeft;
     if (cpuState.jumpCooldown === 0 && Math.random() > 0.9) {
-      keys2.up = true;
+      targetKeys.up = true;
       cpuState.jumpCooldown = 45;
     }
     return;
@@ -9394,21 +9396,21 @@ function updateCpuInput(cpuFighter, opponent) {
   }
 
   if (absDistance > 58) {
-    keys2.left = towardLeft;
-    keys2.right = !towardLeft;
+    targetKeys.left = towardLeft;
+    targetKeys.right = !towardLeft;
   } else {
-    keys2.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
-    keys2.right = !keys2.left;
+    targetKeys.left = towardLeft ? cpuState.strafeBias < 0 : cpuState.strafeBias > 0;
+    targetKeys.right = !targetKeys.left;
     if (Math.random() > 0.96) cpuState.strafeBias *= -1;
   }
 
   if (cpuState.jumpCooldown === 0 && midRange && Math.random() > 0.985) {
-    keys2.up = true;
+    targetKeys.up = true;
     cpuState.jumpCooldown = 70;
   }
 
   if (closeRange && Math.random() > 0.985) {
-    keys2.down = true;
+    targetKeys.down = true;
   }
 }
 
@@ -9802,6 +9804,7 @@ function startRound() {
   }
   resetInputState(keys1);
   resetInputState(keys2);
+  resetInputState(cpuKeys);
   resetCpuState();
   game.timer = ROUND_RULES.timerSeconds;
   game.state = GAME_STATES.COUNTDOWN;
@@ -10550,10 +10553,10 @@ function gameLoop() {
     if (isTeamVsTeamMode()) {
       p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
       p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
-      updateCpuInput(cpu1, getClosestOpponent(cpu1));
-      cpu1.update(keys2, null);
-      updateCpuInput(cpu2, getClosestOpponent(cpu2));
-      cpu2.update(keys2, null);
+      updateCpuInput(cpu1, getClosestOpponent(cpu1), cpuKeys);
+      cpu1.update(cpuKeys, null);
+      updateCpuInput(cpu2, getClosestOpponent(cpu2), cpuKeys);
+      cpu2.update(cpuKeys, null);
 
       const teamA = [p1, p2];
       const teamB = [cpu1, cpu2];

@@ -540,7 +540,7 @@ function endRoundTeam() {
     const allFighters = getAllFighters();
     allFighters.forEach(f => {
       if (!f) return;
-      if (f.team === winningTeam) {
+      if (f.health > 0 && f.team === winningTeam) {
         f.victoryTimer = ROUND_RULES.roundMessageFrames;
         f.state = 'victory';
       } else {

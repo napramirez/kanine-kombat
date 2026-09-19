@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 17+ fighters are present: 13 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`, and `PIXZEL ZLASZH` unlocks when the Battle Plan is completed as `DOGGOMELEON`
+- 19 fighters are present: 15 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`, and `PIXZEL ZLASZH` unlocks when the Battle Plan is completed as `DOGGOMELEON`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states, with a global navigation cooldown
@@ -12,7 +12,9 @@ Use these prompts to iterate on the current game.
 - `BATTLE PLAN` already exists with a route stepper, a `BORKO` sub-boss, and a `SHAO CATNIP` final fight; stepper advances with `L` or Special/Y
 - `NOOB SAIDOG` fireballs now release one after another (4-frame stagger) instead of all at once
 - `SUBDOG` has a passive ice clone that spawns every 5 seconds, lasts 2 seconds, and freezes the opponent on contact
-- MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
+- `SMOWKDAWG` has a passive smoke cloud that fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
+- `TEAM VS TEAM` mode already exists with 2 human players vs 2 CPU opponents, custom team HUD, team round management, and team-aware combat
+- MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing both fighters apart
 - Battle Plan continue system:3 credits,10-second countdown on loss, punch to continue, credits reset on timeout or depletion
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - `DOGGOMELEON` passively cycles through random ninja-type characters every 5 seconds
@@ -48,7 +50,7 @@ Input feels slightly delayed. Improve responsiveness:
 ### Add Another Character
 
 ```text
-Add another character to expand the roster beyond the current fifteen fighters:
+Add another character to expand the roster beyond the current nineteen fighters:
 - Give the character a distinct silhouette, palette, and idle animation.
 - Add them to character select and roster data.
 - Create a unique projectile, trap, or status-effect special.
@@ -59,7 +61,7 @@ Add another character to expand the roster beyond the current fifteen fighters:
 
 ```text
 Push the current roster further apart in feel:
-- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, REPDOG as acid, DOGGABAL as tactical, and SNEK as constrictor/control.
+- Preserve DOGGO CAGE as balanced, BORKO as power, SHAO CATNIP as speed, SKORPDOG as striker, SEKDOG as ambush, CYDOG and SUBDOG as trappers, TREMODOG as quake/control, RAYNDOG as storm/control, RAYDOG as arc/control, DOGGOMELEON as shift, NOOB SAIDOG as shadow/control, REPDOG as acid, DOGGABAL as tactical, SNEK as constrictor/control, MAKDOG as grappler, KANOINE as duality, SMOWKDAWG as striker (with passive smoke cloud), and PIXZEL ZLASZH as glitch.
 - Make per-character normal damage values affect actual attacks, not just roster data.
 - Adjust knockback, frame data, or mobility per character.
 - Add more distinct special attack behaviors where overlap still exists.
@@ -211,9 +213,8 @@ Build on the current fixed audio mix and music-loop hooks:
 Improve the current character-select flow:
 1. Add clearer lock-in feedback for both players.
 2. Display richer stat and special-move descriptions.
-3. Add a random-select option.
-4. Revisit mirror-match rules only if it improves feel.
-5. Add stage preview or stage select follow-up.
+3. Revisit mirror-match rules only if it improves feel.
+4. Add stage preview or stage select follow-up.
 ```
 
 ### Pause Menu

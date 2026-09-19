@@ -1,6 +1,6 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with a seventeen-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a nineteen-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
@@ -27,8 +27,9 @@ Optional music files:
 - Local 2-player versus mode
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
+- `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, with stacked team HUD, team round wins, and friendly-fire prevention
 - Keyboard and standard gamepad support with mixed-input play
-- 13 initially selectable fighters, plus 4 Battle Plan unlocks:
+- 15 initially selectable fighters, plus 4 Battle Plan unlocks:
   - `DOGGO CAGE`
   - `SKORPDOG`
   - `SMOWKDAWG`
@@ -56,12 +57,13 @@ Optional music files:
 - Punch, kick, block, jump, crouch, active special attacks, and passive specials
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and staggered fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, freeze projectile, SUBDOG's passive ice clone, SKORPDOG's fire spit with skull face transformation, KANOINE's orbiting daggers, and PIXZEL ZLASZH's special steal with katana fallback
-- MAX COMBO at10 hits: displays MAX COMBO text and pushes opponent to the screen edge
+- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and staggered fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, freeze projectile, SUBDOG's passive ice clone, SKORPDOG's fire spit with skull face transformation, SMOWKDAWG's passive smoke cloud with speed boost and invisibility, MAKDOG's eye-glow lift-and-slam grapple, KANOINE's dash-punch active and passive orbiting daggers, and PIXZEL ZLASZH's special steal with katana fallback
+- MAX COMBO at 10 hits: displays MAX COMBO text and pushes both fighters apart
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - Battle Plan continue system:3 credits,10-second countdown on loss, press punch to continue
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
+- Title screen and pause overlay include `TEAM VS TEAM` mode button
 - Optional MP3 music hooks for title, character select, and fights
 
 ## Background Stages
@@ -102,7 +104,7 @@ kanine-kombat/
 │       ├── 05-particles.js # Particle system
 │       ├── 06-projectiles.js # All projectile spawn/update/draw
 │       ├── 07-backgrounds.js # Background stages
-│       ├── 08-characters.js # CHARACTERS array, unlock system
+│       ├── 08-characters.js # CHARACTERS array, game object, team helpers, unlock system
 │       ├── 09-battle-plan.js # Battle plan route/stepper
 │       ├── 10-pause.js     # Pause overlay
 │       ├── 11-input.js     # Keyboard, gamepad, CPU AI

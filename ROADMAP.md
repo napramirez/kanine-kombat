@@ -38,7 +38,7 @@
 - [x] Pause overlay with mode switching
 - [ ] Training mode hitbox display
 - [ ] Tournament bracket mode
-- [ ] Team battle (2v2)
+- [x] Team battle (2v2)
 
 ## Phase 4: Audio & Effects
 
@@ -75,7 +75,7 @@
 
 ## Current Build Notes
 
-- Roster is now 17 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, `KANOINE`, and `PIXZEL ZLASZH`
+- Roster is now 19 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, `KANOINE`, and `PIXZEL ZLASZH`
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special
@@ -84,12 +84,15 @@
 - `NOOB SAIDOG` can start a behind-the-opponent 3-second snake coil that prevents movement but allows blocking and attacks, followed by five extremely wide fireballs that fan out one after another before homing
 - `DOGGABAL` dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
 - `SUBDOG` passively spawns an ice clone every 5 seconds that lasts 2 seconds and freezes the opponent on contact for 2 seconds
-- `MAKDOG` is a red SKORPDOG variant with red vest/mask
-- `KANOINE` is a white dog with gray left half face, pure red glowing left eye, white belly, brown stripe, and fully gray left ear
+- `MAKDOG` is a red SKORPDOG variant with red vest/mask; has a 4-phase grapple special (eye glow, lift, hold, slam) dealing 30 damage with 1-second stun
+- `KANOINE` is a white dog with gray left half face, pure red glowing left eye, white belly, brown stripe, and fully gray left ear; has a dash-punch active special and passive orbiting daggers that home toward the opponent
 - `PIXZEL ZLASZH` is a hidden black dog with V-shaped red visor, rainbow outline glow, and red pixel puff particles; active special steals opponent's passive or active at random, falls back to black katana slash with red pixel trail; unlock by completing Battle Plan as DOGGOMELEON
 - `SKORPDOG` has a passive fire spit that burns the opponent for 3 seconds with skull face transformation
+- `SMOWKDAWG` has a passive smoke cloud that fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
+- `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, stacked team HUD, team round wins, friendly-fire prevention, CPU targets closest human
+- Defeated fighters immediately show the defeat pose (crossed eyes, tongue, stars) and cannot attack, take damage, gain meter, or activate specials
 - `DOGGOMELEON` excludes robot-ninjas `SEKDOG` and `CYDOG` from its morph pool
-- MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing the opponent to the screen edge
+- MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing both fighters apart
 - `REPDOG` summons a green python capture and spits a single large acid glob
 - `BORKO` and `SHAO CATNIP` are hidden until defeated as the Battle Plan sub-boss and final boss; unlocks persist and only the scripted boss steps can use them before that
 - `SNEK` is hidden until the Battle Plan is completed as `NOOB SAIDOG`
@@ -109,6 +112,17 @@
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in HUD and character select (hidden until2+ wins)
 
 ## Version History
+
+### v0.4.0 - Team VS Team Update
+
+- Added `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents
+- Team HUD with stacked health, special, passive, and combo meters per side
+- Team round wins tracked separately (best of 3)
+- Friendly fire prevention between teammates
+- CPU targets closest human opponent; humans can freely attack either CPU
+- Defeated fighters show defeat pose immediately and are immune to all combat
+- MAX COMBO now pushes both fighters apart equally instead of massive defender knockback
+- Separated CPU input from P2 input (`cpuKeys`) to fix P2 being controlled by stale CPU data
 
 ### v0.3.7 - Harpoon Stun Update
 

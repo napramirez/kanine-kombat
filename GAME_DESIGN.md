@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a seventeen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a nineteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -16,7 +16,7 @@ Players choose from a shared roster before each match.
 | `BORKO` | Power | 4 | 125 | Hidden gray boss; unlock by defeating the Battle Plan sub-boss |
 | `SHAO CATNIP` | Speed | 8 | 150 | Hidden purple boss; unlock by defeating the Battle Plan final boss |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
-| `SMOWKDAWG` | Striker | 5 | 100 | SKORPDOG variant with gray gear |
+| `SMOWKDAWG` | Striker | 5 | 100 | SKORPDOG variant with gray gear; has passive smoke cloud |
 | `SEKDOG` | Ambush | 5 | 100 | White/black gear, red mask |
 | `CYDOG` | Trapper | 5 | 100 | White/black gear, yellow eyes |
 | `TREMODOG` | Quake | 5 | 100 | White/black gear, red eyes, `scale: 1.1` |
@@ -28,8 +28,8 @@ Players choose from a shared roster before each match.
 | `DOGGABAL` | Tactical | 5 | 100 | Black dog, olive green vertical stripe, brown horizontal stripe, oxygen mask |
 | `SNEK` | Constrictor | 7 | 100 | Hidden black python with red eyes; unlock by completing the Battle Plan as NOOB SAIDOG |
 | `SUBDOG` | Trapper | 5 | 100 | White/black gear, light-blue mask |
-| `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask |
-| `KANOINE` | Duality | 5 | 100 | White dog, gray left half face, pure red glowing left eye, white belly, brown stripe, fully gray left ear |
+| `MAKDOG` | Grappler | 5 | 100 | Red SKORPDOG variant with red vest/mask; has eye-glow lift-and-slam grapple special |
+| `KANOINE` | Duality | 5 | 100 | White dog, gray left half face, pure red glowing left eye, white belly, brown stripe, fully gray left ear; has dash-punch active special and passive orbiting daggers |
 | `PIXZEL ZLASZH` | Glitch | 6 | 100 | Hidden black dog with V-shaped red visor, rainbow outline glow; unlock by completing the Battle Plan as DOGGOMELEON |
 
 ### Combat System
@@ -46,7 +46,7 @@ Players choose from a shared roster before each match.
 - `BORKO`: remembers the opponent's position, leaps high toward it, and creates a landing shockwave that deals 10 damage and 1 second of stun if the opponent is caught in the radius
 - `SHAO CATNIP`: blue/purple energy ball
 - `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun; passive fire spit that burns the opponent for 3 seconds, with skull face transformation during burn
-- `SMOWKDAWG`: gray harpoon that pulls the opponent in and applies a 1-second stun (same as SKORPDOG)
+- `SMOWKDAWG`: gray harpoon that pulls the opponent in and applies a 1-second stun (same as SKORPDOG); passive smoke cloud fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
 - `SEKDOG`: missile followed by a teleport punch from behind
 - `CYDOG`: plants a bomb, then fires a green net that captures and reels the opponent toward the bomb
 - `TREMODOG`: creates a floor-wide pink shockwave field for 600 frames while TREMODOG stays planted in a crouched special stance; each pulse deals 5 damage
@@ -56,6 +56,8 @@ Players choose from a shared roster before each match.
 - `NOOB SAIDOG`: can summon a giant black python from the ground or mid-air behind the opponent to coil around them for a 3-second position lock; the opponent can block or attack but cannot move, while five extremely wide flashing red fireballs fan out one after another before homing
 - `REPDOG`: summons a green python that captures the opponent, then spits a single large acid glob straight at them
 - `DOGGABAL`: dashes rapidly through the opponent, spinning them for 3 seconds and immobilizing them
+- `MAKDOG`: 4-phase grapple: eye glow flashes green, lifts the opponent 220px into the air, holds them, then slams them down for 30 damage, 8 knockback, and 1-second stun; opponent is immobilized during the entire sequence
+- `KANOINE`: active special is a dash-punch that flies through the opponent for 10 damage; passive special spawns two orbiting daggers every 5 seconds that home toward the opponent within 300px range, dealing 5 damage each
 - `SNEK`: slithers rapidly toward the opponent, coils around them, and applies a 3-second full stun
 - `SUBDOG`: snowflake projectile that freezes the opponent for 2 seconds; passive ice clone spawns every 5 seconds at SUBDOG's position, lasts 2 seconds, and freezes the opponent on contact for 2 seconds
 - `PIXZEL ZLASZH`: active special randomly steals opponent's passive or active special; falls back to a pure black katana slash with red pixel trail when opponent has no passive to steal
@@ -66,7 +68,7 @@ Players choose from a shared roster before each match.
 - Every 12 hits increases punch damage by 1
 - Every 12 hits increases kick damage by 2
 - Knockback increases with combo count
-- MAX COMBO triggers at 10 hits: displays "MAX COMBO" for 60 frames and pushes the opponent to the screen edge (vx=160), resetting the combo counter
+- MAX COMBO triggers at 10 hits: displays "MAX COMBO" for 60 frames and pushes both fighters apart (vx=20 each), resetting the combo counter
 
 ### Blocking
 
@@ -89,7 +91,8 @@ Players choose from a shared roster before each match.
 - `RAYDOG`'s passive meter fills over 3 seconds and triggers auto-targeting arc lightning if the opponent is in range, or two skyward lightning arcs if the opponent is out of range
 - `DOGGOMELEON`'s passive meter fills over 5 seconds and advances to a random ninja-type form
 - `SKORPDOG`'s passive meter fills over 6 seconds and spits fire at the opponent, burning them for 3 seconds while SKORPDOG's face turns into a skull
-- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, and `SNEK` do not gain active special meter from punch or kick hits
+- `SMOWKDAWG`'s passive meter fills over 8 seconds and spawns a smoke cloud that lasts 3 seconds, doubling movement speed, boosting jump by 25%, and making SMOWKDAWG nearly invisible
+- `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `SUBDOG`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `KANOINE`, and `MAKDOG` do not gain active special meter from punch or kick hits
 
 ### Physics
 
@@ -111,6 +114,7 @@ Players choose from a shared roster before each match.
 - Local `2 PLAYER`
 - `VS CPU`
 - `BATTLE PLAN`
+- `TEAM VS TEAM`: 2 human players (Team A) vs 2 CPU opponents (Team B); stacked team HUD with per-fighter health, special, passive, and combo meters; team round wins tracked separately; friendly fire prevented between teammates; CPU targets closest human; win by defeating all opponents or having higher total health at timeout
 - Standard gamepads can be used as alternative controllers across menu, select, fight, pause, Battle Plan, and game-over flows
 
 ### Battle Plan
@@ -123,7 +127,7 @@ Players choose from a shared roster before each match.
 - Final match is always `SHAO CATNIP`
 - The `SHAO CATNIP` match always uses `CATNIP's Domain`
 - A route stepper appears before the first match and after each win, and scrolls to keep current progress visible
-- `L` or controller Special advances from the route stepper into the next fight
+- `L` or controller Confirm advances from the route stepper into the next fight
 - Player starts with 3 credits; on loss, a 10-second continue screen appears
 - Press punch to continue (uses1 credit and resumes from current match)
 - If countdown expires or no credits remain, credits reset to3 and player returns to title screen
@@ -165,7 +169,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared seventeen-fighter roster
+- Shared nineteen-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route

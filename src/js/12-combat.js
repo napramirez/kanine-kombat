@@ -354,6 +354,7 @@ function checkHit(attacker, defender) {
 
     if (attacker.comboCount >= 10) {
       attacker.vx = -attacker.facing * 20;
+      defender.vx = attacker.facing * 20;
       addParticle(attacker.x, attacker.y - 50, 'ko');
       game.screenShake = COMBAT.effects.koShake;
       attacker.comboCount = 0;

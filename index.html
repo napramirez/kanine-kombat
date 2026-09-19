@@ -5208,6 +5208,10 @@ class Fighter {
     this.shakeY *= 0.8;
 
     if (this.health <= 0) {
+      if (this.state !== 'defeat') {
+        this.state = 'defeat';
+        this.defeatTimer = ROUND_RULES.roundMessageFrames;
+      }
       if (this.defeatTimer > 0) this.defeatTimer--;
       if (this.victoryTimer > 0) this.victoryTimer--;
       return;

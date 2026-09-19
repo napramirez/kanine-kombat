@@ -203,6 +203,7 @@ class Fighter {
   }
 
   attack(type) {
+    if (this.health <= 0) return;
     if (this.freezeTimer > 0) return;
     if (this.stunnedTimer > 0) return;
     if (this.harpoonLockTimer > 0) return;
@@ -336,6 +337,7 @@ class Fighter {
   }
 
   takeHit(dmg, kb, attackerFacing) {
+    if (this.health <= 0) return null;
     if (this.hitCooldown > 0) return null;
     const incomingDamage = dmg;
     const blocked = this.isBlocking;
@@ -1115,6 +1117,12 @@ class Fighter {
     if (this.hitCooldown > 0) this.hitCooldown--;
     this.shakeX *= 0.8;
     this.shakeY *= 0.8;
+
+    if (this.health <= 0) {
+      if (this.defeatTimer > 0) this.defeatTimer--;
+      if (this.victoryTimer > 0) this.victoryTimer--;
+      return;
+    }
 
     // Frozen state
     if (this.freezeTimer > 0) {

@@ -327,6 +327,7 @@ ui.fightButton.addEventListener('click', () => {
 
 function checkHit(attacker, defender) {
   if (attacker.team && defender.team && attacker.team === defender.team) return;
+  if (attacker.health <= 0 || defender.health <= 0) return;
   const atkBox = attacker.getAttackBox();
   if (!atkBox) return;
 

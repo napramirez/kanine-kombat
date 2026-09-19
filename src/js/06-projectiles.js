@@ -551,6 +551,10 @@ function updateRepdogAcid(p, index) {
   }
 
   const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
+  if (!target || target.health <= 0) {
+    projectiles.splice(index, 1);
+    return;
+  }
   const targetX = target.x;
   const targetY = target.y - target.height / 2;
   const dx = targetX - p.x;
@@ -884,7 +888,7 @@ function updateProjectiles(owner) {
 
     // Collision with opponents
     for (const opponent of targets) {
-    if (opponent !== p.owner && !p.hit) {
+    if (opponent !== p.owner && !p.hit && opponent.health > 0) {
       const hb = opponent.getHurtbox();
       if (p.x > hb.x && p.x < hb.x + hb.w &&
           p.y > hb.y && p.y < hb.y + hb.h) {

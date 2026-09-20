@@ -10111,6 +10111,7 @@ function startRound() {
   resetInputState(keys2);
   resetInputState(cpuKeys);
   resetCpuState();
+  game.screenShake = 0;
   game.timer = ROUND_RULES.timerSeconds;
   game.state = GAME_STATES.COUNTDOWN;
   game.countdownPhase = COUNTDOWN_PHASES.ROUND;

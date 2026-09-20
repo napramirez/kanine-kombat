@@ -602,6 +602,11 @@ function updateProjectiles(owner) {
 
     const target = (isTeamVsTeamMode() || isTeamBattlePlanMode()) && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
 
+    if (!target) {
+      projectiles.splice(i, 1);
+      continue;
+    }
+
     if (p.type === 'noobSnake') {
       updateNoobSnakeSequence(p, i);
       continue;

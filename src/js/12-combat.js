@@ -803,7 +803,7 @@ function updateUI() {
     ui.p2Combo.classList.remove('active');
   }
 
-  if (isTeamVsTeamMode()) updateTeamUI();
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) updateTeamUI();
 }
 
 function createTeamHUD() {

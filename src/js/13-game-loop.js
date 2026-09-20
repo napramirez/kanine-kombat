@@ -311,7 +311,7 @@ function gameLoop() {
 
   updateParticles();
 
-  if (isTeamVsTeamMode()) {
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) {
     p1.draw();
     p2.draw();
     cpu1.draw();

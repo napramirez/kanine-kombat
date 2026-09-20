@@ -227,7 +227,7 @@ class Fighter {
         this.teleportPunchDone = false;
         this.sekdogChestOpen = true;
       } else if (this.name === 'BORKO') {
-        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        const opponent = (isTeamVsTeamMode() || isTeamBattlePlanMode()) ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.borko;
         this.attackTimer = special.airFrames;
         this.borkoImpactX = Math.max(
@@ -254,7 +254,7 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'DOGGABAL') {
-        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        const opponent = (isTeamVsTeamMode() || isTeamBattlePlanMode()) ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.doggbal;
         this.attackTimer = special.dashFrames;
         this.doggbalDashActive = true;
@@ -293,7 +293,7 @@ class Fighter {
         this.isCrouching = false;
       } else if (this.specialFormSource === 'MAKDOG') {
         const special = COMBAT.special.makdog;
-        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        const opponent = (isTeamVsTeamMode() || isTeamBattlePlanMode()) ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         this.attackTimer = special.eyeGlowFrames + special.liftFrames + special.holdFrames + special.slamFrames;
         this.makdogSpecialActive = true;
         this.makdogSpecialPhase = 'eyeGlow';
@@ -316,7 +316,7 @@ class Fighter {
         this.isBlocking = false;
         this.isCrouching = false;
       } else if (this.specialFormSource === 'PIXZEL ZLASZH') {
-        const opponent = isTeamVsTeamMode() ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
+        const opponent = (isTeamVsTeamMode() || isTeamBattlePlanMode()) ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         this.attackTimer = COMBAT.special.duration;
         this.triggerPixzelSteal(opponent);
       } else {
@@ -1085,7 +1085,7 @@ class Fighter {
   }
 
   update(keys, opponent) {
-    const effectiveOpponent = (isTeamVsTeamMode() && this.team) ? getClosestOpponent(this) : opponent;
+    const effectiveOpponent = ((isTeamVsTeamMode() || isTeamBattlePlanMode()) && this.team) ? getClosestOpponent(this) : opponent;
     this.frame++;
     this.updateDoggomeleonMorph();
     if (effectiveOpponent) {

@@ -32,12 +32,12 @@ function spawnProjectile(owner) {
   } else if (specialName === 'BORKO') {
     return;
   } else if (specialName === 'RAYNDOG') {
-    spawnRayndogLightningCloud(owner, isTeamVsTeamMode() && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1));
+    spawnRayndogLightningCloud(owner, (isTeamVsTeamMode() || isTeamBattlePlanMode()) && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1));
     return;
   } else if (specialName === 'RAYDOG') {
     return;
   } else if (specialName === 'NOOB SAIDOG' || specialName === 'REPDOG') {
-    spawnNoobSaidogSequence(owner, isTeamVsTeamMode() && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1), specialName);
+    spawnNoobSaidogSequence(owner, (isTeamVsTeamMode() || isTeamBattlePlanMode()) && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1), specialName);
     return;
   } else if (specialName === 'SNEK') {
     return;
@@ -550,7 +550,7 @@ function updateRepdogAcid(p, index) {
     return;
   }
 
-  const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
+  const target = (isTeamVsTeamMode() || isTeamBattlePlanMode()) && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
   if (!target || target.health <= 0) {
     projectiles.splice(index, 1);
     return;
@@ -595,12 +595,12 @@ function updateSnekCoil(p, index) {
 }
 
 function updateProjectiles(owner) {
-  const targets = isTeamVsTeamMode() && owner.team ? getAliveOpponents(owner) : [owner === p1 ? p2 : p1];
+  const targets = (isTeamVsTeamMode() || isTeamBattlePlanMode()) && owner.team ? getAliveOpponents(owner) : [owner === p1 ? p2 : p1];
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const p = projectiles[i];
     if (p.owner !== owner) continue;
 
-    const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
+    const target = (isTeamVsTeamMode() || isTeamBattlePlanMode()) && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
 
     if (p.type === 'noobSnake') {
       updateNoobSnakeSequence(p, i);
@@ -1504,7 +1504,7 @@ function drawProjectiles() {
       ctx.restore();
     } else if (p.type === 'net') {
       p.rotation += 0.12;
-      const target = isTeamVsTeamMode() && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
+  const target = (isTeamVsTeamMode() || isTeamBattlePlanMode()) && p.owner.team ? getClosestOpponent(p.owner) : (p.owner === p1 ? p2 : p1);
       const capturedHurtbox = p.hit ? target.getHurtbox() : null;
       const netRadiusX = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.w * 0.65) : p.radius;
       const netRadiusY = capturedHurtbox ? Math.max(p.radius, capturedHurtbox.h * 0.58) : p.radius;

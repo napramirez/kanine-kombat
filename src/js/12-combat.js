@@ -366,7 +366,7 @@ function checkHit(attacker, defender) {
       attacker.vx = -attacker.facing * 20;
       defender.vx = attacker.facing * 20;
       addParticle(attacker.x, attacker.y - 50, 'ko');
-      triggerScreenShake(COMBAT.effects.koShake);
+      triggerScreenShake(5);
       attacker.comboCount = 0;
       attacker.lastHitTime = 0;
       attacker.maxComboTimer = 60;
@@ -376,8 +376,6 @@ function checkHit(attacker, defender) {
       triggerScreenShake(COMBAT.effects.koShake);
       addParticle(defender.x, defender.y - 50, 'ko');
       playImpactSound('ko');
-    } else {
-      triggerScreenShake(COMBAT.effects.hitShake);
     }
 
     game.hitStop = COMBAT.effects.meleeHitStop;

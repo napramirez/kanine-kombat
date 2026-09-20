@@ -303,6 +303,20 @@
 
   #pause-team-btn:hover { background: #2a7a4f; }
 
+  #team-battle-plan-btn {
+    background: #1a3d5c;
+    border-color: #4ca8ff;
+  }
+
+  #team-battle-plan-btn:hover { background: #2a5a7f; }
+
+  #pause-team-battle-plan-btn {
+    background: #1a3d5c;
+    border-color: #4ca8ff;
+  }
+
+  #pause-team-battle-plan-btn:hover { background: #2a5a7f; }
+
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -1114,6 +1128,7 @@
       <button class="mode-btn" id="cpu-btn">VS CPU</button>
       <button class="mode-btn" id="battle-plan-btn">BATTLE PLAN</button>
       <button class="mode-btn" id="team-btn">TEAM VS TEAM</button>
+      <button class="mode-btn" id="team-battle-plan-btn">TEAM BATTLE PLAN</button>
     </div>
     <button id="fullscreen-btn">FULLSCREEN</button>
   </div>
@@ -1157,6 +1172,7 @@
       <button class="mode-btn" id="pause-cpu-btn" data-mode="cpu">VS CPU</button>
       <button class="mode-btn" id="pause-battle-plan-btn" data-mode="battlePlan">BATTLE PLAN</button>
       <button class="mode-btn" id="pause-team-btn" data-mode="teamVsTeam">TEAM VS TEAM</button>
+      <button class="mode-btn" id="pause-team-battle-plan-btn" data-mode="teamBattlePlan">TEAM BATTLE PLAN</button>
     </div>
     <button id="fullscreen-btn-pause">FULLSCREEN</button>
     <div id="pause-resume-note">ESC, START, or B resumes the current session</div>
@@ -1192,7 +1208,8 @@ const MATCH_MODES = {
   VERSUS: 'versus',
   CPU: 'cpu',
   BATTLE_PLAN: 'battlePlan',
-  TEAM_VS_TEAM: 'teamVsTeam'
+  TEAM_VS_TEAM: 'teamVsTeam',
+  TEAM_BATTLE_PLAN: 'teamBattlePlan'
 };
 
 const CHAR_SELECT_TIMER_SECONDS = 30;
@@ -1454,6 +1471,7 @@ const ui = {
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
   teamButton: document.getElementById('team-btn'),
+  teamBattlePlanButton: document.getElementById('team-battle-plan-btn'),
   fightButton: document.getElementById('fight-btn'),
   p1SelectLabel: document.getElementById('p1-select-label'),
   p2SelectLabel: document.getElementById('p2-select-label'),
@@ -1492,7 +1510,7 @@ const ui = {
   }
 };
 
-const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.fullscreenBtn];
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.teamBattlePlanButton, ui.fullscreenBtn];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
 
 const teamUI = { elements: null };
@@ -8184,6 +8202,16 @@ let game = {
     stepperFromIndex: -1,
     stepperReady: false
   },
+  teamBattlePlan: {
+    route: [],
+    currentIndex: 0,
+    playerCharacterId: '',
+    playerCharacterId2: '',
+    pendingAdvance: false,
+    cleared: false,
+    stepperFromIndex: -1,
+    stepperReady: false
+  },
   credits: 3,
   continueCountdown: 0,
   continueTimerInterval: null,
@@ -8506,12 +8534,16 @@ function isTeamVsTeamMode() {
   return game.mode === MATCH_MODES.TEAM_VS_TEAM;
 }
 
+function isTeamBattlePlanMode() {
+  return game.mode === MATCH_MODES.TEAM_BATTLE_PLAN;
+}
+
 function isCpuControlledMode() {
   return isCpuMode() || isBattlePlanMode();
 }
 
 function getAllFighters() {
-  if (isTeamVsTeamMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
   return [p1, p2];
 }
 
@@ -8822,6 +8854,254 @@ function proceedBattlePlanStepper() {
   }
 }
 
+function resetTeamBattlePlanState() {
+  game.teamBattlePlan.route = [];
+  game.teamBattlePlan.currentIndex = 0;
+  game.teamBattlePlan.playerCharacterId = '';
+  game.teamBattlePlan.playerCharacterId2 = '';
+  game.teamBattlePlan.pendingAdvance = false;
+  game.teamBattlePlan.cleared = false;
+  game.teamBattlePlan.stepperFromIndex = -1;
+  game.teamBattlePlan.stepperReady = false;
+  hideBattlePlanStepper();
+}
+
+function buildTeamBattlePlanRoute(p1CharId, p2CharId) {
+  const excludeIds = new Set([p1CharId, p2CharId, 'borko', 'catnip']);
+  const pool = shuffleCharacterIds(
+    CHARACTERS
+      .filter(char => !excludeIds.has(char.id) && !isHiddenCharacter(char))
+      .map(char => char.id)
+  );
+
+  const route = [];
+  for (let i = 0; i < pool.length; i += 2) {
+    if (i + 1 < pool.length) {
+      route.push([pool[i], pool[i + 1]]);
+    } else {
+      route.push([pool[i]]);
+    }
+  }
+
+  route.push([p1CharId, p2CharId]);
+  route.push(['borko']);
+  route.push(['catnip']);
+  return route;
+}
+
+function prepareTeamBattlePlanRoute(p1CharId, p2CharId) {
+  game.teamBattlePlan.playerCharacterId = p1CharId;
+  game.teamBattlePlan.playerCharacterId2 = p2CharId;
+  game.teamBattlePlan.route = buildTeamBattlePlanRoute(p1CharId, p2CharId);
+  game.teamBattlePlan.currentIndex = 0;
+  game.teamBattlePlan.pendingAdvance = false;
+  game.teamBattlePlan.cleared = false;
+}
+
+function getTeamBattlePlanCurrentOpponents() {
+  const pair = game.teamBattlePlan.route[game.teamBattlePlan.currentIndex];
+  return pair.map(id => getCharacterById(id));
+}
+
+function loadTeamBattlePlanMatch() {
+  const playerChar1 = getCharacterById(game.teamBattlePlan.playerCharacterId);
+  const playerChar2 = getCharacterById(game.teamBattlePlan.playerCharacterId2);
+  const opponents = getTeamBattlePlanCurrentOpponents();
+  const opponentChar1 = opponents[0];
+  const opponentChar2 = opponents[1] || null;
+
+  const isBorkoMatch = opponentChar1.id === 'borko' && !opponentChar2;
+  const isCatnipMatch = opponentChar1.id === 'catnip' && !opponentChar2;
+  if (isBorkoMatch) {
+    game.stage = BACKGROUND_STAGES.BORKO_LAIR;
+  } else if (isCatnipMatch) {
+    game.stage = BACKGROUND_STAGES.CATNIP_DOMAIN;
+  } else {
+    game.stage = pickRandomBackgroundStage();
+  }
+
+  p1 = new Fighter(PLAYER_SPAWNS.teamA1, playerChar1, 1);
+  p1.team = 'A';
+  p2 = new Fighter(PLAYER_SPAWNS.teamA2, playerChar2, 1);
+  p2.team = 'A';
+  cpu1 = new Fighter(PLAYER_SPAWNS.teamB1, opponentChar1, -1);
+  cpu1.team = 'B';
+  if (opponentChar2) {
+    cpu2 = new Fighter(PLAYER_SPAWNS.teamB2, opponentChar2, -1);
+    cpu2.team = 'B';
+  } else {
+    cpu2 = new Fighter(PLAYER_SPAWNS.teamB2, opponentChar1, -1);
+    cpu2.team = 'B';
+    cpu2.health = 0;
+    cpu2.state = 'defeat';
+  }
+
+  createTeamHUD();
+  ui.p1Name.textContent = p1.name;
+  ui.p2Name.textContent = p2.name;
+  updateTeamRoundDots();
+}
+
+function getTeamBattlePlanStepMeta(pair, index) {
+  const route = game.teamBattlePlan.route;
+  const p1Id = game.teamBattlePlan.playerCharacterId;
+  const p2Id = game.teamBattlePlan.playerCharacterId2;
+
+  if (index === route.length - 1) {
+    return { badge: 'FINAL', note: 'SHAO CATNIP showdown' };
+  }
+  if (index === route.length - 2 && pair[0] === 'borko') {
+    return { badge: 'SUB-BOSS', note: 'BORKO blockade' };
+  }
+  if (pair.length === 2 && pair[0] === p1Id && pair[1] === p2Id) {
+    return { badge: 'MIRROR', note: 'Face yourselves' };
+  }
+  return { badge: `MATCH ${index + 1}`, note: 'CPU opponents' };
+}
+
+function buildTeamBattlePlanStepper() {
+  const playerChar1 = getCharacterById(game.teamBattlePlan.playerCharacterId);
+  const playerChar2 = getCharacterById(game.teamBattlePlan.playerCharacterId2);
+  const nextOpponents = getTeamBattlePlanCurrentOpponents();
+  const clearedCount = game.teamBattlePlan.currentIndex;
+  const routeStepCount = game.teamBattlePlan.route.length;
+  const stepWidth = 132;
+  const stepGap = 34;
+  const routePadding = 160;
+  const routeWidth = Math.max(920, routePadding + routeStepCount * stepWidth + Math.max(0, routeStepCount - 1) * stepGap);
+
+  ui.battlePlanRouteSteps.innerHTML = '';
+  ui.battlePlanPlayerToken.innerHTML = '';
+  ui.battlePlanRoute.style.width = `${routeWidth}px`;
+
+  game.teamBattlePlan.route.forEach((pair, index) => {
+    const meta = getTeamBattlePlanStepMeta(pair, index);
+    const step = document.createElement('div');
+    let cls = 'battle-plan-step';
+    if (index < game.teamBattlePlan.currentIndex) cls += ' completed';
+    else if (index === game.teamBattlePlan.currentIndex) cls += ' next';
+    else cls += ' locked';
+    step.className = cls;
+    step.dataset.stepIndex = index;
+
+    const badge = document.createElement('div');
+    badge.className = 'battle-plan-badge';
+    badge.textContent = meta.badge;
+
+    const portrait = document.createElement('div');
+    portrait.className = 'battle-plan-step-portrait';
+    if (pair.length === 2) {
+      portrait.style.display = 'flex';
+      portrait.style.gap = '2px';
+      pair.forEach(id => {
+        const ch = getCharacterById(id);
+        const sub = document.createElement('div');
+        sub.style.flex = '1';
+        sub.style.display = 'flex';
+        sub.style.alignItems = 'flex-end';
+        sub.style.justifyContent = 'center';
+        sub.appendChild(cloneCanvas(renderCharPreview(ch)));
+        portrait.appendChild(sub);
+      });
+    } else {
+      buildBattlePlanStepPortrait(getCharacterById(pair[0]), portrait);
+    }
+
+    const name = document.createElement('div');
+    name.className = 'battle-plan-step-name';
+    name.textContent = pair.map(id => getCharacterById(id).name).join(' & ');
+
+    const note = document.createElement('div');
+    note.className = 'battle-plan-step-note';
+    note.textContent = index < game.teamBattlePlan.currentIndex ? 'CLEARED' : meta.note;
+
+    step.appendChild(badge);
+    step.appendChild(portrait);
+    step.appendChild(name);
+    step.appendChild(note);
+    ui.battlePlanRouteSteps.appendChild(step);
+  });
+
+  const playerCard = document.createElement('div');
+  playerCard.className = 'battle-plan-player-card';
+  playerCard.style.display = 'flex';
+  playerCard.style.gap = '2px';
+  [playerChar1, playerChar2].forEach(ch => {
+    const sub = document.createElement('div');
+    sub.style.flex = '1';
+    sub.style.display = 'flex';
+    sub.style.alignItems = 'center';
+    sub.style.justifyContent = 'center';
+    sub.style.overflow = 'hidden';
+    sub.appendChild(cloneCanvas(renderCharPreview(ch)));
+    playerCard.appendChild(sub);
+  });
+  ui.battlePlanPlayerToken.appendChild(playerCard);
+
+  const opponentNames = nextOpponents.map(c => c.name).join(' & ');
+  ui.battlePlanSummary.innerHTML = clearedCount === 0
+    ? `Plan locked in.<br>First opponents: ${opponentNames}`
+    : `Match ${clearedCount} cleared.<br>Next opponents: ${opponentNames}`;
+
+  ui.battlePlanPrompt.textContent = 'Scanning route...';
+  ui.battlePlanPrompt.classList.remove('ready');
+}
+
+function showTeamBattlePlanStepper(fromIndex, toIndex) {
+  game.state = GAME_STATES.BATTLE_PLAN_STEPPER;
+  game.teamBattlePlan.stepperFromIndex = fromIndex;
+  game.teamBattlePlan.stepperReady = false;
+  buildTeamBattlePlanStepper();
+  ui.battlePlanStepper.style.display = 'flex';
+  syncMusicMode();
+
+  requestAnimationFrame(() => {
+    setBattlePlanRouteScroll(fromIndex, false);
+    setBattlePlanTokenPosition(fromIndex, false);
+    ui.battlePlanPlayerToken.offsetWidth;
+
+    requestAnimationFrame(() => {
+      setBattlePlanRouteScroll(toIndex, fromIndex !== toIndex);
+      setBattlePlanTokenPosition(toIndex, true);
+      window.setTimeout(() => {
+        game.teamBattlePlan.stepperReady = true;
+        ui.battlePlanPrompt.textContent = 'Press Y to start the next match';
+        ui.battlePlanPrompt.classList.add('ready');
+      }, 900);
+    });
+  });
+}
+
+function queueNextTeamBattlePlanMatch() {
+  game.teamBattlePlan.currentIndex++;
+  game.teamBattlePlan.pendingAdvance = true;
+  game.teamBattlePlan.stepperFromIndex = game.teamBattlePlan.currentIndex - 1;
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  game.teamRoundsWon = { A: 0, B: 0 };
+  updateTeamRoundDots();
+}
+
+function advanceTeamBattlePlanMatch() {
+  game.teamBattlePlan.pendingAdvance = false;
+  hideBattlePlanStepper();
+  loadTeamBattlePlanMatch();
+  startRound();
+}
+
+function proceedTeamBattlePlanStepper() {
+  if (game.state !== GAME_STATES.BATTLE_PLAN_STEPPER || !game.teamBattlePlan.stepperReady) return;
+
+  playUiSound('confirm');
+  if (game.teamBattlePlan.pendingAdvance) {
+    advanceTeamBattlePlanMatch();
+  } else {
+    hideBattlePlanStepper();
+    startRound();
+  }
+}
+
 
 // === 10-pause.js ===
 function pauseTrackForOverlay(track, key) {
@@ -8898,7 +9178,9 @@ function leavePausedSessionForMode(mode) {
   hidePauseOverlay();
   resumeAudioFromOverlay();
   game.mode = mode;
-  if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
+  if (mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_BATTLE_PLAN) game.credits = 3;
+  resetBattlePlanState();
+  resetTeamBattlePlanState();
   removeTeamHUD();
   ensureAudioReady();
   playUiSound('start');
@@ -8927,6 +9209,7 @@ function openTitleScreen() {
   clearAllGamepadHeld();
   resetCpuState();
   resetBattlePlanState();
+  resetTeamBattlePlanState();
   removeTeamHUD();
   ui.charSelect.style.display = 'none';
   ui.startScreen.style.display = 'flex';
@@ -9202,7 +9485,11 @@ if (isGamepadEdgePressed(slot, state, 'special')) {
 function handleGamepadBattlePlanInput(slot, state) {
   if (isGamepadEdgePressed(slot, state, 'confirm')) {
     ensureAudioReady();
-    proceedBattlePlanStepper();
+    if (isTeamBattlePlanMode()) {
+      proceedTeamBattlePlanStepper();
+    } else {
+      proceedBattlePlanStepper();
+    }
   }
 
   if (isGamepadEdgePressed(slot, state, 'start')) {
@@ -9317,7 +9604,11 @@ function randomCpuSelection() {
 function updateCharSelectModeUI() {
   ui.p1SelectLabel.textContent = 'PLAYER 1';
   ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Pad Move &bull; <kbd>J</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>L</kbd> or <kbd>Y</kbd> Random 8';
-  if (isBattlePlanMode()) {
+  if (isTeamBattlePlanMode()) {
+    ui.p2SelectLabel.textContent = 'PLAYER 2';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
+    ui.fightButton.textContent = 'BEGIN TEAM PLAN';
+  } else if (isBattlePlanMode()) {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';
@@ -9659,6 +9950,11 @@ function confirmSelection() {
       prepareBattlePlanRoute(CHARACTERS[p1Selection].id);
     }
     loadBattlePlanMatch();
+  } else if (isTeamBattlePlanMode()) {
+    if (!game.teamBattlePlan.route.length || game.teamBattlePlan.playerCharacterId !== CHARACTERS[p1Selection].id || game.teamBattlePlan.playerCharacterId2 !== CHARACTERS[p2Selection].id) {
+      prepareTeamBattlePlanRoute(CHARACTERS[p1Selection].id, CHARACTERS[p2Selection].id);
+    }
+    loadTeamBattlePlanMatch();
   } else if (isTeamVsTeamMode()) {
     game.stage = pickRandomBackgroundStage();
     p1 = new Fighter(PLAYER_SPAWNS.teamA1, CHARACTERS[p1Selection], 1);
@@ -9684,6 +9980,11 @@ function confirmSelection() {
   playUiSound('confirm');
   if (isBattlePlanMode()) {
     showBattlePlanStepper(-1, game.battlePlan.currentIndex);
+    startGameLoop();
+    return;
+  }
+  if (isTeamBattlePlanMode()) {
+    showTeamBattlePlanStepper(-1, game.teamBattlePlan.currentIndex);
     startGameLoop();
     return;
   }
@@ -9788,7 +10089,7 @@ function checkHit(attacker, defender) {
 }
 
 function startRound() {
-  if (isTeamVsTeamMode()) {
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) {
     p1.reset(PLAYER_SPAWNS.teamA1);
     p2.reset(PLAYER_SPAWNS.teamA2);
     cpu1.reset(PLAYER_SPAWNS.teamB1);
@@ -9841,6 +10142,11 @@ function endRound() {
 
   if (isTeamVsTeamMode()) {
     endRoundTeam();
+    return;
+  }
+
+  if (isTeamBattlePlanMode()) {
+    endRoundTeamBattlePlan();
     return;
   }
 
@@ -9983,6 +10289,91 @@ function endRoundTeam() {
   game.round++;
 }
 
+function endRoundTeamBattlePlan() {
+  const teamAAlive = getTeamFighters('A');
+  const teamBAlive = getTeamFighters('B');
+  const teamATotal = getTeamTotalHealth('A');
+  const teamBTotal = getTeamTotalHealth('B');
+
+  let winningTeam = null;
+  if (teamAAlive.length > 0 && teamBAlive.length === 0) winningTeam = 'A';
+  else if (teamBAlive.length > 0 && teamAAlive.length === 0) winningTeam = 'B';
+  else if (teamAAlive.length > 0 && teamBAlive.length > 0) {
+    if (teamATotal > teamBTotal) winningTeam = 'A';
+    else if (teamBTotal > teamATotal) winningTeam = 'B';
+  }
+
+  if (winningTeam) {
+    if (winningTeam === 'A') {
+      game.teamRoundsWon.A++;
+      game.roundMessage = 'TEAM A\nWINS!';
+    } else {
+      game.teamRoundsWon.B++;
+      game.roundMessage = 'TEAM B\nWINS!';
+    }
+    updateTeamRoundDots();
+    playRoundCue('win');
+
+    const allFighters = getAllFighters();
+    allFighters.forEach(f => {
+      if (!f) return;
+      if (f.health > 0 && f.team === winningTeam) {
+        f.victoryTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'victory';
+      } else {
+        f.defeatTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'defeat';
+      }
+    });
+
+    const matchDecided = game.teamRoundsWon.A >= ROUND_RULES.winsToFinish || game.teamRoundsWon.B >= ROUND_RULES.winsToFinish;
+    if (matchDecided) {
+      const humanTeamWon = game.teamRoundsWon.A >= ROUND_RULES.winsToFinish;
+      const lastStep = game.teamBattlePlan.currentIndex === game.teamBattlePlan.route.length - 1;
+
+      if (humanTeamWon && lastStep) {
+        const opponents = getTeamBattlePlanCurrentOpponents();
+        const opponentChar = opponents[0];
+        const isNoobCatnipFinal = opponentChar.id === 'catnip'
+          && (game.teamBattlePlan.playerCharacterId === 'noob-saidog' || game.teamBattlePlan.playerCharacterId2 === 'noob-saidog');
+        const isDoggomeleonCatnip = opponentChar.id === 'catnip'
+          && (game.teamBattlePlan.playerCharacterId === 'doggomeleon' || game.teamBattlePlan.playerCharacterId2 === 'doggomeleon');
+        const unlockedBoss = unlockHiddenCharacter(opponentChar.id);
+        const unlockedSnek = isNoobCatnipFinal && unlockHiddenCharacter('snek');
+        const unlockedPixzel = isDoggomeleonCatnip && unlockHiddenCharacter('pixzel');
+        const unlockMessage = [unlockedBoss ? `${opponentChar.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '', unlockedPixzel ? 'PIXZEL ZLASZH UNLOCKED!' : '']
+          .filter(Boolean).join('\n');
+        game.roundMessage = 'TEAM BATTLE PLAN\nCLEARED!';
+        if (unlockMessage) game.roundMessage += `\n${unlockMessage}`;
+        game.teamBattlePlan.cleared = true;
+        game.state = GAME_STATES.GAME_OVER;
+        game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
+        return;
+      }
+
+      if (humanTeamWon && !lastStep) {
+        queueNextTeamBattlePlanMatch();
+        return;
+      }
+
+      if (!humanTeamWon && game.credits > 0) {
+        showContinueScreen();
+        return;
+      }
+
+      game.roundMessage = 'TEAM BATTLE PLAN\nFAILED';
+      game.state = GAME_STATES.GAME_OVER;
+      game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
+      return;
+    }
+  } else {
+    game.roundMessage = 'DRAW!';
+    playRoundCue('draw');
+  }
+
+  game.round++;
+}
+
 const CONTINUE_COUNTDOWN_SECONDS = 10;
 
 function showContinueScreen() {
@@ -10019,8 +10410,14 @@ function acceptContinue() {
   game.round = 1;
   p1.roundsWon = 0;
   p2.roundsWon = 0;
-  updateRoundDots();
-  loadBattlePlanMatch();
+  game.teamRoundsWon = { A: 0, B: 0 };
+  if (isTeamBattlePlanMode()) {
+    updateTeamRoundDots();
+    loadTeamBattlePlanMatch();
+  } else {
+    updateRoundDots();
+    loadBattlePlanMatch();
+  }
   startRound();
   startGameLoop();
 }
@@ -10029,6 +10426,8 @@ function declineContinue() {
   hideContinueScreen();
   game.credits = 3;
   resetBattlePlanState();
+  resetTeamBattlePlanState();
+  removeTeamHUD();
   openTitleScreen();
 }
 
@@ -10318,6 +10717,13 @@ function updateTeamUI() {
   updateFighterBars(el.sideBars.b, cpu1, '1');
   updateFighterBars(el.sideBars.b, cpu2, '2');
 
+  const cpu2Dummy = cpu2 && cpu2.health <= 0;
+  el.sideBars.b.h2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.n2.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.s2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.p2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.c2.style.display = cpu2Dummy ? 'none' : '';
+
   el.timer.textContent = game.timer;
 }
 
@@ -10355,7 +10761,7 @@ function openCharacterSelect(resetRounds = false) {
   clearAllGamepadHeld();
   syncMusicMode();
   p1Confirmed = false;
-  p2Confirmed = isBattlePlanMode();
+  p2Confirmed = isBattlePlanMode() && !isTeamBattlePlanMode();
   resetInputState(keys2);
   p1Selection = getSelectableCharacterIndex(p1Selection);
   p2Selection = getSelectableCharacterIndex(p2Selection, p1Selection);
@@ -10367,6 +10773,8 @@ function openCharacterSelect(resetRounds = false) {
   } else if (isTeamVsTeamMode()) {
     cpu1Selection = randomCpuSelection();
     cpu2Selection = randomCpuSelection();
+  } else if (isTeamBattlePlanMode()) {
+    resetTeamBattlePlanState();
   }
   buildCharSelect();
 
@@ -10558,7 +10966,7 @@ function gameLoop() {
   drawBackground();
 
   if (game.state === GAME_STATES.FIGHT) {
-    if (isTeamVsTeamMode()) {
+    if (isTeamVsTeamMode() || isTeamBattlePlanMode()) {
       p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
       p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
       updateCpuInput(cpu1, getClosestOpponent(cpu1), cpuKeys);
@@ -10624,6 +11032,8 @@ function gameLoop() {
     if (game.roundMessageTimer <= 0 && game.state === GAME_STATES.ROUND_END) {
       if (isBattlePlanMode() && game.battlePlan.pendingAdvance) {
         showBattlePlanStepper(game.battlePlan.stepperFromIndex, game.battlePlan.currentIndex);
+      } else if (isTeamBattlePlanMode() && game.teamBattlePlan.pendingAdvance) {
+        showTeamBattlePlanStepper(game.teamBattlePlan.stepperFromIndex, game.teamBattlePlan.currentIndex);
       } else {
         startRound();
       }
@@ -10744,12 +11154,20 @@ ui.teamButton.addEventListener('click', () => {
   openCharacterSelect();
 });
 
+ui.teamBattlePlanButton.addEventListener('click', () => {
+  ensureAudioReady();
+  game.mode = MATCH_MODES.TEAM_BATTLE_PLAN;
+  game.credits = 3;
+  playUiSound('start');
+  openCharacterSelect();
+});
+
 ui.pauseModeButtons.addEventListener('click', e => {
   const button = e.target.closest('[data-mode]');
   if (!button) return;
 
   const mode = button.dataset.mode;
-  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM) {
+  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM || mode === MATCH_MODES.TEAM_BATTLE_PLAN) {
     leavePausedSessionForMode(mode);
   }
 });
@@ -10823,7 +11241,11 @@ document.addEventListener('keydown', e => {
 
   if ((e.key === 'l' || e.key === 'L') && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     ensureAudioReady();
-    proceedBattlePlanStepper();
+    if (isTeamBattlePlanMode()) {
+      proceedTeamBattlePlanStepper();
+    } else {
+      proceedBattlePlanStepper();
+    }
   }
 
   if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {

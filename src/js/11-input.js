@@ -262,7 +262,11 @@ if (isGamepadEdgePressed(slot, state, 'special')) {
 function handleGamepadBattlePlanInput(slot, state) {
   if (isGamepadEdgePressed(slot, state, 'confirm')) {
     ensureAudioReady();
-    proceedBattlePlanStepper();
+    if (isTeamBattlePlanMode()) {
+      proceedTeamBattlePlanStepper();
+    } else {
+      proceedBattlePlanStepper();
+    }
   }
 
   if (isGamepadEdgePressed(slot, state, 'start')) {
@@ -377,7 +381,11 @@ function randomCpuSelection() {
 function updateCharSelectModeUI() {
   ui.p1SelectLabel.textContent = 'PLAYER 1';
   ui.p1SelectControls.innerHTML = 'P1: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Pad Move &bull; <kbd>J</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>L</kbd> or <kbd>Y</kbd> Random 8';
-  if (isBattlePlanMode()) {
+  if (isTeamBattlePlanMode()) {
+    ui.p2SelectLabel.textContent = 'PLAYER 2';
+    ui.p2SelectControls.innerHTML = 'P2: <kbd>&uarr;</kbd><kbd>&larr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd> or Pad Move &bull; <kbd>1</kbd> or <kbd>A</kbd> Confirm &bull; <kbd>3</kbd> or <kbd>Y</kbd> Random 8';
+    ui.fightButton.textContent = 'BEGIN TEAM PLAN';
+  } else if (isBattlePlanMode()) {
     ui.p2SelectLabel.textContent = 'PLAN CPU';
     ui.p2SelectControls.textContent = 'CPU route locks after P1 confirm';
     ui.fightButton.textContent = 'BEGIN PLAN';

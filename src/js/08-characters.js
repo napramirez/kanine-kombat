@@ -12,6 +12,16 @@ let game = {
     stepperFromIndex: -1,
     stepperReady: false
   },
+  teamBattlePlan: {
+    route: [],
+    currentIndex: 0,
+    playerCharacterId: '',
+    playerCharacterId2: '',
+    pendingAdvance: false,
+    cleared: false,
+    stepperFromIndex: -1,
+    stepperReady: false
+  },
   credits: 3,
   continueCountdown: 0,
   continueTimerInterval: null,
@@ -334,12 +344,16 @@ function isTeamVsTeamMode() {
   return game.mode === MATCH_MODES.TEAM_VS_TEAM;
 }
 
+function isTeamBattlePlanMode() {
+  return game.mode === MATCH_MODES.TEAM_BATTLE_PLAN;
+}
+
 function isCpuControlledMode() {
   return isCpuMode() || isBattlePlanMode();
 }
 
 function getAllFighters() {
-  if (isTeamVsTeamMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) return [p1, p2, cpu1, cpu2].filter(Boolean);
   return [p1, p2];
 }
 

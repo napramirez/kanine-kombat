@@ -246,6 +246,11 @@ function confirmSelection() {
       prepareBattlePlanRoute(CHARACTERS[p1Selection].id);
     }
     loadBattlePlanMatch();
+  } else if (isTeamBattlePlanMode()) {
+    if (!game.teamBattlePlan.route.length || game.teamBattlePlan.playerCharacterId !== CHARACTERS[p1Selection].id || game.teamBattlePlan.playerCharacterId2 !== CHARACTERS[p2Selection].id) {
+      prepareTeamBattlePlanRoute(CHARACTERS[p1Selection].id, CHARACTERS[p2Selection].id);
+    }
+    loadTeamBattlePlanMatch();
   } else if (isTeamVsTeamMode()) {
     game.stage = pickRandomBackgroundStage();
     p1 = new Fighter(PLAYER_SPAWNS.teamA1, CHARACTERS[p1Selection], 1);
@@ -271,6 +276,11 @@ function confirmSelection() {
   playUiSound('confirm');
   if (isBattlePlanMode()) {
     showBattlePlanStepper(-1, game.battlePlan.currentIndex);
+    startGameLoop();
+    return;
+  }
+  if (isTeamBattlePlanMode()) {
+    showTeamBattlePlanStepper(-1, game.teamBattlePlan.currentIndex);
     startGameLoop();
     return;
   }
@@ -375,7 +385,7 @@ function checkHit(attacker, defender) {
 }
 
 function startRound() {
-  if (isTeamVsTeamMode()) {
+  if (isTeamVsTeamMode() || isTeamBattlePlanMode()) {
     p1.reset(PLAYER_SPAWNS.teamA1);
     p2.reset(PLAYER_SPAWNS.teamA2);
     cpu1.reset(PLAYER_SPAWNS.teamB1);
@@ -428,6 +438,11 @@ function endRound() {
 
   if (isTeamVsTeamMode()) {
     endRoundTeam();
+    return;
+  }
+
+  if (isTeamBattlePlanMode()) {
+    endRoundTeamBattlePlan();
     return;
   }
 
@@ -570,6 +585,91 @@ function endRoundTeam() {
   game.round++;
 }
 
+function endRoundTeamBattlePlan() {
+  const teamAAlive = getTeamFighters('A');
+  const teamBAlive = getTeamFighters('B');
+  const teamATotal = getTeamTotalHealth('A');
+  const teamBTotal = getTeamTotalHealth('B');
+
+  let winningTeam = null;
+  if (teamAAlive.length > 0 && teamBAlive.length === 0) winningTeam = 'A';
+  else if (teamBAlive.length > 0 && teamAAlive.length === 0) winningTeam = 'B';
+  else if (teamAAlive.length > 0 && teamBAlive.length > 0) {
+    if (teamATotal > teamBTotal) winningTeam = 'A';
+    else if (teamBTotal > teamATotal) winningTeam = 'B';
+  }
+
+  if (winningTeam) {
+    if (winningTeam === 'A') {
+      game.teamRoundsWon.A++;
+      game.roundMessage = 'TEAM A\nWINS!';
+    } else {
+      game.teamRoundsWon.B++;
+      game.roundMessage = 'TEAM B\nWINS!';
+    }
+    updateTeamRoundDots();
+    playRoundCue('win');
+
+    const allFighters = getAllFighters();
+    allFighters.forEach(f => {
+      if (!f) return;
+      if (f.health > 0 && f.team === winningTeam) {
+        f.victoryTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'victory';
+      } else {
+        f.defeatTimer = ROUND_RULES.roundMessageFrames;
+        f.state = 'defeat';
+      }
+    });
+
+    const matchDecided = game.teamRoundsWon.A >= ROUND_RULES.winsToFinish || game.teamRoundsWon.B >= ROUND_RULES.winsToFinish;
+    if (matchDecided) {
+      const humanTeamWon = game.teamRoundsWon.A >= ROUND_RULES.winsToFinish;
+      const lastStep = game.teamBattlePlan.currentIndex === game.teamBattlePlan.route.length - 1;
+
+      if (humanTeamWon && lastStep) {
+        const opponents = getTeamBattlePlanCurrentOpponents();
+        const opponentChar = opponents[0];
+        const isNoobCatnipFinal = opponentChar.id === 'catnip'
+          && (game.teamBattlePlan.playerCharacterId === 'noob-saidog' || game.teamBattlePlan.playerCharacterId2 === 'noob-saidog');
+        const isDoggomeleonCatnip = opponentChar.id === 'catnip'
+          && (game.teamBattlePlan.playerCharacterId === 'doggomeleon' || game.teamBattlePlan.playerCharacterId2 === 'doggomeleon');
+        const unlockedBoss = unlockHiddenCharacter(opponentChar.id);
+        const unlockedSnek = isNoobCatnipFinal && unlockHiddenCharacter('snek');
+        const unlockedPixzel = isDoggomeleonCatnip && unlockHiddenCharacter('pixzel');
+        const unlockMessage = [unlockedBoss ? `${opponentChar.name} UNLOCKED!` : '', unlockedSnek ? 'SNEK UNLOCKED!' : '', unlockedPixzel ? 'PIXZEL ZLASZH UNLOCKED!' : '']
+          .filter(Boolean).join('\n');
+        game.roundMessage = 'TEAM BATTLE PLAN\nCLEARED!';
+        if (unlockMessage) game.roundMessage += `\n${unlockMessage}`;
+        game.teamBattlePlan.cleared = true;
+        game.state = GAME_STATES.GAME_OVER;
+        game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
+        return;
+      }
+
+      if (humanTeamWon && !lastStep) {
+        queueNextTeamBattlePlanMatch();
+        return;
+      }
+
+      if (!humanTeamWon && game.credits > 0) {
+        showContinueScreen();
+        return;
+      }
+
+      game.roundMessage = 'TEAM BATTLE PLAN\nFAILED';
+      game.state = GAME_STATES.GAME_OVER;
+      game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
+      return;
+    }
+  } else {
+    game.roundMessage = 'DRAW!';
+    playRoundCue('draw');
+  }
+
+  game.round++;
+}
+
 const CONTINUE_COUNTDOWN_SECONDS = 10;
 
 function showContinueScreen() {
@@ -606,8 +706,14 @@ function acceptContinue() {
   game.round = 1;
   p1.roundsWon = 0;
   p2.roundsWon = 0;
-  updateRoundDots();
-  loadBattlePlanMatch();
+  game.teamRoundsWon = { A: 0, B: 0 };
+  if (isTeamBattlePlanMode()) {
+    updateTeamRoundDots();
+    loadTeamBattlePlanMatch();
+  } else {
+    updateRoundDots();
+    loadBattlePlanMatch();
+  }
   startRound();
   startGameLoop();
 }
@@ -616,6 +722,8 @@ function declineContinue() {
   hideContinueScreen();
   game.credits = 3;
   resetBattlePlanState();
+  resetTeamBattlePlanState();
+  removeTeamHUD();
   openTitleScreen();
 }
 
@@ -904,6 +1012,13 @@ function updateTeamUI() {
   updateFighterBars(el.sideBars.a, p2, '2');
   updateFighterBars(el.sideBars.b, cpu1, '1');
   updateFighterBars(el.sideBars.b, cpu2, '2');
+
+  const cpu2Dummy = cpu2 && cpu2.health <= 0;
+  el.sideBars.b.h2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.n2.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.s2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.p2Wrap.style.display = cpu2Dummy ? 'none' : '';
+  el.sideBars.b.c2.style.display = cpu2Dummy ? 'none' : '';
 
   el.timer.textContent = game.timer;
 }

@@ -72,7 +72,9 @@ function leavePausedSessionForMode(mode) {
   hidePauseOverlay();
   resumeAudioFromOverlay();
   game.mode = mode;
-  if (mode === MATCH_MODES.BATTLE_PLAN) game.credits = 3;
+  if (mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_BATTLE_PLAN) game.credits = 3;
+  resetBattlePlanState();
+  resetTeamBattlePlanState();
   removeTeamHUD();
   ensureAudioReady();
   playUiSound('start');
@@ -101,6 +103,7 @@ function openTitleScreen() {
   clearAllGamepadHeld();
   resetCpuState();
   resetBattlePlanState();
+  resetTeamBattlePlanState();
   removeTeamHUD();
   ui.charSelect.style.display = 'none';
   ui.startScreen.style.display = 'flex';

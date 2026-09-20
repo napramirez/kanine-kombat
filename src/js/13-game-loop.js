@@ -30,7 +30,7 @@ function openCharacterSelect(resetRounds = false) {
   clearAllGamepadHeld();
   syncMusicMode();
   p1Confirmed = false;
-  p2Confirmed = isBattlePlanMode();
+  p2Confirmed = isBattlePlanMode() && !isTeamBattlePlanMode();
   resetInputState(keys2);
   p1Selection = getSelectableCharacterIndex(p1Selection);
   p2Selection = getSelectableCharacterIndex(p2Selection, p1Selection);
@@ -42,6 +42,8 @@ function openCharacterSelect(resetRounds = false) {
   } else if (isTeamVsTeamMode()) {
     cpu1Selection = randomCpuSelection();
     cpu2Selection = randomCpuSelection();
+  } else if (isTeamBattlePlanMode()) {
+    resetTeamBattlePlanState();
   }
   buildCharSelect();
 
@@ -233,7 +235,7 @@ function gameLoop() {
   drawBackground();
 
   if (game.state === GAME_STATES.FIGHT) {
-    if (isTeamVsTeamMode()) {
+    if (isTeamVsTeamMode() || isTeamBattlePlanMode()) {
       p1.update(mergeInputStates(keys1, gamepadInput.slots.p1.held, combinedKeys1), null);
       p2.update(mergeInputStates(keys2, gamepadInput.slots.p2.held, combinedKeys2), null);
       updateCpuInput(cpu1, getClosestOpponent(cpu1), cpuKeys);
@@ -299,6 +301,8 @@ function gameLoop() {
     if (game.roundMessageTimer <= 0 && game.state === GAME_STATES.ROUND_END) {
       if (isBattlePlanMode() && game.battlePlan.pendingAdvance) {
         showBattlePlanStepper(game.battlePlan.stepperFromIndex, game.battlePlan.currentIndex);
+      } else if (isTeamBattlePlanMode() && game.teamBattlePlan.pendingAdvance) {
+        showTeamBattlePlanStepper(game.teamBattlePlan.stepperFromIndex, game.teamBattlePlan.currentIndex);
       } else {
         startRound();
       }
@@ -419,12 +423,20 @@ ui.teamButton.addEventListener('click', () => {
   openCharacterSelect();
 });
 
+ui.teamBattlePlanButton.addEventListener('click', () => {
+  ensureAudioReady();
+  game.mode = MATCH_MODES.TEAM_BATTLE_PLAN;
+  game.credits = 3;
+  playUiSound('start');
+  openCharacterSelect();
+});
+
 ui.pauseModeButtons.addEventListener('click', e => {
   const button = e.target.closest('[data-mode]');
   if (!button) return;
 
   const mode = button.dataset.mode;
-  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM) {
+  if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM || mode === MATCH_MODES.TEAM_BATTLE_PLAN) {
     leavePausedSessionForMode(mode);
   }
 });
@@ -498,7 +510,11 @@ document.addEventListener('keydown', e => {
 
   if ((e.key === 'l' || e.key === 'L') && game.state === GAME_STATES.BATTLE_PLAN_STEPPER) {
     ensureAudioReady();
-    proceedBattlePlanStepper();
+    if (isTeamBattlePlanMode()) {
+      proceedTeamBattlePlanStepper();
+    } else {
+      proceedBattlePlanStepper();
+    }
   }
 
   if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {

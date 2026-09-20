@@ -18,7 +18,8 @@ const MATCH_MODES = {
   VERSUS: 'versus',
   CPU: 'cpu',
   BATTLE_PLAN: 'battlePlan',
-  TEAM_VS_TEAM: 'teamVsTeam'
+  TEAM_VS_TEAM: 'teamVsTeam',
+  TEAM_BATTLE_PLAN: 'teamBattlePlan'
 };
 
 const CHAR_SELECT_TIMER_SECONDS = 30;
@@ -280,6 +281,7 @@ const ui = {
   cpuButton: document.getElementById('cpu-btn'),
   battlePlanButton: document.getElementById('battle-plan-btn'),
   teamButton: document.getElementById('team-btn'),
+  teamBattlePlanButton: document.getElementById('team-battle-plan-btn'),
   fightButton: document.getElementById('fight-btn'),
   p1SelectLabel: document.getElementById('p1-select-label'),
   p2SelectLabel: document.getElementById('p2-select-label'),
@@ -318,7 +320,7 @@ const ui = {
   }
 };
 
-const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.fullscreenBtn];
+const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.teamBattlePlanButton, ui.fullscreenBtn];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
 
 const teamUI = { elements: null };

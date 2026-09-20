@@ -261,3 +261,251 @@ function proceedBattlePlanStepper() {
   }
 }
 
+function resetTeamBattlePlanState() {
+  game.teamBattlePlan.route = [];
+  game.teamBattlePlan.currentIndex = 0;
+  game.teamBattlePlan.playerCharacterId = '';
+  game.teamBattlePlan.playerCharacterId2 = '';
+  game.teamBattlePlan.pendingAdvance = false;
+  game.teamBattlePlan.cleared = false;
+  game.teamBattlePlan.stepperFromIndex = -1;
+  game.teamBattlePlan.stepperReady = false;
+  hideBattlePlanStepper();
+}
+
+function buildTeamBattlePlanRoute(p1CharId, p2CharId) {
+  const excludeIds = new Set([p1CharId, p2CharId, 'borko', 'catnip']);
+  const pool = shuffleCharacterIds(
+    CHARACTERS
+      .filter(char => !excludeIds.has(char.id) && !isHiddenCharacter(char))
+      .map(char => char.id)
+  );
+
+  const route = [];
+  for (let i = 0; i < pool.length; i += 2) {
+    if (i + 1 < pool.length) {
+      route.push([pool[i], pool[i + 1]]);
+    } else {
+      route.push([pool[i]]);
+    }
+  }
+
+  route.push([p1CharId, p2CharId]);
+  route.push(['borko']);
+  route.push(['catnip']);
+  return route;
+}
+
+function prepareTeamBattlePlanRoute(p1CharId, p2CharId) {
+  game.teamBattlePlan.playerCharacterId = p1CharId;
+  game.teamBattlePlan.playerCharacterId2 = p2CharId;
+  game.teamBattlePlan.route = buildTeamBattlePlanRoute(p1CharId, p2CharId);
+  game.teamBattlePlan.currentIndex = 0;
+  game.teamBattlePlan.pendingAdvance = false;
+  game.teamBattlePlan.cleared = false;
+}
+
+function getTeamBattlePlanCurrentOpponents() {
+  const pair = game.teamBattlePlan.route[game.teamBattlePlan.currentIndex];
+  return pair.map(id => getCharacterById(id));
+}
+
+function loadTeamBattlePlanMatch() {
+  const playerChar1 = getCharacterById(game.teamBattlePlan.playerCharacterId);
+  const playerChar2 = getCharacterById(game.teamBattlePlan.playerCharacterId2);
+  const opponents = getTeamBattlePlanCurrentOpponents();
+  const opponentChar1 = opponents[0];
+  const opponentChar2 = opponents[1] || null;
+
+  const isBorkoMatch = opponentChar1.id === 'borko' && !opponentChar2;
+  const isCatnipMatch = opponentChar1.id === 'catnip' && !opponentChar2;
+  if (isBorkoMatch) {
+    game.stage = BACKGROUND_STAGES.BORKO_LAIR;
+  } else if (isCatnipMatch) {
+    game.stage = BACKGROUND_STAGES.CATNIP_DOMAIN;
+  } else {
+    game.stage = pickRandomBackgroundStage();
+  }
+
+  p1 = new Fighter(PLAYER_SPAWNS.teamA1, playerChar1, 1);
+  p1.team = 'A';
+  p2 = new Fighter(PLAYER_SPAWNS.teamA2, playerChar2, 1);
+  p2.team = 'A';
+  cpu1 = new Fighter(PLAYER_SPAWNS.teamB1, opponentChar1, -1);
+  cpu1.team = 'B';
+  if (opponentChar2) {
+    cpu2 = new Fighter(PLAYER_SPAWNS.teamB2, opponentChar2, -1);
+    cpu2.team = 'B';
+  } else {
+    cpu2 = new Fighter(PLAYER_SPAWNS.teamB2, opponentChar1, -1);
+    cpu2.team = 'B';
+    cpu2.health = 0;
+    cpu2.state = 'defeat';
+  }
+
+  createTeamHUD();
+  ui.p1Name.textContent = p1.name;
+  ui.p2Name.textContent = p2.name;
+  updateTeamRoundDots();
+}
+
+function getTeamBattlePlanStepMeta(pair, index) {
+  const route = game.teamBattlePlan.route;
+  const p1Id = game.teamBattlePlan.playerCharacterId;
+  const p2Id = game.teamBattlePlan.playerCharacterId2;
+
+  if (index === route.length - 1) {
+    return { badge: 'FINAL', note: 'SHAO CATNIP showdown' };
+  }
+  if (index === route.length - 2 && pair[0] === 'borko') {
+    return { badge: 'SUB-BOSS', note: 'BORKO blockade' };
+  }
+  if (pair.length === 2 && pair[0] === p1Id && pair[1] === p2Id) {
+    return { badge: 'MIRROR', note: 'Face yourselves' };
+  }
+  return { badge: `MATCH ${index + 1}`, note: 'CPU opponents' };
+}
+
+function buildTeamBattlePlanStepper() {
+  const playerChar1 = getCharacterById(game.teamBattlePlan.playerCharacterId);
+  const playerChar2 = getCharacterById(game.teamBattlePlan.playerCharacterId2);
+  const nextOpponents = getTeamBattlePlanCurrentOpponents();
+  const clearedCount = game.teamBattlePlan.currentIndex;
+  const routeStepCount = game.teamBattlePlan.route.length;
+  const stepWidth = 132;
+  const stepGap = 34;
+  const routePadding = 160;
+  const routeWidth = Math.max(920, routePadding + routeStepCount * stepWidth + Math.max(0, routeStepCount - 1) * stepGap);
+
+  ui.battlePlanRouteSteps.innerHTML = '';
+  ui.battlePlanPlayerToken.innerHTML = '';
+  ui.battlePlanRoute.style.width = `${routeWidth}px`;
+
+  game.teamBattlePlan.route.forEach((pair, index) => {
+    const meta = getTeamBattlePlanStepMeta(pair, index);
+    const step = document.createElement('div');
+    let cls = 'battle-plan-step';
+    if (index < game.teamBattlePlan.currentIndex) cls += ' completed';
+    else if (index === game.teamBattlePlan.currentIndex) cls += ' next';
+    else cls += ' locked';
+    step.className = cls;
+    step.dataset.stepIndex = index;
+
+    const badge = document.createElement('div');
+    badge.className = 'battle-plan-badge';
+    badge.textContent = meta.badge;
+
+    const portrait = document.createElement('div');
+    portrait.className = 'battle-plan-step-portrait';
+    if (pair.length === 2) {
+      portrait.style.display = 'flex';
+      portrait.style.gap = '2px';
+      pair.forEach(id => {
+        const ch = getCharacterById(id);
+        const sub = document.createElement('div');
+        sub.style.flex = '1';
+        sub.style.display = 'flex';
+        sub.style.alignItems = 'flex-end';
+        sub.style.justifyContent = 'center';
+        sub.appendChild(cloneCanvas(renderCharPreview(ch)));
+        portrait.appendChild(sub);
+      });
+    } else {
+      buildBattlePlanStepPortrait(getCharacterById(pair[0]), portrait);
+    }
+
+    const name = document.createElement('div');
+    name.className = 'battle-plan-step-name';
+    name.textContent = pair.map(id => getCharacterById(id).name).join(' & ');
+
+    const note = document.createElement('div');
+    note.className = 'battle-plan-step-note';
+    note.textContent = index < game.teamBattlePlan.currentIndex ? 'CLEARED' : meta.note;
+
+    step.appendChild(badge);
+    step.appendChild(portrait);
+    step.appendChild(name);
+    step.appendChild(note);
+    ui.battlePlanRouteSteps.appendChild(step);
+  });
+
+  const playerCard = document.createElement('div');
+  playerCard.className = 'battle-plan-player-card';
+  playerCard.style.display = 'flex';
+  playerCard.style.gap = '2px';
+  [playerChar1, playerChar2].forEach(ch => {
+    const sub = document.createElement('div');
+    sub.style.flex = '1';
+    sub.style.display = 'flex';
+    sub.style.alignItems = 'center';
+    sub.style.justifyContent = 'center';
+    sub.style.overflow = 'hidden';
+    sub.appendChild(cloneCanvas(renderCharPreview(ch)));
+    playerCard.appendChild(sub);
+  });
+  ui.battlePlanPlayerToken.appendChild(playerCard);
+
+  const opponentNames = nextOpponents.map(c => c.name).join(' & ');
+  ui.battlePlanSummary.innerHTML = clearedCount === 0
+    ? `Plan locked in.<br>First opponents: ${opponentNames}`
+    : `Match ${clearedCount} cleared.<br>Next opponents: ${opponentNames}`;
+
+  ui.battlePlanPrompt.textContent = 'Scanning route...';
+  ui.battlePlanPrompt.classList.remove('ready');
+}
+
+function showTeamBattlePlanStepper(fromIndex, toIndex) {
+  game.state = GAME_STATES.BATTLE_PLAN_STEPPER;
+  game.teamBattlePlan.stepperFromIndex = fromIndex;
+  game.teamBattlePlan.stepperReady = false;
+  buildTeamBattlePlanStepper();
+  ui.battlePlanStepper.style.display = 'flex';
+  syncMusicMode();
+
+  requestAnimationFrame(() => {
+    setBattlePlanRouteScroll(fromIndex, false);
+    setBattlePlanTokenPosition(fromIndex, false);
+    ui.battlePlanPlayerToken.offsetWidth;
+
+    requestAnimationFrame(() => {
+      setBattlePlanRouteScroll(toIndex, fromIndex !== toIndex);
+      setBattlePlanTokenPosition(toIndex, true);
+      window.setTimeout(() => {
+        game.teamBattlePlan.stepperReady = true;
+        ui.battlePlanPrompt.textContent = 'Press Y to start the next match';
+        ui.battlePlanPrompt.classList.add('ready');
+      }, 900);
+    });
+  });
+}
+
+function queueNextTeamBattlePlanMatch() {
+  game.teamBattlePlan.currentIndex++;
+  game.teamBattlePlan.pendingAdvance = true;
+  game.teamBattlePlan.stepperFromIndex = game.teamBattlePlan.currentIndex - 1;
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  game.teamRoundsWon = { A: 0, B: 0 };
+  updateTeamRoundDots();
+}
+
+function advanceTeamBattlePlanMatch() {
+  game.teamBattlePlan.pendingAdvance = false;
+  hideBattlePlanStepper();
+  loadTeamBattlePlanMatch();
+  startRound();
+}
+
+function proceedTeamBattlePlanStepper() {
+  if (game.state !== GAME_STATES.BATTLE_PLAN_STEPPER || !game.teamBattlePlan.stepperReady) return;
+
+  playUiSound('confirm');
+  if (game.teamBattlePlan.pendingAdvance) {
+    advanceTeamBattlePlanMatch();
+  } else {
+    hideBattlePlanStepper();
+    startRound();
+  }
+}
+

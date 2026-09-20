@@ -226,7 +226,7 @@ function spawnRaydogArcLightning(owner, target) {
   const targetY = target.y - target.height / 2;
 
   target.takeHit(special.damage, special.knockback, owner.facing);
-  game.screenShake = COMBAT.effects.projectileShake;
+  triggerScreenShake(COMBAT.effects.projectileShake);
   game.hitStop = COMBAT.effects.projectileHitStop;
   if (target.health <= 0) addParticle(target.x, target.y - 50, 'ko');
 
@@ -440,7 +440,7 @@ function updateNoobSnakeSequence(p, index) {
         p.owner.lastAttackType = '';
         p.owner.specialFormSource = '';
         p.owner.state = 'idle';
-        game.screenShake = COMBAT.effects.harpoonShake;
+        triggerScreenShake(COMBAT.effects.harpoonShake);
         game.hitStop = COMBAT.effects.harpoonHitStop;
         return;
       }
@@ -453,7 +453,7 @@ function updateNoobSnakeSequence(p, index) {
       p.owner.specialFormSource = '';
       p.owner.state = 'idle';
       addParticle(p.target.x, p.target.y - 50, 'stunned');
-      game.screenShake = COMBAT.effects.harpoonShake;
+      triggerScreenShake(COMBAT.effects.harpoonShake);
       game.hitStop = COMBAT.effects.harpoonHitStop;
       playImpactSound('hit');
       if (p.variant === 'REPDOG') {
@@ -513,7 +513,7 @@ function updateNoobFireball(p, index) {
 
     p.target.takeHit(p.dmg, p.kb, p.owner.facing);
     addParticle(targetX, targetY, 'hit');
-    game.screenShake = COMBAT.effects.projectileShake;
+    triggerScreenShake(COMBAT.effects.projectileShake);
     game.hitStop = COMBAT.effects.projectileHitStop;
     if (p.target.health <= 0) playImpactSound('ko');
     else playImpactSound('hit');
@@ -571,7 +571,7 @@ function updateRepdogAcid(p, index) {
 
     target.takeHit(p.dmg, p.kb, p.owner.facing);
     addParticle(targetX, targetY, 'hit');
-    game.screenShake = COMBAT.effects.projectileShake;
+    triggerScreenShake(COMBAT.effects.projectileShake);
     game.hitStop = COMBAT.effects.projectileHitStop;
     if (target.health <= 0) playImpactSound('ko');
     else playImpactSound('hit');
@@ -651,7 +651,7 @@ function updateProjectiles(owner) {
             target.vy = 0;
             addParticle(p.x, p.y - p.owner.height / 2, 'freeze');
             playImpactSound('freeze');
-            game.screenShake = COMBAT.effects.freezeShake;
+            triggerScreenShake(COMBAT.effects.freezeShake);
             game.hitStop = COMBAT.effects.freezeHitStop;
           }
           p.hit = true;
@@ -806,7 +806,7 @@ function updateProjectiles(owner) {
         p.strikeFrames = 8;
         target.takeHit(p.dmg, p.kb, p.owner.facing);
         addParticle(target.x, target.y - 50, 'hit');
-        game.screenShake = COMBAT.effects.projectileShake;
+        triggerScreenShake(COMBAT.effects.projectileShake);
         game.hitStop = COMBAT.effects.projectileHitStop;
         if (target.health <= 0) playImpactSound('ko');
         else playImpactSound('hit');
@@ -839,7 +839,7 @@ function updateProjectiles(owner) {
             addParticle(target.x, target.y - 26, 'stunned');
           }
           addParticle(target.x, target.y - 26, 'hit');
-          game.screenShake = COMBAT.effects.projectileShake;
+          triggerScreenShake(COMBAT.effects.projectileShake);
           game.hitStop = COMBAT.effects.projectileHitStop;
           if (target.health <= 0) playImpactSound('ko');
           else playImpactSound('hit');
@@ -862,7 +862,7 @@ function updateProjectiles(owner) {
         releaseCapturedOpponent(target);
         addParticle(p.x, p.y, 'ko');
         addParticle(p.x, p.y, 'hit');
-        game.screenShake = COMBAT.effects.projectileShake;
+        triggerScreenShake(COMBAT.effects.projectileShake);
         game.hitStop = COMBAT.effects.projectileHitStop;
         if (target.health <= 0) playImpactSound('ko');
         else playImpactSound('hit');
@@ -912,7 +912,7 @@ function updateProjectiles(owner) {
           opponent.applyStunnedStatus(COMBAT.status.skorpdogStunMs);
           addParticle(p.x, p.y, 'hit');
           addParticle(opponent.x, opponent.y - 65, 'stunned');
-          game.screenShake = COMBAT.effects.harpoonShake;
+          triggerScreenShake(COMBAT.effects.harpoonShake);
           game.hitStop = COMBAT.effects.harpoonHitStop;
           if (opponent.health <= 0) playImpactSound('ko');
         } else if (p.type === 'net') {
@@ -934,7 +934,7 @@ function updateProjectiles(owner) {
           p.owner.state = 'idle';
           opponent.applyStunnedStatus(COMBAT.special.cydog.captureHoldMs);
           addParticle(p.x, p.y, 'stunned');
-          game.screenShake = COMBAT.effects.freezeShake;
+          triggerScreenShake(COMBAT.effects.freezeShake);
           game.hitStop = COMBAT.effects.freezeHitStop;
         } else if (p.type === 'snowflake') {
           // Snowflake: freeze opponent (blocked if opponent is blocking)
@@ -955,14 +955,14 @@ function updateProjectiles(owner) {
           opponent.vy = 0;
           addParticle(p.x, p.y, 'freeze');
           playImpactSound('freeze');
-          game.screenShake = COMBAT.effects.freezeShake;
+          triggerScreenShake(COMBAT.effects.freezeShake);
           game.hitStop = COMBAT.effects.freezeHitStop;
           projectiles.splice(i, 1);
         } else {
           // Regular projectile / missile hit
           opponent.takeHit(p.dmg, p.kb, p.owner.facing);
           addParticle(p.x, p.y, 'hit');
-          game.screenShake = COMBAT.effects.projectileShake;
+          triggerScreenShake(COMBAT.effects.projectileShake);
           game.hitStop = COMBAT.effects.projectileHitStop;
           if (opponent.health <= 0) playImpactSound('ko');
           projectiles.splice(i, 1);

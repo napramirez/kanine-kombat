@@ -44,6 +44,10 @@ let game = {
   screenShake: 0
 };
 
+function triggerScreenShake(value) {
+  game.screenShake = Math.max(game.screenShake, value);
+}
+
 // Character definitions
 const CHARACTERS = [
   {

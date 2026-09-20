@@ -416,7 +416,7 @@ class Fighter {
     addParticle(shockX, shockY, 'hit');
     addParticle(shockX - 28, shockY + 8, 'hit');
     addParticle(shockX + 28, shockY + 8, 'hit');
-    game.screenShake = COMBAT.effects.projectileShake;
+    triggerScreenShake(COMBAT.effects.projectileShake);
     game.hitStop = COMBAT.effects.projectileHitStop;
 
     if (caught) {
@@ -491,7 +491,7 @@ class Fighter {
         spawnSnekCoil(this, opponent);
         addParticle(opponent.x, opponent.y - 50, 'stunned');
       }
-      game.screenShake = COMBAT.effects.harpoonShake;
+      triggerScreenShake(COMBAT.effects.harpoonShake);
       game.hitStop = COMBAT.effects.harpoonHitStop;
       if (opponent.health <= 0) playImpactSound('ko');
       else if (!opponent.isBlocking) playImpactSound('hit');
@@ -528,7 +528,7 @@ class Fighter {
           opponent.doggbalSpinDuration = special.stunMs;
           addParticle(opponent.x, opponent.y - 50, 'stunned');
         }
-        game.screenShake = COMBAT.effects.harpoonShake;
+        triggerScreenShake(COMBAT.effects.harpoonShake);
         game.hitStop = COMBAT.effects.harpoonHitStop;
         if (opponent.health <= 0) playImpactSound('ko');
         else playImpactSound('hit');
@@ -575,7 +575,7 @@ class Fighter {
               playImpactSound('block');
             } else {
               opponent.takeHit(special.damage, special.knockback, this.facing);
-              game.screenShake = COMBAT.effects.hitShake;
+              triggerScreenShake(COMBAT.effects.hitShake);
               game.hitStop = COMBAT.effects.meleeHitStop;
               playImpactSound('block');
             }
@@ -618,7 +618,7 @@ class Fighter {
       this.raydogDashTimer--;
 
       if (atEdge || this.raydogDashTimer <= 0) {
-        game.screenShake = COMBAT.effects.koShake;
+        triggerScreenShake(COMBAT.effects.koShake);
         addParticle(opponent.x, opponent.y - 50, 'hit');
         this.raydogDashPhase = 'hurl';
         this.raydogDashTimer = special.hurlBackFrames;
@@ -727,7 +727,7 @@ class Fighter {
           opponent.makdogPendingStun = special.stunMs;
         }
 
-        game.screenShake = COMBAT.effects.koShake;
+        triggerScreenShake(COMBAT.effects.koShake);
         game.hitStop = COMBAT.effects.freezeHitStop;
         addParticle(opponent.x, opponent.y - 50, blocked ? 'block' : 'ko');
         playImpactSound(blocked ? 'block' : 'ko');
@@ -756,11 +756,11 @@ class Fighter {
     addParticle(opponent.x - this.facing * 18, opponent.y - 50, 'hit');
 
     if (opponent.health <= 0) {
-      game.screenShake = COMBAT.effects.koShake;
+      triggerScreenShake(COMBAT.effects.koShake);
       addParticle(opponent.x, opponent.y - 50, 'ko');
       playImpactSound('ko');
     } else {
-      game.screenShake = COMBAT.effects.hitShake;
+      triggerScreenShake(COMBAT.effects.hitShake);
     }
 
     game.hitStop = COMBAT.effects.meleeHitStop;
@@ -1072,7 +1072,7 @@ class Fighter {
         opponent.takeHit(special.katanaDamage, special.katanaKnockback, this.facing);
         addParticle(opponent.x, opponent.y - 50, 'hit');
         playImpactSound('hit');
-        game.screenShake = COMBAT.effects.hitShake;
+        triggerScreenShake(COMBAT.effects.hitShake);
         game.hitStop = COMBAT.effects.meleeHitStop;
       }
     }

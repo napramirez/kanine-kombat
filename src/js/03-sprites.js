@@ -1438,7 +1438,7 @@ const isSpecialCrouch = state === 'special' && name === 'TREMODOG';
       x.beginPath();
       x.arc(78, bodyY + 16, 7, 0, Math.PI * 2);
       x.fill();
-    } else if (name === 'BORKO') {
+    } else if (name === 'BORKO' || name === 'BORKITO') {
       const leftArm = { x: 44, y: bodyY + 14, angle: -2.85, length: 26, rise: -4 };
       const rightArm = { x: 72, y: bodyY + 14, angle: -0.25, length: 26, rise: 4 };
       const leftPawX = leftArm.x + leftArm.length * Math.cos(leftArm.angle) - leftArm.rise * Math.sin(leftArm.angle);

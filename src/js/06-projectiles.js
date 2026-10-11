@@ -29,7 +29,7 @@ function spawnProjectile(owner) {
     radius = COMBAT.special.sekdog.missileRadius;
     dmg = COMBAT.special.sekdog.missileDamage;
     kb = COMBAT.special.sekdog.missileKnockback;
-  } else if (specialName === 'BORKO') {
+  } else if (specialName === 'BORKO' || specialName === 'BORKITO') {
     return;
   } else if (specialName === 'RAYNDOG') {
     spawnRayndogLightningCloud(owner, (isTeamVsTeamMode() || isTeamBattlePlanMode()) && owner.team ? getClosestOpponent(owner) : (owner === p1 ? p2 : p1));

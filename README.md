@@ -1,6 +1,6 @@
 # KANINE KOMBAT
 
-A 2-player 2D fighting game with a nineteen-fighter animal roster, built as a single static web page.
+A 2-player 2D fighting game with a twenty-fighter animal roster, built as a single static web page.
 
 ## Quick Start
 
@@ -28,9 +28,11 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, with stacked team HUD, team round wins, and friendly-fire prevention
+- `TEAM BATTLE PLAN` mode: 2 human players fight together through a CPU gauntlet with 2v2 steps, a mirror match, and BORKO/SHAO CATNIP boss steps
 - Keyboard and standard gamepad support with mixed-input play
-- 15 initially selectable fighters, plus 4 Battle Plan unlocks:
+- 16 initially selectable fighters, plus 4 Battle Plan unlocks:
   - `DOGGO CAGE`
+  - `BORKITO`
   - `SKORPDOG`
   - `SMOWKDAWG`
   - `SEKDOG`
@@ -57,7 +59,7 @@ Optional music files:
 - Punch, kick, block, jump, crouch, active special attacks, and passive specials
 - HUD with health bars, `ACTIVE` special meters, and conditional `PASSIVE` special meters for passive-special fighters
 - Combo scaling, hit stop, screen shake, particles, and KO effects
-- Character-specific specials including BORKO's leap-and-shockwave slam, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and staggered fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, freeze projectile, SUBDOG's passive ice clone, SKORPDOG's fire spit with skull face transformation, SMOWKDAWG's passive smoke cloud with speed boost and invisibility, MAKDOG's eye-glow lift-and-slam grapple, KANOINE's dash-punch active and passive orbiting daggers, and PIXZEL ZLASZH's special steal with katana fallback
+- Character-specific specials including BORKO's leap-and-shockwave slam, BORKITO's inherited leap-and-shockwave, RAYNDOG's lightning cloud, RAYDOG's arc lightning, DOGGOMELEON's morph cycle, NOOB SAIDOG's snake capture and staggered fireball barrage, DOGGABAL's dash-past spin immobilize, REPDOG's acid glob, SNEK's slither-and-stun coil, harpoon stun, missile teleport punch, bomb-and-net capture, floor shockwave, freeze projectile, SUBDOG's passive ice clone, SKORPDOG's fire spit with skull face transformation, SMOWKDAWG's passive smoke cloud with speed boost and invisibility, MAKDOG's eye-glow lift-and-slam grapple, KANOINE's dash-punch active and passive orbiting daggers, and PIXZEL ZLASZH's special steal with katana fallback
 - MAX COMBO at 10 hits: displays MAX COMBO text and pushes both fighters apart
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - Battle Plan continue system:3 credits,10-second countdown on loss, press punch to continue

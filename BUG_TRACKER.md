@@ -114,6 +114,18 @@ None currently tracked.
 - [ ] Jump velocity boosted by 25% during smoke cloud
 - [ ] SMOWKDAWG becomes nearly invisible (15% opacity) during smoke cloud
 
+### BORKITO
+- [ ] BORKITO is selectable from the start (not hidden)
+- [ ] BORKITO looks like BORKO with blue eyes
+- [ ] BORKITO is half-size (scale 0.5)
+- [ ] BORKITO moves at double BORKO's speed (8)
+- [ ] BORKITO has 64 health (half of BORKO's 125, rounded up)
+- [ ] BORKITO inherits BORKO's leap-and-shockwave special
+- [ ] BORKITO gains BORKO's boosted blocked meter (0.75x)
+- [ ] BORKITO's punch/kick hitboxes scale to its body size
+- [ ] Crouch hurtbox reduction scales with fighter size
+- [ ] BORKO/SHAO CATNIP/TREMODOG/SNEK hitboxes scale with their sizes
+
 ### Movement
 - [ ] Jump height is consistent
 - [ ] Ground collision works

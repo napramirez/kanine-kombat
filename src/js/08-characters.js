@@ -75,6 +75,18 @@ const CHARACTERS = [
     desc: 'POWER'
   },
   {
+    id: 'borkito',
+    name: 'BORKITO',
+    color1: '#808080',
+    color2: '#d3d3d3',
+    eyeColor: '#3498db',
+    scale: 0.5,
+    speed: 8,
+    health: 64,
+    specialGain: 0.08,
+    desc: 'MINI POWER'
+  },
+  {
     id: 'catnip',
     name: 'SHAO CATNIP',
     hidden: true,

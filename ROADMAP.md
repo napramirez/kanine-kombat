@@ -75,7 +75,8 @@
 
 ## Current Build Notes
 
-- Roster is now 19 fighters: `DOGGO CAGE`, `BORKO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, `KANOINE`, and `PIXZEL ZLASZH`
+- Roster is now 20 fighters: `DOGGO CAGE`, `BORKO`, `BORKITO`, `SHAO CATNIP`, `SKORPDOG`, `SMOWKDAWG`, `SEKDOG`, `CYDOG`, `TREMODOG`, `RAYNDOG`, `RAYDOG`, `DOGGOMELEON`, `NOOB SAIDOG`, `REPDOG`, `DOGGABAL`, `SNEK`, `SUBDOG`, `MAKDOG`, `KANOINE`, and `PIXZEL ZLASZH`
+- `BORKITO` is a selectable mini BORKO clone with blue eyes, half scale, double BORKO's speed, and 64 health; inherits BORKO's leap-and-shockwave special and boosted blocked meter gain; hitboxes (attack boxes and crouch reduction) now scale with fighter size
 - `CYDOG` uses a bomb-and-net capture special
 - `TREMODOG` uses a planted floor shockwave special stance
 - `RAYNDOG` uses a 3-second lightning-cloud special

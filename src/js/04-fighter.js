@@ -164,7 +164,7 @@ class Fighter {
       return { x: -9999, y: -9999, w: 0, h: 0 };
     }
 
-    const crouch = this.isCrouching ? 20 : 0;
+    const crouch = this.isCrouching ? 20 * this.scale : 0;
     return {
       x: this.x - this.width / 2,
       y: this.y - this.height + crouch,
@@ -178,21 +178,22 @@ class Fighter {
     if (this.stunnedTimer > 0) return null;
     if (this.attackTimer <= 0) return null;
     const comboStage = Math.floor(this.comboCount / 12);
+    const s = this.scale;
     if (this.lastAttackType === 'punch') {
       return {
-        x: this.x + this.facing * COMBAT.punch.hitbox.xOffset,
-        y: this.y - COMBAT.punch.hitbox.yOffset + (this.isCrouching ? COMBAT.punch.hitbox.crouchOffset : 0),
-        w: COMBAT.punch.hitbox.width,
-        h: COMBAT.punch.hitbox.height,
+        x: this.x + this.facing * COMBAT.punch.hitbox.xOffset * s,
+        y: this.y - COMBAT.punch.hitbox.yOffset * s + (this.isCrouching ? COMBAT.punch.hitbox.crouchOffset * s : 0),
+        w: COMBAT.punch.hitbox.width * s,
+        h: COMBAT.punch.hitbox.height * s,
         dmg: COMBAT.punch.damage + comboStage * COMBAT.punch.comboDamageStep,
         kb: COMBAT.punch.knockback + this.comboCount * COMBAT.punch.comboKnockbackStep
       };
     } else if (this.lastAttackType === 'kick') {
       return {
-        x: this.x + this.facing * COMBAT.kick.hitbox.xOffset,
-        y: this.y - COMBAT.kick.hitbox.yOffset + (this.isCrouching ? COMBAT.kick.hitbox.crouchOffset : 0),
-        w: COMBAT.kick.hitbox.width,
-        h: COMBAT.kick.hitbox.height,
+        x: this.x + this.facing * COMBAT.kick.hitbox.xOffset * s,
+        y: this.y - COMBAT.kick.hitbox.yOffset * s + (this.isCrouching ? COMBAT.kick.hitbox.crouchOffset * s : 0),
+        w: COMBAT.kick.hitbox.width * s,
+        h: COMBAT.kick.hitbox.height * s,
         dmg: COMBAT.kick.damage + comboStage * COMBAT.kick.comboDamageStep,
         kb: COMBAT.kick.knockback
       };
@@ -226,7 +227,7 @@ class Fighter {
         this.teleportOffset = 0;
         this.teleportPunchDone = false;
         this.sekdogChestOpen = true;
-      } else if (this.name === 'BORKO') {
+      } else if (this.name === 'BORKO' || this.name === 'BORKITO') {
         const opponent = (isTeamVsTeamMode() || isTeamBattlePlanMode()) ? getClosestOpponent(this) : (this === p1 ? p2 : p1);
         const special = COMBAT.special.borko;
         this.attackTimer = special.airFrames;
@@ -358,7 +359,7 @@ class Fighter {
     this.vx = attackerFacing * kb;
     if (!this.onGround) this.vy = PHYSICS.airborneHitLift;
     this.hitCooldown = COMBAT.hit.cooldownFrames;
-    const blockedMeterGain = this.name === 'BORKO'
+    const blockedMeterGain = (this.name === 'BORKO' || this.name === 'BORKITO')
       ? incomingDamage * COMBAT.meter.onBlockBorkoMultiplier
       : (this.name === 'SHAO CATNIP'
         ? incomingDamage * COMBAT.meter.onBlockBonusMultiplier

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Kanine Kombat is a 2-player 2D fighting game with a nineteen-fighter animal roster, pixel-art presentation, and arcade-style match flow.
+Kanine Kombat is a 2-player 2D fighting game with a twenty-fighter animal roster, pixel-art presentation, and arcade-style match flow.
 
 ## Core Mechanics
 
@@ -14,6 +14,7 @@ Players choose from a shared roster before each match.
 |---|---|---:|---:|---|
 | `DOGGO CAGE` | Balanced | 5 | 100 | Tan/brown palette, sunglasses |
 | `BORKO` | Power | 4 | 125 | Hidden gray boss; unlock by defeating the Battle Plan sub-boss |
+| `BORKITO` | Speed | 8 | 64 | Selectable mini BORKO clone; gray palette with blue eyes, `scale: 0.5`, inherits BORKO's leap-and-shockwave |
 | `SHAO CATNIP` | Speed | 8 | 150 | Hidden purple boss; unlock by defeating the Battle Plan final boss |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SMOWKDAWG` | Striker | 5 | 100 | SKORPDOG variant with gray gear; has passive smoke cloud |
@@ -44,6 +45,7 @@ Players choose from a shared roster before each match.
 
 - `DOGGO CAGE`: gold/red energy ball
 - `BORKO`: remembers the opponent's position, leaps high toward it, and creates a landing shockwave that deals 10 damage and 1 second of stun if the opponent is caught in the radius
+- `BORKITO`: inherits BORKO's leap-and-shockwave special; also inherits BORKO's boosted blocked meter gain (0.75x)
 - `SHAO CATNIP`: blue/purple energy ball
 - `SKORPDOG`: harpoon that pulls the opponent in and applies a 1-second stun; passive fire spit that burns the opponent for 3 seconds, with skull face transformation during burn
 - `SMOWKDAWG`: gray harpoon that pulls the opponent in and applies a 1-second stun (same as SKORPDOG); passive smoke cloud fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
@@ -169,7 +171,7 @@ fight or battlePlanStepper -> paused
 
 ### Character Select
 
-- Shared nineteen-fighter roster
+- Shared twenty-fighter roster
 - Both players manually confirm in versus mode
 - In `VS CPU`, Player 2 auto-selects and auto-confirms
 - In `BATTLE PLAN`, the player keeps the selected character for the whole route

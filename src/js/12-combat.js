@@ -344,7 +344,7 @@ function checkHit(attacker, defender) {
   const defBox = defender.getHurtbox();
 
   const actualAtkBox = {
-    x: attacker.facing === 1 ? attacker.x + COMBAT.attackBox.forwardOffset : attacker.x - COMBAT.attackBox.backwardOffset,
+    x: attacker.facing === 1 ? attacker.x + COMBAT.attackBox.forwardOffset * attacker.scale : attacker.x - COMBAT.attackBox.backwardOffset * attacker.scale,
     y: atkBox.y,
     w: atkBox.w,
     h: atkBox.h

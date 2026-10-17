@@ -96,6 +96,7 @@ function openTitleScreen() {
   if (game.timerInterval) clearInterval(game.timerInterval);
 
   hidePauseOverlay();
+  hideResumePrompt();
   hideBattlePlanStepper();
   hideContinueScreen();
   resetInputState(keys1);

@@ -136,6 +136,17 @@ function navigatePauseSelection(delta) {
   playUiSound('navigate');
 }
 
+function updateResumeFocus() {
+  updateModeButtonFocus(resumePromptButtons, gamepadInput.resumeSelection);
+}
+
+function navigateResumeSelection(delta) {
+  gamepadInput.resumeSelection = (gamepadInput.resumeSelection + delta + resumePromptButtons.length) % resumePromptButtons.length;
+  updateResumeFocus();
+  ensureAudioReady();
+  playUiSound('navigate');
+}
+
 function handleGamepadTitleInput(slot, state, now) {
   const left = state.left && !state.right;
   const right = state.right && !state.left;
@@ -165,6 +176,25 @@ function handleGamepadPauseInput(slot, state, now) {
 
   if (isGamepadEdgePressed(slot, state, 'start') || isGamepadEdgePressed(slot, state, 'back')) {
     resumePausedSession();
+  }
+}
+
+function handleGamepadResumePromptInput(slot, state, now) {
+  const left = state.left && !state.right;
+  const right = state.right && !state.left;
+  const up = state.up && !state.down;
+  const down = state.down && !state.up;
+
+  if (shouldRepeatMenuDirection(slot, 'left', left || up, now)) navigateResumeSelection(-1);
+  else if (shouldRepeatMenuDirection(slot, 'right', right || down, now)) navigateResumeSelection(1);
+
+  if (isGamepadEdgePressed(slot, state, 'special')) {
+    ensureAudioReady();
+    resumePromptButtons[gamepadInput.resumeSelection].click();
+  }
+
+  if (isGamepadEdgePressed(slot, state, 'start') || isGamepadEdgePressed(slot, state, 'back')) {
+    cancelResumePrompt();
   }
 }
 
@@ -326,6 +356,7 @@ function processGamepadSlot(slotName, slot, state, now) {
   else if (game.state === GAME_STATES.CHAR_SELECT) handleGamepadCharacterSelectInput(slotName, slot, state, now);
   else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) handleGamepadBattlePlanInput(slot, state);
   else if (game.state === GAME_STATES.PAUSED) handleGamepadPauseInput(slot, state, now);
+  else if (game.state === GAME_STATES.RESUME_PROMPT) handleGamepadResumePromptInput(slot, state, now);
   else if (game.state === GAME_STATES.GAME_OVER) handleGamepadGameOverInput(slotName, slot, state);
   else if (game.state === GAME_STATES.CONTINUE) handleGamepadContinueInput(slot, state);
 

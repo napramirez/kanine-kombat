@@ -880,6 +880,44 @@
     text-shadow: 2px 2px #000;
   }
 
+  #resume-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 85;
+    text-align: center;
+    padding: 30px;
+  }
+
+  #resume-overlay h1 {
+    color: #f1c40f;
+    font-size: 28px;
+    text-shadow: 3px 3px #000;
+    margin-bottom: 14px;
+  }
+
+  #resume-overlay p {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.9;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 26px;
+  }
+
+  #resume-buttons {
+    display: flex;
+    gap: 18px;
+    pointer-events: all;
+  }
+
+  #resume-overlay .mode-btn {
+    animation: none;
+  }
+
   #continue-screen {
     position: absolute;
     inset: 0;

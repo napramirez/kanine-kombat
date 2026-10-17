@@ -63,6 +63,7 @@ Optional music files:
 - MAX COMBO at 10 hits: displays MAX COMBO text and pushes both fighters apart
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)
 - Battle Plan continue system:3 credits,10-second countdown on loss, press punch to continue
+- Battle Plan and Team Battle Plan runs save route progress, character picks, and remaining credits to local storage; a resume/new-run prompt appears when entering a mode with a saved run
 - Pause flow on `Esc` during fights and Battle Plan route screens
 - Title screen logo and mode-select layout
 - Title screen and pause overlay include `TEAM VS TEAM` mode button

@@ -1,3 +1,85 @@
+const BATTLE_PLAN_PROGRESS_KEY = 'kanine-kombat-battle-plan-progress-v1';
+const TEAM_BATTLE_PLAN_PROGRESS_KEY = 'kanine-kombat-team-battle-plan-progress-v1';
+
+function isValidCharacterId(id) {
+  return CHARACTERS.some(char => char.id === id);
+}
+
+function saveBattlePlanProgress() {
+  try {
+    window.localStorage.setItem(BATTLE_PLAN_PROGRESS_KEY, JSON.stringify({
+      version: 1,
+      route: game.battlePlan.route,
+      currentIndex: game.battlePlan.currentIndex,
+      playerCharacterId: game.battlePlan.playerCharacterId,
+      credits: game.credits
+    }));
+  } catch {
+    // Ignore storage failures; progress stays in memory for this session.
+  }
+}
+
+function saveTeamBattlePlanProgress() {
+  try {
+    window.localStorage.setItem(TEAM_BATTLE_PLAN_PROGRESS_KEY, JSON.stringify({
+      version: 1,
+      route: game.teamBattlePlan.route,
+      currentIndex: game.teamBattlePlan.currentIndex,
+      playerCharacterId: game.teamBattlePlan.playerCharacterId,
+      playerCharacterId2: game.teamBattlePlan.playerCharacterId2,
+      credits: game.credits
+    }));
+  } catch {
+    // Ignore storage failures; progress stays in memory for this session.
+  }
+}
+
+function loadBattlePlanProgress() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(BATTLE_PLAN_PROGRESS_KEY) || 'null');
+    if (!saved || saved.version !== 1) return null;
+    if (!Array.isArray(saved.route) || saved.route.length === 0) return null;
+    if (!saved.route.every(isValidCharacterId)) return null;
+    if (!Number.isInteger(saved.currentIndex) || saved.currentIndex < 0 || saved.currentIndex >= saved.route.length) return null;
+    if (!isValidCharacterId(saved.playerCharacterId)) return null;
+    if (typeof saved.credits !== 'number' || !Number.isFinite(saved.credits) || saved.credits < 0) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+function loadTeamBattlePlanProgress() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(TEAM_BATTLE_PLAN_PROGRESS_KEY) || 'null');
+    if (!saved || saved.version !== 1) return null;
+    if (!Array.isArray(saved.route) || saved.route.length === 0) return null;
+    if (!saved.route.every(pair => Array.isArray(pair) && pair.length > 0 && pair.every(isValidCharacterId))) return null;
+    if (!Number.isInteger(saved.currentIndex) || saved.currentIndex < 0 || saved.currentIndex >= saved.route.length) return null;
+    if (!isValidCharacterId(saved.playerCharacterId) || !isValidCharacterId(saved.playerCharacterId2)) return null;
+    if (typeof saved.credits !== 'number' || !Number.isFinite(saved.credits) || saved.credits < 0) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+function clearBattlePlanProgress() {
+  try {
+    window.localStorage.removeItem(BATTLE_PLAN_PROGRESS_KEY);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+function clearTeamBattlePlanProgress() {
+  try {
+    window.localStorage.removeItem(TEAM_BATTLE_PLAN_PROGRESS_KEY);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
 function resetBattlePlanState() {
   game.battlePlan.route = [];
   game.battlePlan.currentIndex = 0;
@@ -29,6 +111,7 @@ function prepareBattlePlanRoute(playerCharacterId) {
   game.battlePlan.pendingAdvance = false;
   game.battlePlan.cleared = false;
   p2Selection = CHARACTERS.findIndex(char => char.id === game.battlePlan.route[0]);
+  saveBattlePlanProgress();
 }
 
 function getBattlePlanCurrentOpponent() {
@@ -240,6 +323,7 @@ function queueNextBattlePlanMatch() {
   p1.roundsWon = 0;
   p2.roundsWon = 0;
   updateRoundDots();
+  saveBattlePlanProgress();
 }
 
 function advanceBattlePlanMatch() {
@@ -303,6 +387,7 @@ function prepareTeamBattlePlanRoute(p1CharId, p2CharId) {
   game.teamBattlePlan.currentIndex = 0;
   game.teamBattlePlan.pendingAdvance = false;
   game.teamBattlePlan.cleared = false;
+  saveTeamBattlePlanProgress();
 }
 
 function getTeamBattlePlanCurrentOpponents() {
@@ -488,6 +573,7 @@ function queueNextTeamBattlePlanMatch() {
   p2.roundsWon = 0;
   game.teamRoundsWon = { A: 0, B: 0 };
   updateTeamRoundDots();
+  saveTeamBattlePlanProgress();
 }
 
 function advanceTeamBattlePlanMatch() {
@@ -507,5 +593,117 @@ function proceedTeamBattlePlanStepper() {
     hideBattlePlanStepper();
     startRound();
   }
+}
+
+function resumeBattlePlanRun(save) {
+  game.battlePlan.route = save.route;
+  game.battlePlan.currentIndex = save.currentIndex;
+  game.battlePlan.playerCharacterId = save.playerCharacterId;
+  game.battlePlan.pendingAdvance = false;
+  game.battlePlan.cleared = false;
+  game.credits = save.credits;
+
+  hidePauseOverlay();
+  resumeAudioFromOverlay();
+  ui.startScreen.style.display = 'none';
+  clearAllGamepadHeld();
+  resetInputState(keys1);
+  resetInputState(keys2);
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  loadBattlePlanMatch();
+  const fromIndex = save.currentIndex > 0 ? save.currentIndex - 1 : -1;
+  showBattlePlanStepper(fromIndex, save.currentIndex);
+  startGameLoop();
+}
+
+function resumeTeamBattlePlanRun(save) {
+  game.teamBattlePlan.route = save.route;
+  game.teamBattlePlan.currentIndex = save.currentIndex;
+  game.teamBattlePlan.playerCharacterId = save.playerCharacterId;
+  game.teamBattlePlan.playerCharacterId2 = save.playerCharacterId2;
+  game.teamBattlePlan.pendingAdvance = false;
+  game.teamBattlePlan.cleared = false;
+  game.credits = save.credits;
+
+  hidePauseOverlay();
+  resumeAudioFromOverlay();
+  ui.startScreen.style.display = 'none';
+  clearAllGamepadHeld();
+  resetInputState(keys1);
+  resetInputState(keys2);
+  game.round = 1;
+  p1.roundsWon = 0;
+  p2.roundsWon = 0;
+  game.teamRoundsWon = { A: 0, B: 0 };
+  loadTeamBattlePlanMatch();
+  const fromIndex = save.currentIndex > 0 ? save.currentIndex - 1 : -1;
+  showTeamBattlePlanStepper(fromIndex, save.currentIndex);
+  startGameLoop();
+}
+
+function showResumePrompt(mode, returnState) {
+  const save = mode === MATCH_MODES.TEAM_BATTLE_PLAN ? loadTeamBattlePlanProgress() : loadBattlePlanProgress();
+  if (!save) return false;
+
+  game.mode = mode;
+  game.resumePrompt.mode = mode;
+  game.resumePrompt.returnState = returnState;
+  game.resumePrompt.save = save;
+  game.state = GAME_STATES.RESUME_PROMPT;
+  gamepadInput.resumeSelection = 0;
+
+  const char1 = getCharacterById(save.playerCharacterId);
+  const names = mode === MATCH_MODES.TEAM_BATTLE_PLAN
+    ? `${char1.name} & ${getCharacterById(save.playerCharacterId2).name}`
+    : char1.name;
+  const creditsLabel = save.credits === 1 ? '1 credit left' : `${save.credits} credits left`;
+
+  ui.resumeTitle.textContent = mode === MATCH_MODES.TEAM_BATTLE_PLAN ? 'TEAM BATTLE PLAN' : 'BATTLE PLAN';
+  ui.resumeSummary.innerHTML = `Match ${save.currentIndex + 1} of ${save.route.length} &bull; ${creditsLabel}<br>${names}`;
+  ui.resumeOverlay.style.display = 'flex';
+  updateResumeFocus();
+  return true;
+}
+
+function hideResumePrompt() {
+  ui.resumeOverlay.style.display = 'none';
+  game.resumePrompt.mode = '';
+  game.resumePrompt.returnState = '';
+  game.resumePrompt.save = null;
+}
+
+function cancelResumePrompt() {
+  if (game.state !== GAME_STATES.RESUME_PROMPT) return;
+
+  const returnState = game.resumePrompt.returnState;
+  hideResumePrompt();
+  if (returnState === GAME_STATES.PAUSED) {
+    game.state = GAME_STATES.PAUSED;
+    updatePauseModeFocus();
+  } else {
+    game.state = GAME_STATES.MENU;
+    updateTitleModeFocus();
+  }
+}
+
+function resumeSelectedRun() {
+  const mode = game.resumePrompt.mode;
+  const save = game.resumePrompt.save;
+  hideResumePrompt();
+  if (!save) return;
+
+  if (mode === MATCH_MODES.TEAM_BATTLE_PLAN) {
+    resumeTeamBattlePlanRun(save);
+  } else {
+    resumeBattlePlanRun(save);
+  }
+}
+
+function startNewRun() {
+  const mode = game.resumePrompt.mode || game.mode;
+  hideResumePrompt();
+  leavePausedSessionForMode(mode);
 }
 

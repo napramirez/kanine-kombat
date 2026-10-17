@@ -117,6 +117,7 @@ Players choose from a shared roster before each match.
 - `VS CPU`
 - `BATTLE PLAN`
 - `TEAM VS TEAM`: 2 human players (Team A) vs 2 CPU opponents (Team B); stacked team HUD with per-fighter health, special, passive, and combo meters; team round wins tracked separately; friendly fire prevented between teammates; CPU targets closest human; win by defeating all opponents or having higher total health at timeout
+- `TEAM BATTLE PLAN`: 2 human players fight a CPU gauntlet together; 2v2 shuffled steps, a mirror match, a `BORKO` & `BORKITO` sub-boss step, and a solo `SHAO CATNIP` final boss step
 - Standard gamepads can be used as alternative controllers across menu, select, fight, pause, Battle Plan, and game-over flows
 
 ### Battle Plan
@@ -133,6 +134,25 @@ Players choose from a shared roster before each match.
 - Player starts with 3 credits; on loss, a 10-second continue screen appears
 - Press punch to continue (uses1 credit and resumes from current match)
 - If countdown expires or no credits remain, credits reset to3 and player returns to title screen
+
+### Team Battle Plan
+
+- Both human players pick fighters; the picks persist for the full route
+- Shuffled steps field pairs of CPU opponents drawn from the roster, excluding both player picks, `BORKO`, `BORKITO`, and `SHAO CATNIP`
+- The mirror match fields both player picks as CPU opponents
+- The penultimate step is always `BORKO` & `BORKITO` and uses `Borko's Lair`; winning it unlocks `BORKITO`
+- The final step is always a solo `SHAO CATNIP` and uses `CATNIP's Domain`
+- An odd leftover opponent forms a solo 2v1 step; boss steps fill the empty slot with an already-defeated dummy
+- Shares the same credit and continue rules as `BATTLE PLAN`
+
+### Progress Persistence
+
+- `BATTLE PLAN` and `TEAM BATTLE PLAN` runs save route progress, position, character picks, and remaining credits to browser local storage after each match win and continue
+- Entering either mode with a saved run shows a `RESUME RUN` / `NEW RUN` prompt with a progress summary
+- Choosing `RESUME RUN` restores the route, characters, and credits, then returns to the route stepper before the current match
+- Choosing `NEW RUN` starts a fresh run; the old save is overwritten once a new route is confirmed
+- Completing, failing, or declining a continue clears that mode's save; the two modes keep independent saves
+- Quitting mid-match resumes that match from round 1
 
 ### Win Streak
 

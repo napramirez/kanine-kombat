@@ -60,6 +60,7 @@ const combinedKeys2 = { left: false, right: false, up: false, down: false, block
 const gamepadInput = {
   titleSelection: 0,
   pauseSelection: 0,
+  resumeSelection: 0,
   loopStarted: false,
   slots: {
     p1: {

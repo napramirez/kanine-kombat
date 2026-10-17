@@ -91,6 +91,7 @@
 - `SKORPDOG` has a passive fire spit that burns the opponent for 3 seconds with skull face transformation
 - `SMOWKDAWG` has a passive smoke cloud that fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
 - `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, stacked team HUD, team round wins, friendly-fire prevention, CPU targets closest human
+- `BATTLE PLAN` and `TEAM BATTLE PLAN` runs persist route progress, character picks, and remaining credits to local storage; a `RESUME RUN` / `NEW RUN` prompt appears when entering a mode with a saved run
 - Defeated fighters immediately show the defeat pose (crossed eyes, tongue, stars) and cannot attack, take damage, gain meter, or activate specials
 - `DOGGOMELEON` excludes robot-ninjas `SEKDOG` and `CYDOG` from its morph pool
 - MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing both fighters apart

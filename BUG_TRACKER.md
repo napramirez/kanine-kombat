@@ -129,6 +129,20 @@ None currently tracked.
 - [ ] Crouch hurtbox reduction scales with fighter size
 - [ ] BORKO/SHAO CATNIP/TREMODOG/SNEK hitboxes scale with their sizes
 
+### Progress Persistence
+- [ ] BATTLE PLAN progress (route, position, character, credits) saves after each match win
+- [ ] TEAM BATTLE PLAN progress (route, both characters, credits) saves after each match win
+- [ ] Remaining credits persist across reloads
+- [ ] RESUME RUN / NEW RUN prompt appears when entering a mode with a saved run (from title and pause)
+- [ ] RESUME RUN restores the route, characters, credits, and shows the stepper before the current match
+- [ ] NEW RUN starts fresh with 3 credits; backing out of character select keeps the old save
+- [ ] Cancel (Esc / gamepad back) returns to title or pause respectively
+- [ ] Completing a run clears its save
+- [ ] Failing a run (no credits left) clears its save
+- [ ] Declining a continue clears only the current mode's save
+- [ ] BATTLE PLAN and TEAM BATTLE PLAN saves coexist independently
+- [ ] Corrupt or outdated saves are ignored safely
+
 ### Movement
 - [ ] Jump height is consistent
 - [ ] Ground collision works

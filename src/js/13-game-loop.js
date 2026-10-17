@@ -138,6 +138,7 @@ document.addEventListener('keydown', e => {
     if (game.state === GAME_STATES.FIGHT) showPauseOverlay(GAME_STATES.FIGHT);
     else if (game.state === GAME_STATES.BATTLE_PLAN_STEPPER) showPauseOverlay(GAME_STATES.BATTLE_PLAN_STEPPER);
     else if (game.state === GAME_STATES.PAUSED) resumePausedSession();
+    else if (game.state === GAME_STATES.RESUME_PROMPT) cancelResumePrompt();
     else if (game.state === GAME_STATES.CHAR_SELECT) openTitleScreen();
     else if (game.state === GAME_STATES.GAME_OVER && game.roundMessageTimer < ROUND_RULES.restartPromptFrames) {
       ensureAudioReady();
@@ -410,9 +411,10 @@ ui.cpuButton.addEventListener('click', () => {
 
 ui.battlePlanButton.addEventListener('click', () => {
   ensureAudioReady();
-  game.mode = MATCH_MODES.BATTLE_PLAN;
-  game.credits = 3;
   playUiSound('start');
+  game.mode = MATCH_MODES.BATTLE_PLAN;
+  if (showResumePrompt(MATCH_MODES.BATTLE_PLAN, GAME_STATES.MENU)) return;
+  game.credits = 3;
   openCharacterSelect();
 });
 
@@ -425,9 +427,10 @@ ui.teamButton.addEventListener('click', () => {
 
 ui.teamBattlePlanButton.addEventListener('click', () => {
   ensureAudioReady();
-  game.mode = MATCH_MODES.TEAM_BATTLE_PLAN;
-  game.credits = 3;
   playUiSound('start');
+  game.mode = MATCH_MODES.TEAM_BATTLE_PLAN;
+  if (showResumePrompt(MATCH_MODES.TEAM_BATTLE_PLAN, GAME_STATES.MENU)) return;
+  game.credits = 3;
   openCharacterSelect();
 });
 
@@ -436,6 +439,13 @@ ui.pauseModeButtons.addEventListener('click', e => {
   if (!button) return;
 
   const mode = button.dataset.mode;
+  if (mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_BATTLE_PLAN) {
+    ensureAudioReady();
+    if (showResumePrompt(mode, GAME_STATES.PAUSED)) {
+      playUiSound('start');
+      return;
+    }
+  }
   if (mode === MATCH_MODES.VERSUS || mode === MATCH_MODES.CPU || mode === MATCH_MODES.BATTLE_PLAN || mode === MATCH_MODES.TEAM_VS_TEAM || mode === MATCH_MODES.TEAM_BATTLE_PLAN) {
     leavePausedSessionForMode(mode);
   }
@@ -455,6 +465,26 @@ pauseModeButtons.forEach((button, index) => {
   const syncFocus = () => {
     gamepadInput.pauseSelection = index;
     updatePauseModeFocus();
+  };
+  button.addEventListener('mouseenter', syncFocus);
+  button.addEventListener('focus', syncFocus);
+  button.addEventListener('click', syncFocus);
+});
+
+ui.resumeRunButton.addEventListener('click', () => {
+  ensureAudioReady();
+  resumeSelectedRun();
+});
+
+ui.newRunButton.addEventListener('click', () => {
+  ensureAudioReady();
+  startNewRun();
+});
+
+resumePromptButtons.forEach((button, index) => {
+  const syncFocus = () => {
+    gamepadInput.resumeSelection = index;
+    updateResumeFocus();
   };
   button.addEventListener('mouseenter', syncFocus);
   button.addEventListener('focus', syncFocus);
@@ -505,6 +535,19 @@ document.addEventListener('keydown', e => {
     else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') { navigatePauseSelection(-1); e.preventDefault(); }
     else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { navigatePauseSelection(1); e.preventDefault(); }
     else if (e.key === '3' || e.key === 'Numpad3') { ensureAudioReady(); pauseModeButtons[gamepadInput.pauseSelection].click(); e.preventDefault(); }
+    return;
+  }
+
+  if (game.state === GAME_STATES.RESUME_PROMPT) {
+    if (e.key === 'a' || e.key === 'A') { navigateResumeSelection(-1); e.preventDefault(); }
+    else if (e.key === 'd' || e.key === 'D') { navigateResumeSelection(1); e.preventDefault(); }
+    else if (e.key === 'w' || e.key === 'W') { navigateResumeSelection(-1); e.preventDefault(); }
+    else if (e.key === 's' || e.key === 'S') { navigateResumeSelection(1); e.preventDefault(); }
+    else if (e.key === 'l' || e.key === 'L') { ensureAudioReady(); resumePromptButtons[gamepadInput.resumeSelection].click(); e.preventDefault(); }
+    else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') { navigateResumeSelection(-1); e.preventDefault(); }
+    else if (e.code === 'ArrowRight' || e.code === 'ArrowDown') { navigateResumeSelection(1); e.preventDefault(); }
+    else if (e.key === '3' || e.key === 'Numpad3') { ensureAudioReady(); resumePromptButtons[gamepadInput.resumeSelection].click(); e.preventDefault(); }
+    else if (e.key === 'Escape') { ensureAudioReady(); cancelResumePrompt(); e.preventDefault(); }
     return;
   }
 

@@ -32,6 +32,11 @@ let game = {
     returnState: '',
     snapshotCanvas: null
   },
+  resumePrompt: {
+    mode: '',
+    returnState: '',
+    save: null
+  },
   timer: ROUND_RULES.timerSeconds,
   timerInterval: null,
   round: 1,

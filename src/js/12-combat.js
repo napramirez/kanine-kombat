@@ -517,6 +517,7 @@ function endRound() {
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       if (isBattlePlanMode() && winner === p1) game.battlePlan.cleared = true;
       if (isBattlePlanMode() && winner === p2) game.credits = 3;
+      if (isBattlePlanMode()) clearBattlePlanProgress();
       return;
     }
   } else {
@@ -641,6 +642,7 @@ function endRoundTeamBattlePlan() {
         game.roundMessage = 'TEAM BATTLE PLAN\nCLEARED!';
         if (unlockMessage) game.roundMessage += `\n${unlockMessage}`;
         game.teamBattlePlan.cleared = true;
+        clearTeamBattlePlanProgress();
         game.state = GAME_STATES.GAME_OVER;
         game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
         return;
@@ -661,6 +663,7 @@ function endRoundTeamBattlePlan() {
       }
 
       game.roundMessage = 'TEAM BATTLE PLAN\nFAILED';
+      clearTeamBattlePlanProgress();
       game.state = GAME_STATES.GAME_OVER;
       game.roundMessageTimer = ROUND_RULES.gameOverMessageFrames;
       return;
@@ -713,9 +716,11 @@ function acceptContinue() {
   if (isTeamBattlePlanMode()) {
     updateTeamRoundDots();
     loadTeamBattlePlanMatch();
+    saveTeamBattlePlanProgress();
   } else {
     updateRoundDots();
     loadBattlePlanMatch();
+    saveBattlePlanProgress();
   }
   startRound();
   startGameLoop();
@@ -724,6 +729,11 @@ function acceptContinue() {
 function declineContinue() {
   hideContinueScreen();
   game.credits = 3;
+  if (isTeamBattlePlanMode()) {
+    clearTeamBattlePlanProgress();
+  } else {
+    clearBattlePlanProgress();
+  }
   resetBattlePlanState();
   resetTeamBattlePlanState();
   removeTeamHUD();

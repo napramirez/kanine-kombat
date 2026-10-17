@@ -7,6 +7,7 @@ const GAME_STATES = {
   CHAR_SELECT: 'charSelect',
   BATTLE_PLAN_STEPPER: 'battlePlanStepper',
   PAUSED: 'paused',
+  RESUME_PROMPT: 'resumePrompt',
   COUNTDOWN: 'countdown',
   FIGHT: 'fight',
   ROUND_END: 'roundEnd',
@@ -274,6 +275,11 @@ const ui = {
   battlePlanPlayerToken: document.getElementById('battle-plan-player-token'),
   battlePlanPrompt: document.getElementById('battle-plan-prompt'),
   pauseOverlay: document.getElementById('pause-overlay'),
+  resumeOverlay: document.getElementById('resume-overlay'),
+  resumeTitle: document.getElementById('resume-title'),
+  resumeSummary: document.getElementById('resume-summary'),
+  resumeRunButton: document.getElementById('resume-run-btn'),
+  newRunButton: document.getElementById('new-run-btn'),
   pauseTitle: document.getElementById('pause-title'),
   pauseCopy: document.getElementById('pause-copy'),
   pauseModeButtons: document.getElementById('pause-mode-buttons'),
@@ -322,6 +328,7 @@ const ui = {
 
 const titleModeButtons = [ui.startButton, ui.cpuButton, ui.battlePlanButton, ui.teamButton, ui.teamBattlePlanButton, ui.fullscreenBtn];
 const pauseModeButtons = Array.from(ui.pauseModeButtons.querySelectorAll('[data-mode]')).concat([ui.fullscreenBtnPause]);
+const resumePromptButtons = [ui.resumeRunButton, ui.newRunButton];
 
 const teamUI = { elements: null };
 

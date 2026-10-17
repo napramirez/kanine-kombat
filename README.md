@@ -28,7 +28,7 @@ Optional music files:
 - `VS CPU` single-player mode
 - `BATTLE PLAN` gauntlet mode with a route stepper between matches
 - `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, with stacked team HUD, team round wins, and friendly-fire prevention
-- `TEAM BATTLE PLAN` mode: 2 human players fight together through a CPU gauntlet with 2v2 steps, a mirror match, and BORKO/SHAO CATNIP boss steps
+- `TEAM BATTLE PLAN` mode: 2 human players fight together through a CPU gauntlet with 2v2 steps, a mirror match, a BORKO & BORKITO sub-boss step, and a SHAO CATNIP final boss step
 - Keyboard and standard gamepad support with mixed-input play
 - 16 initially selectable fighters, plus 4 Battle Plan unlocks:
   - `DOGGO CAGE`

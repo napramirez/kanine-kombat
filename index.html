@@ -8889,7 +8889,7 @@ function resetTeamBattlePlanState() {
 }
 
 function buildTeamBattlePlanRoute(p1CharId, p2CharId) {
-  const excludeIds = new Set([p1CharId, p2CharId, 'borko', 'catnip']);
+  const excludeIds = new Set([p1CharId, p2CharId, 'borko', 'catnip', 'borkito']);
   const pool = shuffleCharacterIds(
     CHARACTERS
       .filter(char => !excludeIds.has(char.id) && !isHiddenCharacter(char))
@@ -8906,7 +8906,7 @@ function buildTeamBattlePlanRoute(p1CharId, p2CharId) {
   }
 
   route.push([p1CharId, p2CharId]);
-  route.push(['borko']);
+  route.push(['borko', 'borkito']);
   route.push(['catnip']);
   return route;
 }
@@ -8932,8 +8932,8 @@ function loadTeamBattlePlanMatch() {
   const opponentChar1 = opponents[0];
   const opponentChar2 = opponents[1] || null;
 
-  const isBorkoMatch = opponentChar1.id === 'borko' && !opponentChar2;
-  const isCatnipMatch = opponentChar1.id === 'catnip' && !opponentChar2;
+  const isBorkoMatch = opponentChar1.id === 'borko';
+  const isCatnipMatch = opponentChar1.id === 'catnip';
   if (isBorkoMatch) {
     game.stage = BACKGROUND_STAGES.BORKO_LAIR;
   } else if (isCatnipMatch) {
@@ -8973,7 +8973,7 @@ function getTeamBattlePlanStepMeta(pair, index) {
     return { badge: 'FINAL', note: 'SHAO CATNIP showdown' };
   }
   if (index === route.length - 2 && pair[0] === 'borko') {
-    return { badge: 'SUB-BOSS', note: 'BORKO blockade' };
+    return { badge: 'SUB-BOSS', note: 'BORKO & BORKITO blockade' };
   }
   if (pair.length === 2 && pair[0] === p1Id && pair[1] === p2Id) {
     return { badge: 'MIRROR', note: 'Face yourselves' };

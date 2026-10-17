@@ -14,7 +14,7 @@ Use these prompts to iterate on the current game.
 - `SUBDOG` has a passive ice clone that spawns every 5 seconds, lasts 2 seconds, and freezes the opponent on contact
 - `SMOWKDAWG` has a passive smoke cloud that fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
 - `TEAM VS TEAM` mode already exists with 2 human players vs 2 CPU opponents, custom team HUD, team round management, and team-aware combat
-- `TEAM BATTLE PLAN` mode already exists with 2 humans fighting a CPU gauntlet of 2v2 steps, a mirror match, and solo BORKO/SHAO CATNIP boss steps
+- `TEAM BATTLE PLAN` mode already exists with 2 humans fighting a CPU gauntlet of 2v2 steps, a mirror match, a BORKO & BORKITO sub-boss step, and a solo SHAO CATNIP final boss step
 - `BORKITO` is a selectable mini BORKO clone (blue eyes, half scale, double speed, 64 health) that inherits BORKO's leap-and-shockwave special; attack boxes and crouch reduction scale with fighter size
 - MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing both fighters apart
 - Battle Plan continue system:3 credits,10-second countdown on loss, punch to continue, credits reset on timeout or depletion

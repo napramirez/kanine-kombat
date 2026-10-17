@@ -30,9 +30,8 @@ Optional music files:
 - `TEAM VS TEAM` mode: 2 human players vs 2 CPU opponents, with stacked team HUD, team round wins, and friendly-fire prevention
 - `TEAM BATTLE PLAN` mode: 2 human players fight together through a CPU gauntlet with 2v2 steps, a mirror match, a BORKO & BORKITO sub-boss step, and a SHAO CATNIP final boss step
 - Keyboard and standard gamepad support with mixed-input play
-- 16 initially selectable fighters, plus 4 Battle Plan unlocks:
+- 15 initially selectable fighters, plus 5 unlocks:
   - `DOGGO CAGE`
-  - `BORKITO`
   - `SKORPDOG`
   - `SMOWKDAWG`
   - `SEKDOG`
@@ -48,6 +47,7 @@ Optional music files:
   - `MAKDOG`
   - `KANOINE`
   - Unlock `BORKO` by defeating the Battle Plan sub-boss
+  - Unlock `BORKITO` by winning the BORKO & BORKITO match in `TEAM BATTLE PLAN`
   - Unlock `SHAO CATNIP` by defeating the Battle Plan final boss
   - Unlock `SNEK` by completing the Battle Plan as `NOOB SAIDOG`
   - Unlock `PIXZEL ZLASZH` by completing the Battle Plan as `DOGGOMELEON`

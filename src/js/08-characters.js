@@ -77,6 +77,7 @@ const CHARACTERS = [
   {
     id: 'borkito',
     name: 'BORKITO',
+    hidden: true,
     color1: '#808080',
     color2: '#d3d3d3',
     eyeColor: '#3498db',

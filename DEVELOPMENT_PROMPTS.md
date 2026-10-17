@@ -4,7 +4,7 @@ Use these prompts to iterate on the current game.
 
 ## Current Build Assumptions
 
-- 20 fighters are present: 16 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `SHAO CATNIP` unlocks after defeating the final boss, `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`, and `PIXZEL ZLASZH` unlocks when the Battle Plan is completed as `DOGGOMELEON`
+- 20 fighters are present: 15 are initially selectable, while `BORKO` unlocks after defeating the Battle Plan sub-boss, `BORKITO` unlocks after winning the TEAM BATTLE PLAN BORKO & BORKITO sub-boss match, `SHAO CATNIP` unlocks after defeating the final boss, `SNEK` unlocks when the Battle Plan is completed as `NOOB SAIDOG`, and `PIXZEL ZLASZH` unlocks when the Battle Plan is completed as `DOGGOMELEON`
 - Character select, combo counters, victory and defeat poses, and character-specific specials already exist
 - The HUD now includes `ACTIVE` special meters and conditional `PASSIVE` special meters for passive-special fighters
 - Standard gamepads now work as alternative controllers across the main game states, with a global navigation cooldown
@@ -15,7 +15,7 @@ Use these prompts to iterate on the current game.
 - `SMOWKDAWG` has a passive smoke cloud that fills every 8 seconds, lasts 3 seconds, doubles movement speed, boosts jump by 25%, and makes SMOWKDAWG nearly invisible
 - `TEAM VS TEAM` mode already exists with 2 human players vs 2 CPU opponents, custom team HUD, team round management, and team-aware combat
 - `TEAM BATTLE PLAN` mode already exists with 2 humans fighting a CPU gauntlet of 2v2 steps, a mirror match, a BORKO & BORKITO sub-boss step, and a solo SHAO CATNIP final boss step
-- `BORKITO` is a selectable mini BORKO clone (blue eyes, half scale, double speed, 64 health) that inherits BORKO's leap-and-shockwave special; attack boxes and crouch reduction scale with fighter size
+- `BORKITO` is a hidden mini BORKO clone (blue eyes, half scale, double speed, 64 health) that inherits BORKO's leap-and-shockwave special; unlock by winning the TEAM BATTLE PLAN BORKO & BORKITO sub-boss match; attack boxes and crouch reduction scale with fighter size
 - MAX COMBO triggers at 10 hits, displaying "MAX COMBO" text and pushing both fighters apart
 - Battle Plan continue system:3 credits,10-second countdown on loss, punch to continue, credits reset on timeout or depletion
 - Win streak tracking in `2 PLAYER` and `VS CPU` modes, displayed in fight HUD and character select (hidden until2+ wins)

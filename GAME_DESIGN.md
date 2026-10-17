@@ -14,7 +14,7 @@ Players choose from a shared roster before each match.
 |---|---|---:|---:|---|
 | `DOGGO CAGE` | Balanced | 5 | 100 | Tan/brown palette, sunglasses |
 | `BORKO` | Power | 4 | 125 | Hidden gray boss; unlock by defeating the Battle Plan sub-boss |
-| `BORKITO` | Speed | 8 | 64 | Selectable mini BORKO clone; gray palette with blue eyes, `scale: 0.5`, inherits BORKO's leap-and-shockwave |
+| `BORKITO` | Speed | 8 | 64 | Hidden mini BORKO clone; gray palette with blue eyes, `scale: 0.5`, inherits BORKO's leap-and-shockwave; unlock by winning the TEAM BATTLE PLAN BORKO & BORKITO sub-boss match |
 | `SHAO CATNIP` | Speed | 8 | 150 | Hidden purple boss; unlock by defeating the Battle Plan final boss |
 | `SKORPDOG` | Striker | 5 | 100 | White/black gear, yellow mask |
 | `SMOWKDAWG` | Striker | 5 | 100 | SKORPDOG variant with gray gear; has passive smoke cloud |
@@ -180,6 +180,7 @@ fight or battlePlanStepper -> paused
 - Win streak displayed below player portraits when2+ (2 Player and VS CPU)
 - Hidden fighters are absent from character select, Random 8, and unscripted CPU pools until unlocked
 - Defeating the Battle Plan `BORKO` sub-boss unlocks `BORKO`; defeating the `SHAO CATNIP` final boss unlocks `SHAO CATNIP`
+- Winning the `TEAM BATTLE PLAN` BORKO & BORKITO sub-boss match unlocks `BORKITO`
 - Completing the Battle Plan as `NOOB SAIDOG` unlocks `SNEK`
 - Completing the Battle Plan as `DOGGOMELEON` unlocks `PIXZEL ZLASZH`
 - Unlocks persist in browser local storage; the two bosses remain explicitly scripted Battle Plan encounters rather than random route opponents

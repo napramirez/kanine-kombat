@@ -115,7 +115,10 @@ None currently tracked.
 - [ ] SMOWKDAWG becomes nearly invisible (15% opacity) during smoke cloud
 
 ### BORKITO
-- [ ] BORKITO is selectable from the start (not hidden)
+- [ ] BORKITO is hidden from character select, Random 8, and CPU pools until unlocked
+- [ ] Winning the TEAM BATTLE PLAN BORKO & BORKITO sub-boss match unlocks BORKITO and shows the unlock message
+- [ ] Losing the BORKO & BORKITO sub-boss match does not unlock BORKITO
+- [ ] BORKITO unlock persists after returning to the title screen and reopening the game
 - [ ] BORKITO looks like BORKO with blue eyes
 - [ ] BORKITO is half-size (scale 0.5)
 - [ ] BORKITO moves at double BORKO's speed (8)

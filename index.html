@@ -8273,6 +8273,7 @@ const CHARACTERS = [
   {
     id: 'borkito',
     name: 'BORKITO',
+    hidden: true,
     color1: '#808080',
     color2: '#d3d3d3',
     eyeColor: '#3498db',
@@ -10373,6 +10374,10 @@ function endRoundTeamBattlePlan() {
       }
 
       if (humanTeamWon && !lastStep) {
+        const isSubBossStep = game.teamBattlePlan.currentIndex === game.teamBattlePlan.route.length - 2;
+        if (isSubBossStep && unlockHiddenCharacter('borkito')) {
+          game.roundMessage = 'BORKITO\nUNLOCKED!';
+        }
         queueNextTeamBattlePlanMatch();
         return;
       }

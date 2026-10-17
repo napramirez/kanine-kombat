@@ -647,6 +647,10 @@ function endRoundTeamBattlePlan() {
       }
 
       if (humanTeamWon && !lastStep) {
+        const isSubBossStep = game.teamBattlePlan.currentIndex === game.teamBattlePlan.route.length - 2;
+        if (isSubBossStep && unlockHiddenCharacter('borkito')) {
+          game.roundMessage = 'BORKITO\nUNLOCKED!';
+        }
         queueNextTeamBattlePlanMatch();
         return;
       }
